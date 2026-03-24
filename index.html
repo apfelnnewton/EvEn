@@ -532,11 +532,9 @@
           <div class="header-left"><span style="font-size:1.3rem">📡</span>&nbsp;&nbsp;<strong>Aliens</strong>
           </div>
           <div class="header-right">
-            <span id="student-notice-btn" style="font-size:0.85rem; color:#4a5d4e; cursor:pointer; margin-right:12px; font-weight:bold;" onclick="openNoticeModal()">📢 공지</span>
-            <span class="logout-btn" onclick="logout()">로그아웃</span>
+            <span id="student-notice-btn" style="font-size:0.85rem; color:#4a5d4e; cursor:pointer; font-weight:bold;" onclick="openNoticeModal()">📢 공지</span>
           </div>
         </div>
-        <div id="greeting-msg" style="padding:12px 20px; font-size:0.9rem; color:#4a5d4e; background:#e8f0eb; text-align:center;"></div>
         <div class="aliens-select">
           <h2>누구와 대화할까요?</h2>
           <div class="alien-cards">
@@ -564,7 +562,7 @@
           </div>
           <div class="header-right"><span class="logout-btn" onclick="logout()">로그아웃</span></div>
         </div>
-        <div class="chat-box" id="chat-box"><div class="message received">👽 Hey there, Earthling! I'm Zeeto!</div></div>
+        <div class="chat-box" id="chat-box"><div class="message received" id="greeting-msg">👽 Hey there, Earthling! I'm Zeeto!</div></div>
         <div class="input-area">
           <input type="text" class="chat-input" id="chat-input" placeholder="Send a message...">
           <button class="send-btn" onclick="sendMessage()">Send</button>
@@ -1139,7 +1137,7 @@
 
 <script>
   // ★ 여기에 새롭게 배포한 URL을 반드시 넣어주세요!
-  const SHEET_URL = "https://script.google.com/macros/s/AKfycbyNWhfCFnEJALTPRPaqI16BSl2ANbVGelZiAqtqXGiQdqbN8CL-7hEEpZTJ9YyI1MhrZw/exec";
+  const SHEET_URL = "https://script.google.com/macros/s/AKfycbzuIipCGBtC6MuxpqI8m0wgnxF_deKUAUOplCOPPJFzLGh3FRwMMJ6wva5_GpW2GZFUBw/exec";
 
   let currentFirstName = ""; let currentStudentId = ""; let currentUserProfile = ""; let currentLoginId = ""; let currentToken = "";
   let chatHistory = []; let allInstaPosts = []; let currentFilterUser = null; let newCommentData = { count: 0, posts: [] };
@@ -3415,6 +3413,7 @@ async function sendWeetoAuto(systemMsg) {
         type: 'teach_chat',
         studentId: currentStudentId,
         token: currentToken,
+        firstName: currentFirstName,
         lesson: currentWeeetoGrammar.lesson,
         grammarName: currentWeeetoGrammar.grammarName,
         grammarDesc: currentWeeetoGrammar.grammarDesc,
@@ -3459,6 +3458,7 @@ async function sendWeeto() {
         type: 'teach_chat',
         studentId: currentStudentId,
         token: currentToken,
+        firstName: currentFirstName,
         lesson: currentWeeetoGrammar.lesson,
         grammarName: currentWeeetoGrammar.grammarName,
         grammarDesc: currentWeeetoGrammar.grammarDesc,
