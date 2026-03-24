@@ -1018,7 +1018,7 @@
     </div>
 
     <!-- Weeto Panel -->
-    <div id="weeto-panel" class="teacher-panel" style="display:none;">
+    <div id="t-panel-weeto" style="display:none;">
       <h3 style="margin-bottom:15px;">👾 Weeto 현황</h3>
       <div id="weeto-status-list" style="font-size:0.9rem; color:#666;">로딩 중...</div>
     </div>
@@ -1128,7 +1128,7 @@
 
 <script>
   // ★ 여기에 새롭게 배포한 URL을 반드시 넣어주세요!
-  const SHEET_URL = "https://script.google.com/macros/s/AKfycbzrcnWGoVWNDhQyVEDj4n27zKon7-kaLogxvB9JJrQYW_Du3-PHnROhug7s7zj1hhlA-g/exec";
+  const SHEET_URL = "https://script.google.com/macros/s/AKfycbx4TV4GxKKgCeQeHhEdzn-MwYT-jrVnC7549OOBQB49yMl6AW6ibdKaFkVzzAzK-IcI/exec";
 
   let currentFirstName = ""; let currentStudentId = ""; let currentUserProfile = ""; let currentLoginId = ""; let currentToken = "";
   let chatHistory = []; let allInstaPosts = []; let currentFilterUser = null; let newCommentData = { count: 0, posts: [] };
@@ -3046,7 +3046,7 @@ async function loadWeetoDetail(studentId) {
     // 클리어 현황 + 대화 가능한 레슨/문법 목록 가져오기
     const res = await fetch(SHEET_URL, {
       method: 'POST',
-      headers: {'Content-Type': 'application/json'},
+
       body: JSON.stringify({ type: 'get_teaching_status', id: currentLoginId, pw: sessionStorage.getItem('teacherPw') })
     }).then(r => r.json());
     const student = Array.isArray(res) ? res.find(s => s.studentId === studentId) : null;
@@ -3090,7 +3090,7 @@ async function loadWeetoChatDetail(studentId, lesson, grammarName) {
   try {
     const res = await fetch(SHEET_URL, {
       method: 'POST',
-      headers: {'Content-Type': 'application/json'},
+
       body: JSON.stringify({ type: 'get_teaching_chat', id: currentLoginId, pw: sessionStorage.getItem('teacherPw'), studentId, lesson, grammarName })
     }).then(r => r.json());
 
@@ -3337,7 +3337,7 @@ async function loadGrammarList() {
   try {
     const res = await fetch(SHEET_URL, {
       method: 'POST',
-      headers: {'Content-Type': 'application/json'},
+
       body: JSON.stringify({ type: 'teach_start', studentId: currentStudentId, token: currentToken })
     }).then(r => r.json());
     if (res.error) { listEl.innerHTML = '<h3>오류</h3><p style="text-align:center;color:red;">' + res.error + '</p>'; return; }
@@ -3399,7 +3399,7 @@ async function sendWeetoAuto(systemMsg) {
   try {
     const res = await fetch(SHEET_URL, {
       method: 'POST',
-      headers: {'Content-Type': 'application/json'},
+
       body: JSON.stringify({
         type: 'teach_chat',
         studentId: currentStudentId,
@@ -3443,7 +3443,7 @@ async function sendWeeto() {
   try {
     const res = await fetch(SHEET_URL, {
       method: 'POST',
-      headers: {'Content-Type': 'application/json'},
+
       body: JSON.stringify({
         type: 'teach_chat',
         studentId: currentStudentId,
@@ -3483,7 +3483,7 @@ async function handleTeachingClear() {
   try {
     const res = await fetch(SHEET_URL, {
       method: 'POST',
-      headers: {'Content-Type': 'application/json'},
+
       body: JSON.stringify({
         type: 'teach_complete',
         studentId: currentStudentId,
@@ -3546,7 +3546,7 @@ async function loadWeetoStatus() {
   try {
     const res = await fetch(SHEET_URL, {
       method: 'POST',
-      headers: {'Content-Type': 'application/json'},
+
       body: JSON.stringify({ type: 'get_teaching_status', id: currentLoginId, pw: document.getElementById('login-pw') ? document.getElementById('login-pw').value : sessionStorage.getItem('teacherPw') })
     }).then(r => r.json());
     if (!Array.isArray(res)) { container.innerHTML = '<p style="color:red;">데이터를 불러올 수 없어요.</p>'; return; }
