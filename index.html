@@ -1137,7 +1137,7 @@
 
 <script>
   // ★ 여기에 새롭게 배포한 URL을 반드시 넣어주세요!
-  const SHEET_URL = "https://script.google.com/macros/s/AKfycbzuIipCGBtC6MuxpqI8m0wgnxF_deKUAUOplCOPPJFzLGh3FRwMMJ6wva5_GpW2GZFUBw/exec";
+  const SHEET_URL = "https://script.google.com/macros/s/AKfycbxD4GXjiWEv52QYI_1zPr8Uyivq8mkx4ZOoD1HkYkd0X9jP4GWqTW3PPvywz6eiudE8tQ/exec";
 
   let currentFirstName = ""; let currentStudentId = ""; let currentUserProfile = ""; let currentLoginId = ""; let currentToken = "";
   let chatHistory = []; let allInstaPosts = []; let currentFilterUser = null; let newCommentData = { count: 0, posts: [] };
@@ -1557,7 +1557,7 @@ checkNewComments();
 
     try {
       const response = await fetch(SHEET_URL, { method: 'POST', body: JSON.stringify({ type: "gemini_proxy", studentId: currentStudentId, token: currentToken, payload: {
-        systemInstruction: { parts: [{ text: `너는 중학생의 영어 학습을 돕는 친근한 외계인 'Zeeto'야. 학생 이름은 '${currentFirstName}'. 1. 분량제한: 3~4문단 이내 짧게. 2. 가독성: 의미 단위 문단 바꿈. 3. 지구 호기심 컨셉. 4. 외계인 말투 '~임/함'. 5. 우주 이모지 필수. 6. 마크다운 기호(*, #) 금지. 7. 첫인사는 이름만. 8. 부드러운 교정. 9. 마무리 영어퀴즈 1개.` }] }, contents: chatHistory
+        systemInstruction: { parts: [{ text: `너는 중학생의 영어 학습을 돕는 친근한 외계인 'Zeeto'야. 학생 이름은 '${currentFirstName}'. [세계관] 'Weeto'(위토)는 너의 신입 후배 외계인이야. 영어를 배우고 싶어서 지구에 왔고, 학생들이 Weeto한테 영어를 가르쳐주고 있음. 너는 Weeto를 아끼는 선배임. 1. 분량제한: 3~4문단 이내 짧게. 2. 가독성: 의미 단위 문단 바꿈. 3. 지구 호기심 컨셉. 4. 외계인 말투 '~임/함'. 5. 우주 이모지 필수. 6. 마크다운 기호(*, #) 금지. 7. 첫인사는 이름만. 8. 부드러운 교정. 9. 마무리 영어퀴즈 1개.` }] }, contents: chatHistory
       }})});
       const data = await response.json();
       if (data.error) {
