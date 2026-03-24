@@ -96,6 +96,12 @@
   .received { background-color: white; align-self: flex-start; border: 1px solid #e0e0e0; border-bottom-left-radius: 5px; }
   .sent { background-color: #d2e3d5; align-self: flex-end; border-bottom-right-radius: 5px; }
 
+  .input-area { display: flex; padding: 10px 15px; background: white; border-top: 1px solid #e0e0e0; gap: 8px; align-items: center; flex-shrink: 0; }
+  .chat-input { flex: 1; padding: 10px 15px; border: 1px solid #e0e0e0; border-radius: 20px; outline: none; font-size: 0.9rem; font-family: 'Noto Sans KR', sans-serif; background: #f9fbf9; }
+  .chat-input:focus { border-color: #4a5d4e; }
+  .send-btn { padding: 10px 18px; background-color: #4a5d4e; color: white; border: none; border-radius: 20px; font-weight: 700; font-size: 0.85rem; cursor: pointer; font-family: 'Noto Sans KR', sans-serif; white-space: nowrap; }
+  .send-btn:active { background-color: #384a3c; }
+
   .typing-indicator { display: flex; align-items: center; gap: 4px; padding: 5px 0; }
   .dot { width: 6px; height: 6px; background-color: #4a5d4e; border-radius: 50%; animation: bounce 1.4s infinite ease-in-out both; }
   .dot:nth-child(1) { animation-delay: -0.32s; }
@@ -523,9 +529,14 @@
       <!-- Aliens Selection Screen -->
       <div id="aliens-select-view">
         <div class="chat-header">
-          <div class="header-left"><span style="font-size:1.3rem">📡</span>&nbsp;&nbsp;<strong>Aliens</strong></div>
-          <div class="header-right"><span class="logout-btn" onclick="logout()">로그아웃</span></div>
+          <div class="header-left"><span style="font-size:1.3rem">📡</span>&nbsp;&nbsp;<strong>Aliens</strong>
+          </div>
+          <div class="header-right">
+            <span id="student-notice-btn" style="font-size:0.85rem; color:#4a5d4e; cursor:pointer; margin-right:12px; font-weight:bold;" onclick="openNoticeModal()">📢 공지</span>
+            <span class="logout-btn" onclick="logout()">로그아웃</span>
+          </div>
         </div>
+        <div id="greeting-msg" style="padding:12px 20px; font-size:0.9rem; color:#4a5d4e; background:#e8f0eb; text-align:center;"></div>
         <div class="aliens-select">
           <h2>누구와 대화할까요?</h2>
           <div class="alien-cards">
@@ -1128,7 +1139,7 @@
 
 <script>
   // ★ 여기에 새롭게 배포한 URL을 반드시 넣어주세요!
-  const SHEET_URL = "https://script.google.com/macros/s/AKfycbx4TV4GxKKgCeQeHhEdzn-MwYT-jrVnC7549OOBQB49yMl6AW6ibdKaFkVzzAzK-IcI/exec";
+  const SHEET_URL = "https://script.google.com/macros/s/AKfycbyNWhfCFnEJALTPRPaqI16BSl2ANbVGelZiAqtqXGiQdqbN8CL-7hEEpZTJ9YyI1MhrZw/exec";
 
   let currentFirstName = ""; let currentStudentId = ""; let currentUserProfile = ""; let currentLoginId = ""; let currentToken = "";
   let chatHistory = []; let allInstaPosts = []; let currentFilterUser = null; let newCommentData = { count: 0, posts: [] };
