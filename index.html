@@ -96,12 +96,6 @@
   .received { background-color: white; align-self: flex-start; border: 1px solid #e0e0e0; border-bottom-left-radius: 5px; }
   .sent { background-color: #d2e3d5; align-self: flex-end; border-bottom-right-radius: 5px; }
 
-  .input-area { display: flex; padding: 10px 15px; background: white; border-top: 1px solid #e0e0e0; gap: 8px; align-items: center; flex-shrink: 0; }
-  .chat-input { flex: 1; padding: 10px 15px; border: 1px solid #e0e0e0; border-radius: 20px; outline: none; font-size: 0.9rem; font-family: 'Noto Sans KR', sans-serif; background: #f9fbf9; }
-  .chat-input:focus { border-color: #4a5d4e; }
-  .send-btn { padding: 10px 18px; background-color: #4a5d4e; color: white; border: none; border-radius: 20px; font-weight: 700; font-size: 0.85rem; cursor: pointer; font-family: 'Noto Sans KR', sans-serif; white-space: nowrap; }
-  .send-btn:active { background-color: #384a3c; }
-
   .typing-indicator { display: flex; align-items: center; gap: 4px; padding: 5px 0; }
   .dot { width: 6px; height: 6px; background-color: #4a5d4e; border-radius: 50%; animation: bounce 1.4s infinite ease-in-out both; }
   .dot:nth-child(1) { animation-delay: -0.32s; }
@@ -529,11 +523,8 @@
       <!-- Aliens Selection Screen -->
       <div id="aliens-select-view">
         <div class="chat-header">
-          <div class="header-left"><span style="font-size:1.3rem">📡</span>&nbsp;&nbsp;<strong>Aliens</strong>
-          </div>
-          <div class="header-right">
-            <span id="student-notice-btn" style="font-size:0.85rem; color:#4a5d4e; cursor:pointer; font-weight:bold;" onclick="openNoticeModal()">📢 공지</span>
-          </div>
+          <div class="header-left"><span style="font-size:1.3rem">📡</span>&nbsp;&nbsp;<strong>Aliens</strong></div>
+          <div class="header-right"><span class="logout-btn" onclick="logout()">로그아웃</span></div>
         </div>
         <div class="aliens-select">
           <h2>누구와 대화할까요?</h2>
@@ -562,7 +553,7 @@
           </div>
           <div class="header-right"><span class="logout-btn" onclick="logout()">로그아웃</span></div>
         </div>
-        <div class="chat-box" id="chat-box"><div class="message received" id="greeting-msg">👽 Hey there, Earthling! I'm Zeeto!</div></div>
+        <div class="chat-box" id="chat-box"><div class="message received">👽 Hey there, Earthling! I'm Zeeto!</div></div>
         <div class="input-area">
           <input type="text" class="chat-input" id="chat-input" placeholder="Send a message...">
           <button class="send-btn" onclick="sendMessage()">Send</button>
@@ -931,7 +922,6 @@
     <div id="t-tab-stats" onclick="switchTeacherTab('stats')" style="flex:1; text-align:center; padding:8px; border-radius:10px; font-size:0.8rem; font-weight:bold; cursor:pointer; color:#999;">📊 통계</div>
     <div id="t-tab-notice" onclick="switchTeacherTab('notice')" style="flex:1; text-align:center; padding:8px; border-radius:10px; font-size:0.8rem; font-weight:bold; cursor:pointer; color:#999;">📢 공지</div>
     <div id="t-tab-approve" onclick="switchTeacherTab('approve')" style="flex:1; text-align:center; padding:8px; border-radius:10px; font-size:0.8rem; font-weight:bold; cursor:pointer; color:#999;">✅ 승인</div>
-    <div id="t-tab-weeto" onclick="switchTeacherTab('weeto')" style="flex:1; text-align:center; padding:8px; border-radius:10px; font-size:0.8rem; font-weight:bold; cursor:pointer; color:#999;">👾 Weeto</div>
   </div>
 
   <div style="flex:1; overflow-y:auto; padding:15px;">
@@ -1027,10 +1017,6 @@
     </div>
 
     <!-- Weeto Panel -->
-    <div id="t-panel-weeto" style="display:none;">
-      <h3 style="margin-bottom:15px;">👾 Weeto 현황</h3>
-      <div id="weeto-status-list" style="font-size:0.9rem; color:#666;">로딩 중...</div>
-    </div>
 
   </div>
 </div>
@@ -1137,7 +1123,7 @@
 
 <script>
   // ★ 여기에 새롭게 배포한 URL을 반드시 넣어주세요!
-  const SHEET_URL = "https://script.google.com/macros/s/AKfycbxD4GXjiWEv52QYI_1zPr8Uyivq8mkx4ZOoD1HkYkd0X9jP4GWqTW3PPvywz6eiudE8tQ/exec";
+  const SHEET_URL = "https://script.google.com/macros/s/AKfycbw9VkAoZNY2CPJUwQgyNavQ7duG8tbepwnNBVFObzdso8tXPDDA2D1rTnqegob_mariyA/exec";
 
   let currentFirstName = ""; let currentStudentId = ""; let currentUserProfile = ""; let currentLoginId = ""; let currentToken = "";
   let chatHistory = []; let allInstaPosts = []; let currentFilterUser = null; let newCommentData = { count: 0, posts: [] };
@@ -1154,6 +1140,7 @@
   let weetoChatHistory = [];
   let weetoGrammarList = [];
   let weetoClearedList = [];
+  let currentWeetoAttempt = 1;
 
   // ★ 행성 개발 프로젝트
   let planetData = null;
@@ -1557,7 +1544,7 @@ checkNewComments();
 
     try {
       const response = await fetch(SHEET_URL, { method: 'POST', body: JSON.stringify({ type: "gemini_proxy", studentId: currentStudentId, token: currentToken, payload: {
-        systemInstruction: { parts: [{ text: `너는 중학생의 영어 학습을 돕는 친근한 외계인 'Zeeto'야. 학생 이름은 '${currentFirstName}'. [세계관] 'Weeto'(위토)는 너의 신입 후배 외계인이야. 영어를 배우고 싶어서 지구에 왔고, 학생들이 Weeto한테 영어를 가르쳐주고 있음. 너는 Weeto를 아끼는 선배임. 1. 분량제한: 3~4문단 이내 짧게. 2. 가독성: 의미 단위 문단 바꿈. 3. 지구 호기심 컨셉. 4. 외계인 말투 '~임/함'. 5. 우주 이모지 필수. 6. 마크다운 기호(*, #) 금지. 7. 첫인사는 이름만. 8. 부드러운 교정. 9. 마무리 영어퀴즈 1개.` }] }, contents: chatHistory
+        systemInstruction: { parts: [{ text: `너는 중학생의 영어 학습을 돕는 친근한 외계인 'Zeeto'야. 학생 이름은 '${currentFirstName}'. 1. 분량제한: 3~4문단 이내 짧게. 2. 가독성: 의미 단위 문단 바꿈. 3. 지구 호기심 컨셉. 4. 외계인 말투 '~임/함'. 5. 우주 이모지 필수. 6. 마크다운 기호(*, #) 금지. 7. 첫인사는 이름만. 8. 부드러운 교정. 9. 마무리 영어퀴즈 1개.` }] }, contents: chatHistory
       }})});
       const data = await response.json();
       if (data.error) {
@@ -2755,7 +2742,7 @@ function renderStudentList() {
         <div style="font-size:1.8rem;">${escapeHtml(u.emoji)}</div>
         <div>
           <div style="font-weight:bold; color:#333;">${escapeHtml(u.lastName)}${escapeHtml(u.firstName)} <span style="font-size:0.8rem; color:#999;">(${escapeHtml(u.studentId)})</span></div>
-          <div style="font-size:0.75rem; color:#999;">📝 Log ${u.logCount} &nbsp; 📖 Story ${u.storyCount}</div>
+          <div style="font-size:0.75rem; color:#999;">📝 ${u.logCount} &nbsp; 📖 ${u.storyCount} &nbsp; 📸 ${u.postCount || 0} &nbsp; 👾 ${u.teachCount || 0}</div>
         </div>
       </div>
       <button onclick="deleteStudent('${escapeHtml(u.id)}', '${escapeHtml(u.firstName)}')" style="background:none; border:1px solid #ffcccc; color:#d9534f; border-radius:8px; padding:5px 8px; font-size:0.75rem; cursor:pointer;">삭제</button>
@@ -2969,7 +2956,7 @@ function switchStudentModal(type) {
   if (type === 'insta') {
     const posts = (detail.myPosts || []);
     if (!posts.length) html = '<div style="text-align:center;color:#999;padding:20px;">올린 게시물이 없어요.</div>';
-    else posts.forEach(p => {
+    else posts.sort((a,b) => new Date(b.date) - new Date(a.date)).forEach(p => {
       const exitBadge = p.exitCount > 0 ? `<span style="background:#ffebee;color:#c62828;font-size:0.75rem;padding:2px 6px;border-radius:8px;margin-left:6px;">이탈 ${p.exitCount}회</span>` : '';
       html += `<div style="background:white;border-radius:12px;padding:12px;margin-bottom:10px;border:1px solid #eee;">
         <div style="font-size:0.8rem;color:#999;margin-bottom:6px;">${formatTime(p.date)}${exitBadge}</div>
@@ -3052,10 +3039,8 @@ async function loadWeetoDetail(studentId) {
   const container = document.getElementById('weeto-detail-container');
   if (!container) return;
   try {
-    // 클리어 현황 + 대화 가능한 레슨/문법 목록 가져오기
     const res = await fetch(SHEET_URL, {
       method: 'POST',
-
       body: JSON.stringify({ type: 'get_teaching_status', id: currentLoginId, pw: sessionStorage.getItem('teacherPw') })
     }).then(r => r.json());
     const student = Array.isArray(res) ? res.find(s => s.studentId === studentId) : null;
@@ -3065,23 +3050,37 @@ async function loadWeetoDetail(studentId) {
       return;
     }
 
-    // 레슨별로 그룹핑
-    const lessonMap = {};
+    // 문법별로 그룹핑 (같은 문법 여러 시도 묶기)
+    const grammarMap = {};
     student.clears.forEach(c => {
-      if (!lessonMap[c.lesson]) lessonMap[c.lesson] = [];
-      lessonMap[c.lesson].push(c);
+      const key = c.lesson + '||' + c.grammarName;
+      if (!grammarMap[key]) grammarMap[key] = { lesson: c.lesson, grammarName: c.grammarName, attempts: [] };
+      grammarMap[key].attempts.push(c);
+    });
+
+    // 레슨별로 다시 그룹핑
+    const lessonMap = {};
+    Object.values(grammarMap).forEach(g => {
+      if (!lessonMap[g.lesson]) lessonMap[g.lesson] = [];
+      lessonMap[g.lesson].push(g);
     });
 
     let html = '<div style="text-align:left;">';
     Object.keys(lessonMap).sort((a,b) => a-b).forEach(lesson => {
       html += '<div style="margin-bottom:15px;">';
       html += '<div style="font-weight:bold;color:#4a5d4e;font-size:0.9rem;margin-bottom:8px;">📚 Lesson ' + lesson + '</div>';
-      lessonMap[lesson].forEach(c => {
-        const d = c.clearDate ? new Date(c.clearDate) : null;
-        const dateStr = d ? d.getFullYear() + '.' + (d.getMonth()+1) + '.' + d.getDate() : '';
-        html += '<div onclick="loadWeetoChatDetail(\'' + studentId + '\', \'' + lesson + '\', decodeURIComponent(\'' + encodeURIComponent(c.grammarName) + '\'))" style="background:white;border:1px solid #a8d5b6;border-radius:12px;padding:10px 12px;margin-bottom:6px;cursor:pointer;display:flex;justify-content:space-between;align-items:center;">';
-        html += '<span style="font-size:0.9rem;">✅ ' + escapeHtml(c.grammarName) + '</span>';
-        html += '<span style="font-size:0.75rem;color:#999;">' + dateStr + ' →</span>';
+      lessonMap[lesson].forEach(g => {
+        const hasNormal = g.attempts.some(a => a.clearType === 'normal');
+        const ggCount = g.attempts.filter(a => a.clearType === 'gg').length;
+        // 시도 이력 뱃지
+        let badges = '';
+        g.attempts.forEach((a, i) => {
+          if (a.clearType === 'gg') badges += '<span style="background:#ffebee;color:#c62828;font-size:0.7rem;padding:2px 5px;border-radius:6px;margin-right:3px;">❌GG</span>';
+          else badges += '<span style="background:#e8f5e9;color:#2e7d32;font-size:0.7rem;padding:2px 5px;border-radius:6px;margin-right:3px;">✅클리어</span>';
+        });
+        html += '<div onclick="loadWeetoAttempts(\'' + studentId + '\', \'' + lesson + '\', decodeURIComponent(\'' + encodeURIComponent(g.grammarName) + '\'))" style="background:white;border:1px solid ' + (hasNormal ? '#a8d5b6' : '#ffcdd2') + ';border-radius:12px;padding:10px 12px;margin-bottom:6px;cursor:pointer;">';
+        html += '<div style="display:flex;justify-content:space-between;align-items:center;"><span style="font-size:0.9rem;">' + (hasNormal ? '✅' : '❌') + ' ' + escapeHtml(g.grammarName) + '</span><span style="font-size:0.75rem;color:#999;">→</span></div>';
+        html += '<div style="margin-top:5px;">' + badges + '</div>';
         html += '</div>';
       });
       html += '</div>';
@@ -3093,26 +3092,62 @@ async function loadWeetoDetail(studentId) {
   }
 }
 
-async function loadWeetoChatDetail(studentId, lesson, grammarName) {
+// 특정 문법의 시도 목록 보기
+async function loadWeetoAttempts(studentId, lesson, grammarName) {
   const container = document.getElementById('weeto-detail-container');
-  container.innerHTML = '<div style="text-align:center;color:#999;padding:20px;">대화 불러오는 중...</div>';
+  container.innerHTML = '<div style="text-align:center;color:#999;padding:20px;">불러오는 중...</div>';
   try {
     const res = await fetch(SHEET_URL, {
       method: 'POST',
-
       body: JSON.stringify({ type: 'get_teaching_chat', id: currentLoginId, pw: sessionStorage.getItem('teacherPw'), studentId, lesson, grammarName })
     }).then(r => r.json());
 
+    const attempts = res.attempts || [];
     let html = '<div style="margin-bottom:10px;">';
     html += '<span onclick="loadWeetoDetail(\'' + studentId + '\')" style="cursor:pointer;color:#4a5d4e;font-size:0.9rem;">← 목록으로</span>';
     html += '<span style="margin-left:10px;font-weight:bold;color:#4a5d4e;">L' + lesson + ' ' + escapeHtml(grammarName) + '</span>';
     html += '</div>';
 
-    if (!Array.isArray(res) || res.length === 0) {
+    if (attempts.length === 0) {
+      html += '<div style="text-align:center;color:#999;padding:20px;">기록이 없어요.</div>';
+    } else {
+      attempts.forEach((a, i) => {
+        const d = a.clearDate ? new Date(a.clearDate) : null;
+        const dateStr = d ? d.getFullYear() + '.' + (d.getMonth()+1) + '.' + d.getDate() : '';
+        const isGG = a.clearType === 'gg';
+        html += '<div onclick="loadWeetoChatDetail(\'' + studentId + '\', \'' + lesson + '\', decodeURIComponent(\'' + encodeURIComponent(grammarName) + '\'), ' + (i+1) + ')" style="background:white;border:1px solid ' + (isGG ? '#ffcdd2' : '#a8d5b6') + ';border-radius:12px;padding:10px 12px;margin-bottom:6px;cursor:pointer;display:flex;justify-content:space-between;align-items:center;">';
+        html += '<span style="font-size:0.9rem;">' + (isGG ? '❌ ' + (i+1) + '차 시도 (GG)' : '✅ ' + (i+1) + '차 시도 (클리어)') + '</span>';
+        html += '<span style="font-size:0.75rem;color:#999;">' + dateStr + ' →</span>';
+        html += '</div>';
+      });
+    }
+    container.innerHTML = html;
+  } catch(e) {
+    container.innerHTML = '<div style="text-align:center;color:red;padding:20px;">데이터를 불러올 수 없어요.</div>';
+  }
+}
+
+// 특정 시도의 대화 보기
+async function loadWeetoChatDetail(studentId, lesson, grammarName, attempt) {
+  const container = document.getElementById('weeto-detail-container');
+  container.innerHTML = '<div style="text-align:center;color:#999;padding:20px;">대화 불러오는 중...</div>';
+  try {
+    const res = await fetch(SHEET_URL, {
+      method: 'POST',
+      body: JSON.stringify({ type: 'get_teaching_chat', id: currentLoginId, pw: sessionStorage.getItem('teacherPw'), studentId, lesson, grammarName, attempt })
+    }).then(r => r.json());
+
+    const messages = res.messages || [];
+    let html = '<div style="margin-bottom:10px;">';
+    html += '<span onclick="loadWeetoAttempts(\'' + studentId + '\', \'' + lesson + '\', decodeURIComponent(\'' + encodeURIComponent(grammarName) + '\'))" style="cursor:pointer;color:#4a5d4e;font-size:0.9rem;">← 시도 목록</span>';
+    html += '<span style="margin-left:10px;font-weight:bold;color:#4a5d4e;">L' + lesson + ' ' + escapeHtml(grammarName) + ' (' + attempt + '차)</span>';
+    html += '</div>';
+
+    if (messages.length === 0) {
       html += '<div style="text-align:center;color:#999;padding:20px;">저장된 대화가 없어요.</div>';
     } else {
       html += '<div style="display:flex;flex-direction:column;gap:8px;">';
-      res.forEach(msg => {
+      messages.forEach(msg => {
         const isStudent = msg.sender === 'student';
         html += '<div style="max-width:80%;padding:10px 14px;border-radius:16px;font-size:0.85rem;line-height:1.5;white-space:pre-line;' +
           (isStudent
@@ -3346,12 +3381,12 @@ async function loadGrammarList() {
   try {
     const res = await fetch(SHEET_URL, {
       method: 'POST',
-
       body: JSON.stringify({ type: 'teach_start', studentId: currentStudentId, token: currentToken })
     }).then(r => r.json());
     if (res.error) { listEl.innerHTML = '<h3>오류</h3><p style="text-align:center;color:red;">' + res.error + '</p>'; return; }
     weetoGrammarList = res.myGrammar || [];
     weetoClearedList = res.cleared || [];
+    window._weetoAttemptCounts = res.attemptCounts || {};
     renderGrammarList();
   } catch(e) {
     listEl.innerHTML = '<h3>오류</h3><p style="text-align:center;color:red;">문법 데이터를 불러올 수 없어요.</p>';
@@ -3389,6 +3424,9 @@ function startTeaching(grammarName, lesson) {
   if (!grammar) return;
   currentWeeetoGrammar = grammar;
   weetoChatHistory = [];
+  // 시도 횟수 계산: 기존 기록 수 + 1 (이번 시도)
+  const key = lesson + "||" + grammarName;
+  currentWeetoAttempt = ((window._weetoAttemptCounts || {})[key] || 0) + 1;
   document.getElementById('weeto-grammar-tag').textContent = grammarName;
   document.getElementById('weeto-chat-box').innerHTML = '';
   document.getElementById('weeto-grammar-select').style.display = 'none';
@@ -3408,18 +3446,17 @@ async function sendWeetoAuto(systemMsg) {
   try {
     const res = await fetch(SHEET_URL, {
       method: 'POST',
-
       body: JSON.stringify({
         type: 'teach_chat',
         studentId: currentStudentId,
         token: currentToken,
-        firstName: currentFirstName,
         lesson: currentWeeetoGrammar.lesson,
         grammarName: currentWeeetoGrammar.grammarName,
         grammarDesc: currentWeeetoGrammar.grammarDesc,
         exampleWrong: currentWeeetoGrammar.exampleWrong,
         message: systemMsg,
-        history: weetoChatHistory.map(h => h.role + ': ' + h.text).join('\n')
+        history: weetoChatHistory.map(h => h.role + ': ' + h.text).join('\n'),
+        attempt: currentWeetoAttempt
       })
     }).then(r => r.json());
     const typing = document.getElementById('weeto-typing');
@@ -3438,10 +3475,13 @@ async function sendWeetoAuto(systemMsg) {
 
 async function sendWeeto() {
   const input = document.getElementById('weeto-chat-input');
-  if (input.disabled) return; // 클리어 후 추가 대화 차단
+  if (input.disabled) return; // 클리어/GG/로딩 중 추가 대화 차단
   const msg = input.value.trim();
   if (!msg) return;
   input.value = '';
+  // ★ 연타 방지: 응답 올 때까지 입력 잠금
+  input.disabled = true;
+  input.placeholder = 'Weeto가 생각 중...';
   const chatBox = document.getElementById('weeto-chat-box');
   // Show student message
   chatBox.innerHTML += '<div class="message sent">' + escapeHtml(msg) + '</div>';
@@ -3453,18 +3493,17 @@ async function sendWeeto() {
   try {
     const res = await fetch(SHEET_URL, {
       method: 'POST',
-
       body: JSON.stringify({
         type: 'teach_chat',
         studentId: currentStudentId,
         token: currentToken,
-        firstName: currentFirstName,
         lesson: currentWeeetoGrammar.lesson,
         grammarName: currentWeeetoGrammar.grammarName,
         grammarDesc: currentWeeetoGrammar.grammarDesc,
         exampleWrong: currentWeeetoGrammar.exampleWrong,
         message: msg,
-        history: weetoChatHistory.map(h => h.role + ': ' + h.text).join('\n')
+        history: weetoChatHistory.map(h => h.role + ': ' + h.text).join('\n'),
+        attempt: currentWeetoAttempt
       })
     }).then(r => r.json());
     const typing = document.getElementById('weeto-typing');
@@ -3473,28 +3512,43 @@ async function sendWeeto() {
       weetoChatHistory.push({ role: 'Weeto', text: res.reply });
       chatBox.innerHTML += '<div class="message received">👾 ' + res.reply.replace(/\n/g, '<br>') + '</div>';
       chatBox.scrollTop = chatBox.scrollHeight;
-      // Check for CLEAR
+      // Check for CLEAR or GG
       if (res.isClear) {
-        // 즉시 입력 차단
-        document.getElementById('weeto-chat-input').disabled = true;
-        document.getElementById('weeto-chat-input').placeholder = '클리어! 🎉';
-        // Weeto 메시지 보여준 후 1.5초 뒤 오버레이
-        setTimeout(() => handleTeachingClear(), 1500);
+        input.disabled = true;
+        input.placeholder = '클리어! 🎉';
+        const lastMsg = res.reply;
+        setTimeout(() => handleTeachingClear(lastMsg), 1500);
+      } else if (res.isGG) {
+        input.disabled = true;
+        input.placeholder = '다음에 다시 도전!';
+        const lastMsg = res.reply;
+        setTimeout(() => handleTeachingGG(lastMsg), 1500);
+      } else {
+        // ★ 일반 대화 계속: 입력 잠금 해제
+        input.disabled = false;
+        input.placeholder = '메시지를 입력하세요...';
+        input.focus();
       }
+    } else {
+      // 응답이 비었을 때도 잠금 해제
+      input.disabled = false;
+      input.placeholder = '메시지를 입력하세요...';
     }
   } catch(e) {
     const typing = document.getElementById('weeto-typing');
     if (typing) typing.remove();
     chatBox.innerHTML += '<div class="message received" style="color:red;">오류가 발생했어요. 다시 시도해주세요.</div>';
+    // ★ 에러 시에도 잠금 해제
+    input.disabled = false;
+    input.placeholder = '메시지를 입력하세요...';
   }
 }
 
-async function handleTeachingClear() {
+async function handleTeachingClear(lastMsg) {
   // Record clear on server
   try {
     const res = await fetch(SHEET_URL, {
       method: 'POST',
-
       body: JSON.stringify({
         type: 'teach_complete',
         studentId: currentStudentId,
@@ -3504,12 +3558,13 @@ async function handleTeachingClear() {
       })
     }).then(r => r.json());
 
-    // Show clear overlay
+    // Show clear overlay with Weeto's last message
     const overlay = document.createElement('div');
     overlay.className = 'clear-overlay';
     overlay.innerHTML = '<div class="clear-emoji">🎉</div>' +
       '<div class="clear-text">Teaching Clear!</div>' +
       '<div class="clear-sub">' + escapeHtml(currentWeeetoGrammar.grammarName) + (res.alreadyCleared ? ' (이미 클리어 — 재도전 성공!)' : ' (+3점!)') + '</div>' +
+      (lastMsg ? '<div style="background:rgba(255,255,255,0.15);border-radius:12px;padding:12px 16px;margin:15px 20px 0;max-height:120px;overflow-y:auto;font-size:0.85rem;color:#eee;line-height:1.5;text-align:left;">👾 ' + escapeHtml(lastMsg).replace(/\n/g, '<br>') + '</div>' : '') +
       '<button class="clear-btn" onclick="closeClearOverlay(this)">돌아가기</button>';
     document.querySelector('.mobile-app').appendChild(overlay);
 
@@ -3523,6 +3578,40 @@ async function handleTeachingClear() {
       });
     }
   } catch(e) { console.error('Teaching clear save error:', e); }
+}
+
+async function handleTeachingGG(lastMsg) {
+  // GG: Teaching 시트에 gg로 기록 (점수/도장 없음)
+  try {
+    await fetch(SHEET_URL, {
+      method: 'POST',
+      body: JSON.stringify({
+        type: 'teach_complete',
+        studentId: currentStudentId,
+        token: currentToken,
+        lesson: currentWeeetoGrammar.lesson,
+        grammarName: currentWeeetoGrammar.grammarName,
+        clearType: 'gg'
+      })
+    });
+  } catch(e) { console.error('GG save error:', e); }
+
+  const overlay = document.createElement('div');
+  overlay.className = 'clear-overlay';
+  overlay.innerHTML = '<div class="clear-emoji">👾</div>' +
+    '<div class="clear-text">다음에 다시 도전!</div>' +
+    '<div class="clear-sub">Weeto가 아직 이해 못했어요</div>' +
+    (lastMsg ? '<div style="background:rgba(255,255,255,0.15);border-radius:12px;padding:12px 16px;margin:15px 20px 0;max-height:120px;overflow-y:auto;font-size:0.85rem;color:#eee;line-height:1.5;text-align:left;">👾 ' + escapeHtml(lastMsg).replace(/\n/g, '<br>') + '</div>' : '') +
+    '<button class="clear-btn" onclick="closeGGOverlay(this)">돌아가기</button>';
+  document.querySelector('.mobile-app').appendChild(overlay);
+}
+
+function closeGGOverlay(btn) {
+  const overlay = btn.closest('.clear-overlay');
+  if (overlay) overlay.remove();
+  // GG는 클리어 목록에 추가하지 않음 — "도전 →" 상태 유지
+  backToGrammarSelect();
+  renderGrammarList();
 }
 
 function closeClearOverlay(btn) {
@@ -3557,7 +3646,6 @@ async function loadWeetoStatus() {
   try {
     const res = await fetch(SHEET_URL, {
       method: 'POST',
-
       body: JSON.stringify({ type: 'get_teaching_status', id: currentLoginId, pw: document.getElementById('login-pw') ? document.getElementById('login-pw').value : sessionStorage.getItem('teacherPw') })
     }).then(r => r.json());
     if (!Array.isArray(res)) { container.innerHTML = '<p style="color:red;">데이터를 불러올 수 없어요.</p>'; return; }
