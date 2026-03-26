@@ -91,7 +91,10 @@
   .back-btn { font-size: 1.2rem; cursor: pointer; margin-right: 15px; color: #4a5d4e; display: none; } 
   .logout-btn { font-size: 0.85rem; color: #999; text-decoration: underline; cursor: pointer; margin-left: auto; }
 
-  .chat-box { flex: 1; padding: 20px; overflow-y: auto; display: flex; flex-direction: column; gap: 12px; }
+  .chat-box { flex: 1; padding: 20px; overflow-y: auto; display: flex; flex-direction: column; gap: 12px; min-height: 0; }
+  .input-area { display: flex; padding: 10px 15px; background: white; border-top: 1px solid #e0e0e0; gap: 8px; flex-shrink: 0; }
+  .chat-input { flex: 1; padding: 10px 15px; border: 1px solid #e0e0e0; border-radius: 20px; outline: none; font-size: 0.95rem; font-family: 'Noto Sans KR', sans-serif; min-width: 0; box-sizing: border-box; }
+  .send-btn { padding: 10px 18px; background-color: #4a5d4e; color: white; border: none; border-radius: 20px; font-size: 0.9rem; cursor: pointer; font-family: 'Noto Sans KR', sans-serif; flex-shrink: 0; }
   .message { max-width: 75%; padding: 12px 16px; border-radius: 20px; font-size: 0.95rem; line-height: 1.5; white-space: pre-line; }
   .received { background-color: white; align-self: flex-start; border: 1px solid #e0e0e0; border-bottom-left-radius: 5px; }
   .sent { background-color: #d2e3d5; align-self: flex-end; border-bottom-right-radius: 5px; }
@@ -396,7 +399,7 @@
   .weeto-chat-header .weeto-info { display: flex; align-items: center; gap: 8px; }
   .weeto-chat-header .weeto-grammar-tag { font-size: 0.75rem; background: #e8f0eb; color: #4a5d4e; padding: 2px 8px; border-radius: 10px; margin-left: auto; }
 
-  .clear-overlay { position: absolute; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.7); z-index: 100; display: flex; flex-direction: column; justify-content: center; align-items: center; color: white; }
+  .clear-overlay { position: absolute; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.9); z-index: 100; display: flex; flex-direction: column; justify-content: center; align-items: center; color: white; }
   .clear-overlay .clear-emoji { font-size: 5rem; animation: clearBounce 0.6s ease-out; }
   .clear-overlay .clear-text { font-size: 1.5rem; font-weight: 700; margin-top: 15px; }
   .clear-overlay .clear-sub { font-size: 0.9rem; margin-top: 8px; color: #ccc; }
@@ -577,7 +580,7 @@
         </div>
 
         <!-- Weeto Chat -->
-        <div id="weeto-chat" style="display:none; flex-direction:column; height:100%;">
+        <div id="weeto-chat" style="display:none; flex-direction:column; height:100%; flex:1;">
           <div class="weeto-chat-header">
             <span class="back-btn-weeto" onclick="backToGrammarSelect()">←</span>
             <div class="weeto-info">
@@ -1122,7 +1125,7 @@
 
 <script>
   // ★ 여기에 새롭게 배포한 URL을 반드시 넣어주세요!
-  const SHEET_URL = "https://script.google.com/macros/s/AKfycbz3qeHqqzWBNe_vGAsye3tqdpdBZL5OLPC5xaBDwM_40h6-pgKlt6WdVAr0_IreSwgcZA/exec";
+  const SHEET_URL = "https://script.google.com/macros/s/AKfycbysJYCSSPESQJ_QtZmX3IppHDloGyimQ7AQEp53_xuUId67GBKeabWL6J1K0mBNcy9zYA/exec";
 
   let currentFirstName = ""; let currentStudentId = ""; let currentUserProfile = ""; let currentLoginId = ""; let currentToken = "";
   let chatHistory = []; let allInstaPosts = []; let currentFilterUser = null; let newCommentData = { count: 0, posts: [] };
@@ -1436,9 +1439,26 @@ checkNewComments();
     if(!id || !pw) return alert("아이디와 비밀번호를 모두 입력해주세요!");
     if(isLoading) return;
     showLoading("학생 정보 확인 중...");
+    const MAX_RETRY = 2;
+    let data = null;
+    for (let attempt = 0; attempt <= MAX_RETRY; attempt++) {
+      try {
+        const res = await fetch(SHEET_URL, { method: 'POST', body: JSON.stringify({ type: "login", id, pw }) });
+        data = await res.json();
+        break; // 성공하면 루프 탈출
+      } catch(e) {
+        if (attempt < MAX_RETRY) {
+          showLoading(attempt === 0 ? "서버 깨우는 중... 잠시만 기다려주세요!" : "거의 다 됐어요! 조금만 더...");
+          await new Promise(r => setTimeout(r, 2000));
+        } else {
+          hideLoading();
+          alert("서버 연결에 실패했습니다. 잠시 후 다시 시도해주세요.");
+          return;
+        }
+      }
+    }
+    hideLoading();
     try {
-      const res = await fetch(SHEET_URL, { method: 'POST', body: JSON.stringify({ type: "login", id, pw }) });
-     const data = await res.json(); hideLoading();
       if (data.success) {
         data.loginId = id;
         sessionStorage.setItem('even_login', JSON.stringify(data));
@@ -1487,7 +1507,7 @@ checkNewComments();
       } else if (data.pending) {
         alert("⏳ " + data.message);
       } else { alert("⚠️ " + data.message); }
-    } catch(e) { hideLoading(); alert("서버 연결에 실패했습니다."); }
+    } catch(e) { hideLoading(); alert("로그인 처리 중 오류가 발생했습니다."); }
   }
 
   function sendChatToSheet(sender, msg) { fetch(SHEET_URL, { method: 'POST', mode: 'no-cors', body: JSON.stringify({ type: "chat", userName: currentUserProfile, sender: sender, message: msg }) }); }
@@ -3168,8 +3188,9 @@ async function loadWeetoAttempts(studentId, lesson, grammarName) {
         const d = a.clearDate ? new Date(a.clearDate) : null;
         const dateStr = d ? d.getFullYear() + '.' + (d.getMonth()+1) + '.' + d.getDate() : '';
         const isGG = a.clearType === 'gg';
-        html += '<div onclick="loadWeetoChatDetail(\'' + studentId + '\', \'' + lesson + '\', decodeURIComponent(\'' + encodeURIComponent(grammarName) + '\'), ' + (i+1) + ')" style="background:white;border:1px solid ' + (isGG ? '#ffcdd2' : '#a8d5b6') + ';border-radius:12px;padding:10px 12px;margin-bottom:6px;cursor:pointer;display:flex;justify-content:space-between;align-items:center;">';
-        html += '<span style="font-size:0.9rem;">' + (isGG ? '❌ ' + (i+1) + '차 시도 (GG)' : '✅ ' + (i+1) + '차 시도 (클리어)') + '</span>';
+        const attemptNum = a.attempt || (i+1);
+        html += '<div onclick="loadWeetoChatDetail(\'' + studentId + '\', \'' + lesson + '\', decodeURIComponent(\'' + encodeURIComponent(grammarName) + '\'), ' + attemptNum + ')" style="background:white;border:1px solid ' + (isGG ? '#ffcdd2' : '#a8d5b6') + ';border-radius:12px;padding:10px 12px;margin-bottom:6px;cursor:pointer;display:flex;justify-content:space-between;align-items:center;">';
+        html += '<span style="font-size:0.9rem;">' + (isGG ? '❌ ' + attemptNum + '차 시도 (GG)' : '✅ ' + attemptNum + '차 시도 (클리어)') + '</span>';
         html += '<span style="font-size:0.75rem;color:#999;">' + dateStr + ' →</span>';
         html += '</div>';
       });
@@ -3579,21 +3600,23 @@ async function sendWeeto() {
     if (typing) typing.remove();
     if (res.reply) {
       weetoChatHistory.push({ role: 'Weeto', text: res.reply });
-      chatBox.innerHTML += '<div class="message received">👾 ' + res.reply.replace(/\n/g, '<br>') + '</div>';
-      chatBox.scrollTop = chatBox.scrollHeight;
       // Check for CLEAR or GG
       if (res.isClear) {
+        // CLEAR일 때는 채팅에 표시하지 않고 오버레이에서만 보여줌
         input.disabled = true;
         input.placeholder = '클리어! 🎉';
         const lastMsg = res.reply;
         setTimeout(() => handleTeachingClear(lastMsg), 1500);
       } else if (res.isGG) {
+        // GG일 때도 채팅에 표시하지 않고 오버레이에서만 보여줌
         input.disabled = true;
         input.placeholder = '다음에 다시 도전!';
         const lastMsg = res.reply;
         setTimeout(() => handleTeachingGG(lastMsg), 1500);
       } else {
-        // ★ 일반 대화 계속: 입력 잠금 해제
+        // 일반 대화: 채팅에 메시지 표시 + 입력 잠금 해제
+        chatBox.innerHTML += '<div class="message received">👾 ' + res.reply.replace(/\n/g, '<br>') + '</div>';
+        chatBox.scrollTop = chatBox.scrollHeight;
         input.disabled = false;
         input.placeholder = '메시지를 입력하세요...';
         input.focus();
