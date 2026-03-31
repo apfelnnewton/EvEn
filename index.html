@@ -696,7 +696,7 @@
         
         <div class="zeeto-box">
           <div class="zeeto-title">👽 Zeeto의 힌트</div>
-          <div id="ms-zeeto-hint" style="font-size:0.9rem; line-height:1.4; white-space: pre-wrap;">(Zeeto가 분석 중...)</div>
+          <div id="ms-zeeto-hint" style="font-size:0.9rem; line-height:1.4;">(Zeeto가 분석 중...)</div>
         </div>
 
         <textarea id="ms-revision" class="input-field" style="width:100%; box-sizing:border-box; height:120px; resize:none;" placeholder="힌트를 보고 수정본을 작성해 보세요!"></textarea>
@@ -1125,7 +1125,7 @@
 
 <script>
   // ★ 여기에 새롭게 배포한 URL을 반드시 넣어주세요!
-  const SHEET_URL = "https://script.google.com/macros/s/AKfycbysJYCSSPESQJ_QtZmX3IppHDloGyimQ7AQEp53_xuUId67GBKeabWL6J1K0mBNcy9zYA/exec";
+  const SHEET_URL = "https://script.google.com/macros/s/AKfycbyJcvcfpY8ut65F6ZjzTfmni_7ROFWHUo3QnBT5byTkg_su7XcRrY_z9rIOyv-kEAcMLw/exec";
 
   let currentFirstName = ""; let currentStudentId = ""; let currentUserProfile = ""; let currentLoginId = ""; let currentToken = "";
   let chatHistory = []; let allInstaPosts = []; let currentFilterUser = null; let newCommentData = { count: 0, posts: [] };
@@ -1153,6 +1153,35 @@
   function escapeHtml(str) {
     if(!str) return "";
     return String(str).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
+  }
+
+  // ★ V6 추가: AI 응답을 안전하게 화면에 표시하는 함수
+  // AI가 실수로 <br>, <b> 등 HTML 태그를 보내도 텍스트로 처리하고, \n만 줄바꿈으로 변환
+  function safeAiRender(text) {
+    if(!text) return "";
+    let safe = String(text).replace(/<br\s*\/?>/gi, '\n'); // AI가 보낸 <br>은 \n으로 통합
+    safe = safe.replace(/<\/?[a-zA-Z][^>]*>/g, '');  // 실제 HTML 태그만 제거 (< b > 같은 일반 텍스트는 보존)
+    safe = safe.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;'); // 남은 특수문자 이스케이프
+    safe = safe.replace(/\n/g, '<br>');   // \n을 <br>로 변환하여 줄바꿈 표시
+    return safe;
+  }
+
+  // ★ V6 추가: 이미 저장된 데이터를 안전하게 화면에 표시하는 함수
+  // 기존 데이터(구버전)와 새 데이터(V6) 모두 호환
+  function safeSavedHtml(html) {
+    if(!html) return "-";
+    let safe = String(html);
+    safe = safe.replace(/<br\s*\/?>/gi, '\n');   // <br> 태그 → \n으로 통합
+    safe = safe.replace(/&lt;br\s*\/?&gt;/gi, '\n'); // 이스케이프된 &lt;br&gt;도 → \n으로 통합
+    // ^텍스트^ 마크(빨간 글씨)는 보존
+    safe = safe.replace(/<span style="color:#d9534f; font-weight:bold;">/gi, '\x00RS\x00');
+    safe = safe.replace(/<\/span>/gi, '\x00RE\x00');
+    safe = safe.replace(/<\/?[a-zA-Z][^>]*>/g, '');  // 실제 HTML 태그만 제거
+    safe = safe.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+    safe = safe.replace(/\x00RS\x00/g, '<span style="color:#d9534f; font-weight:bold;">');
+    safe = safe.replace(/\x00RE\x00/g, '</span>');
+    safe = safe.replace(/\n/g, '<br>');
+    return safe;
   }
 
   window.addEventListener('load', () => { 
@@ -1599,7 +1628,7 @@ checkNewComments();
       else {
         const aiReply = data?.candidates?.[0]?.content?.parts?.[0]?.text;
         if (!aiReply) { aiMsg.textContent = "😵 Zeeto가 잠깐 멈췄음! 다시 말해봐!"; }
-        else { aiMsg.textContent = aiReply; sendChatToSheet("Zeeto", aiReply); chatHistory.push({ role: "model", parts: [{ text: aiReply }] }); }
+        else { aiMsg.innerHTML = safeAiRender(aiReply); sendChatToSheet("Zeeto", aiReply); chatHistory.push({ role: "model", parts: [{ text: aiReply }] }); }
       }
       chatBox.scrollTop = chatBox.scrollHeight;
     } catch(e) { aiMsg.textContent = "⚠️ 통신 오류"; }
@@ -1626,17 +1655,17 @@ checkNewComments();
       if(step === 1) {
         document.getElementById('hint-area').style.display = "block";
         if (result.includes("CORRECT")) {
-          document.getElementById('hint-text').innerText = result;
+          document.getElementById('hint-text').innerHTML = safeAiRender(result);
           // ★ Practice 1 정답 → Practice 2 자동 패스
           document.getElementById('practice-2').value = input;
           document.getElementById('answer-area').style.display = "block";
           document.getElementById('answer-text').innerText = "1st Practice에서 완벽했음! 패스 👽✨";
         } else {
-          document.getElementById('hint-text').innerText = result;
+          document.getElementById('hint-text').innerHTML = safeAiRender(result);
         }
       } else {
         document.getElementById('answer-area').style.display = "block";
-        document.getElementById('answer-text').innerText = result;
+        document.getElementById('answer-text').innerHTML = safeAiRender(result);
       }
     } catch(e) { hideLoading(); alert("연결 오류"); }
   }
@@ -1752,7 +1781,7 @@ checkNewComments();
         const res = await fetch(SHEET_URL, { method: 'POST', body: JSON.stringify({ type: "ms_hint", studentId: currentStudentId, token: currentToken, grammar: grammar, reqWords: msCombinedWords, title: title, draft: draft }) });
         const data = await res.json(); hideLoading();
         if (data.error) { alert("⚠️ 세션이 만료됐음! 다시 로그인하셈 👽"); logout(); return; }
-        document.getElementById('ms-zeeto-hint').innerText = data.result;
+        document.getElementById('ms-zeeto-hint').innerHTML = safeAiRender(data.result);
       } catch(e) { hideLoading(); return alert("통신 오류 🛸"); }
       document.getElementById('ms-display-draft').innerHTML = `<b>${escapeHtml(title)}</b><br><br>${escapeHtml(draft)}`;
     }
@@ -1781,12 +1810,13 @@ checkNewComments();
             });
         } catch(e) { finalPart = rawText; } 
 
-        document.getElementById('ms-zeeto-feedback').innerHTML = feedbackPart;
-        document.getElementById('ms-zeeto-final').innerHTML = formatForPersonal(finalPart);
-        document.getElementById('ms-zeeto-tip').innerHTML = formatForPersonal(tipPart);
-        // 원본은 몰래 숨겨두고, 화면(빨간박스)에서는 퀴즈 부분을 싹 지워서 깔끔하게!
+        document.getElementById('ms-zeeto-feedback').innerHTML = safeAiRender(feedbackPart);
+        document.getElementById('ms-zeeto-final').innerHTML = formatForPersonal(safeAiRender(finalPart));
+        document.getElementById('ms-zeeto-tip').innerHTML = formatForPersonal(safeAiRender(tipPart));
+        // 원본은 몰래 숨겨두고(퀴즈 추출용), 화면(빨간박스)에서는 퀴즈 부분을 싹 지워서 깔끔하게!
         document.getElementById('ms-oops-point').dataset.original = oopsPart;
-        document.getElementById('ms-oops-point').innerHTML = oopsPart.replace(/👽 Zeeto의 퀴즈:[\s\S]*?🎯/g, '').trim();
+        const oopsDisplay = oopsPart.replace(/👽 Zeeto의 퀴즈:[\s\S]*?🎯/g, '').trim();
+        document.getElementById('ms-oops-point').innerHTML = safeAiRender(oopsDisplay);
         hideLoading();
       } catch(e) { hideLoading(); return alert("통신 오류 🛸"); }
       document.getElementById('ms-display-revision').innerText = revision;
@@ -1834,28 +1864,48 @@ checkNewComments();
       const res = await fetch(SHEET_URL, { method: 'POST', body: JSON.stringify({ type: "ms_check_new", studentId: currentStudentId, token: currentToken, errorText: errText, newText: newText }) });
       const data = await res.json(); hideLoading();
       if (data.error) { alert("⚠️ 세션이 만료됐음! 다시 로그인하셈 👽"); logout(); return; }
-      const fb = document.getElementById(`ms-feedback-${boxNum}`); fb.style.display = "block"; fb.innerText = "👽 " + data.result;
+      const fb = document.getElementById(`ms-feedback-${boxNum}`); fb.style.display = "block"; fb.innerHTML = "👽 " + safeAiRender(data.result);
     } catch(e) { hideLoading(); alert("통신 오류 🛸"); }
   }
 
   function submitMyStory() {
     const reflection = document.getElementById('ms-reflection').value.trim(); if(!reflection) return alert("성찰(Reflection)을 적어주셈! 🌱");
+
+    // ★ V6 추가: Oops Point 퀴즈가 있으면 교정 필수 체크
+    for (let i = 1; i <= 3; i++) {
+      const quizEl = document.getElementById(`ms-error-${i}`);
+      if (quizEl.value.trim() && !document.getElementById(`ms-new-${i}`).value.trim()) {
+        return alert("Oops Point 교정을 완료해주셈! 틀린 문장을 올바르게 고치고 이유를 적어야 제출 가능함 👽");
+      }
+    }
+
     if(isLoading) return;
     showLoading("우주 서버로 전송 중... 🚀");
-    
+
     const rawFinalStory = document.getElementById('ms-zeeto-final').innerHTML.replace(/<span[^>]*>/g, '^').replace(/<\/span>/g, '^');
+
+    // ★ V6 추가: Oops Point 교정 데이터 수집
+    const corrections = [];
+    for (let i = 1; i <= 3; i++) {
+      const quiz = document.getElementById(`ms-error-${i}`).value.trim();
+      const answer = document.getElementById(`ms-new-${i}`).value.trim();
+      const fbEl = document.getElementById(`ms-feedback-${i}`);
+      const feedback = fbEl.style.display !== 'none' ? fbEl.innerText : '';
+      if (quiz) corrections.push({ quiz, answer, feedback });
+    }
 
     const payload = {
       type: "ms_submit", userName: currentUserProfile, studentId: currentStudentId, token: currentToken, lesson: document.getElementById('ms-lesson').value,
       grammar: document.getElementById('ms-grammar').value, reqWords: msCombinedWords, title: document.getElementById('ms-title').value,
-      draft: document.getElementById('ms-draft').value, 
+      draft: document.getElementById('ms-draft').value,
       hint: document.getElementById('ms-zeeto-hint').innerHTML,
-      revision: document.getElementById('ms-revision').value, 
-      feedback: document.getElementById('ms-zeeto-feedback').innerHTML, 
-      finalStory: rawFinalStory, 
+      revision: document.getElementById('ms-revision').value,
+      feedback: document.getElementById('ms-zeeto-feedback').innerHTML,
+      finalStory: rawFinalStory,
       tip: document.getElementById('ms-zeeto-tip').innerHTML,
-      oops: document.getElementById('ms-oops-point').innerHTML, 
-      reflection: reflection
+      oops: document.getElementById('ms-oops-point').innerHTML,
+      reflection: reflection,
+      corrections: JSON.stringify(corrections)
     };
     
     fetch(SHEET_URL, { method: 'POST', body: JSON.stringify(payload) })
@@ -1863,7 +1913,7 @@ checkNewComments();
     .then(text => {
       if (text === "Unauthorized") { hideLoading(); alert("⚠️ 다른 기기에서 로그인해서 세션이 만료됐음! 다시 로그인하셈 👽"); logout(); return; }
       hideLoading(); alert("🎉 My Story가 저장되었습니다!");
-      myStories.push({ date: new Date().toISOString(), lesson: payload.lesson, grammar: payload.grammar, words: payload.reqWords, title: payload.title, draft: payload.draft, hint: payload.hint, revision: payload.revision, feedback: payload.feedback, finalStory: payload.finalStory, tip: payload.tip, oops: payload.oops, reflection: payload.reflection });
+      myStories.push({ date: new Date().toISOString(), lesson: payload.lesson, grammar: payload.grammar, words: payload.reqWords, title: payload.title, draft: payload.draft, hint: payload.hint, revision: payload.revision, feedback: payload.feedback, finalStory: payload.finalStory, tip: payload.tip, oops: payload.oops, reflection: payload.reflection, corrections: payload.corrections });
       // ★ sessionStorage 동기화 (새로고침 착시 방지)
       const savedLogin = sessionStorage.getItem('even_login');
       if (savedLogin) { const loginData = JSON.parse(savedLogin); loginData.myStories = myStories; sessionStorage.setItem('even_login', JSON.stringify(loginData)); }
@@ -1947,8 +1997,8 @@ checkNewComments();
       
       htmlLog += `<div class="log-detail-box"><div class="log-label">📌 Lesson ${currentLogData.lesson || "?"}</div><div class="log-text">${currentLogData.summary || "-"}</div></div>`;
       htmlLog += `<div class="log-detail-box"><div class="log-label">💡 새로 알게 된 점</div><div class="log-text">${currentLogData.newThings || "-"}</div></div>`;
-      htmlLog += `<div class="log-detail-box"><div class="log-label">📝 1st Practice</div><div class="log-text">${currentLogData.p1 || "-"}</div><div class="log-label" style="color:#d9534f; margin-top:5px;">👽 Zeeto's Hint</div><div class="log-text">${currentLogData.hint || "-"}</div></div>`;
-      htmlLog += `<div class="log-detail-box"><div class="log-label">📝 2nd Practice</div><div class="log-text">${currentLogData.p2 || "-"}</div><div class="log-label" style="color:#4a5d4e; margin-top:5px;">👽 Zeeto's Answer</div><div class="log-text">${currentLogData.answer || "-"}</div></div>`;
+      htmlLog += `<div class="log-detail-box"><div class="log-label">📝 1st Practice</div><div class="log-text">${escapeHtml(currentLogData.p1 || "-")}</div><div class="log-label" style="color:#d9534f; margin-top:5px;">👽 Zeeto's Hint</div><div class="log-text">${safeSavedHtml(currentLogData.hint || "-")}</div></div>`;
+      htmlLog += `<div class="log-detail-box"><div class="log-label">📝 2nd Practice</div><div class="log-text">${escapeHtml(currentLogData.p2 || "-")}</div><div class="log-label" style="color:#4a5d4e; margin-top:5px;">👽 Zeeto's Answer</div><div class="log-text">${safeSavedHtml(currentLogData.answer || "-")}</div></div>`;
       htmlLog += `<div class="log-detail-box"><div class="log-label">🤔 Reflection</div><div class="log-text">${currentLogData.reflection || "-"}</div></div>`;
       if(currentLogData.image && currentLogData.image.startsWith('http')) htmlLog += `<div class="log-detail-box"><img src="${currentLogData.image}" style="width:100%; border-radius:10px;"></div>`;
       
@@ -1963,21 +2013,37 @@ checkNewComments();
       htmlStory += `<summary style="padding: 12px; background: #e8f0eb; border-radius: 10px; font-weight: 900; color: #4a5d4e; cursor: pointer; margin-bottom: 10px; outline: none; list-style-position: inside;">📖 ${idx + 1}번째 Story: ${currentStoryData.title || "제목 없음"}</summary>`;
 
       htmlStory += `<div class="log-detail-box"><div class="log-label">📌 Lesson ${currentStoryData.lesson || "?"}</div><div class="log-text" style="font-weight:bold; color:#4a5d4e;">${currentStoryData.title || "?"}</div><div class="log-text" style="font-size:0.8rem; color:#666; margin-top:5px;">문법: ${currentStoryData.grammar} | 단어: ${currentStoryData.words}</div></div>`;
-      htmlStory += `<div class="log-detail-box"><div class="log-label">📝 나의 초안</div><div class="log-text">${currentStoryData.draft || "-"}</div><div class="log-label" style="color:#d9534f; margin-top:10px;">👽 Zeeto's Hint</div><div class="log-text">${currentStoryData.hint || "-"}</div></div>`;
-      htmlStory += `<div class="log-detail-box"><div class="log-label">✏️ 나의 수정본</div><div class="log-text">${currentStoryData.revision || "-"}</div></div>`;
-      
-      const redFinalStory = formatForPersonal(currentStoryData.finalStory);
+      htmlStory += `<div class="log-detail-box"><div class="log-label">📝 나의 초안</div><div class="log-text">${escapeHtml(currentStoryData.draft || "-")}</div><div class="log-label" style="color:#d9534f; margin-top:10px;">👽 Zeeto's Hint</div><div class="log-text">${safeSavedHtml(currentStoryData.hint || "-")}</div></div>`;
+      htmlStory += `<div class="log-detail-box"><div class="log-label">✏️ 나의 수정본</div><div class="log-text">${escapeHtml(currentStoryData.revision || "-")}</div></div>`;
+
+      const redFinalStory = formatForPersonal(safeSavedHtml(currentStoryData.finalStory));
       htmlStory += `<div class="log-detail-box" style="border: 1px solid #4a5d4e; background:#f0f7f2;">
         <div class="log-label" style="color:#ff9800; margin-bottom:5px;">👽 Zeeto's Feedback</div>
-        <div class="log-text" style="font-size:0.85rem; color:#666;">${currentStoryData.feedback || "-"}</div>
+        <div class="log-text" style="font-size:0.85rem; color:#666;">${safeSavedHtml(currentStoryData.feedback || "-")}</div>
         <div class="log-label" style="color:#4a5d4e; margin-top:10px; margin-bottom:5px;">✨ 완벽 최종본</div>
-        <div class="log-text" style="white-space: pre-wrap; font-size:0.95rem;">${redFinalStory || "-"}</div>
+        <div class="log-text" style="font-size:0.95rem;">${redFinalStory || "-"}</div>
         <div class="log-label" style="color:#2196f3; margin-top:10px; margin-bottom:5px;">💡 Zeeto's Tip</div>
-        <div class="log-text" style="white-space: pre-wrap; font-size:0.85rem; color:#0d47a1;">${formatForPersonal(currentStoryData.tip || "-")}</div>
+        <div class="log-text" style="font-size:0.85rem; color:#0d47a1;">${formatForPersonal(safeSavedHtml(currentStoryData.tip || "-"))}</div>
         <div class="log-label" style="color:#c62828; margin-top:10px; margin-bottom:5px;">🚨 Oops Point</div>
-        <div class="log-text" style="white-space: pre-wrap; font-size:0.85rem; color:#c62828;">${formatForPersonal(currentStoryData.oops || "-")}</div>
+        <div class="log-text" style="font-size:0.85rem; color:#c62828;">${safeSavedHtml(currentStoryData.oops || "-")}</div>
       </div>`;
-      htmlStory += `<div class="log-detail-box"><div class="log-label">🤔 Reflection</div><div class="log-text">${currentStoryData.reflection || "-"}</div></div>`;
+      // ★ V6 추가: Oops Point 교정 내용 표시
+      try {
+        const corr = JSON.parse(currentStoryData.corrections || '[]');
+        if (corr.length > 0) {
+          htmlStory += '<div class="log-detail-box" style="border-left:3px solid #d9534f; background:#fffafa;">';
+          htmlStory += '<div class="log-label" style="color:#4a5d4e;">📝 Oops Point 교정</div>';
+          corr.forEach(c => {
+            htmlStory += '<div style="margin-top:8px; padding:8px; background:#fff; border-radius:8px;">';
+            htmlStory += '<div style="color:#c62828; font-size:0.85rem;">❌ ' + escapeHtml(c.quiz) + '</div>';
+            htmlStory += '<div style="color:#2e7d32; font-size:0.85rem; margin-top:3px;">✅ ' + escapeHtml(c.answer) + '</div>';
+            if (c.feedback) htmlStory += '<div style="color:#666; font-size:0.8rem; margin-top:3px;">👽 ' + escapeHtml(c.feedback) + '</div>';
+            htmlStory += '</div>';
+          });
+          htmlStory += '</div>';
+        }
+      } catch(e) {}
+      htmlStory += `<div class="log-detail-box"><div class="log-label">🤔 Reflection</div><div class="log-text">${escapeHtml(currentStoryData.reflection || "-")}</div></div>`;
       
       htmlStory += `</details>`;
     });
@@ -2972,13 +3038,13 @@ function switchStudentModal(type) {
             <div class="log-label">📝 1st Practice</div>
             <div class="log-text">${escapeHtml(l.p1||'-')}</div>
             <div class="log-label" style="color:#d9534f; margin-top:8px;">👽 Zeeto's Hint</div>
-            <div class="log-text" style="color:#666;">${escapeHtml(l.hint||'-')}</div>
+            <div class="log-text" style="color:#666;">${safeSavedHtml(l.hint||'-')}</div>
           </div>
           <div class="log-detail-box">
             <div class="log-label">📝 2nd Practice</div>
             <div class="log-text">${escapeHtml(l.p2||'-')}</div>
             <div class="log-label" style="color:#4a5d4e; margin-top:8px;">👽 Zeeto's Answer</div>
-            <div class="log-text" style="color:#666;">${escapeHtml(l.answer||'-')}</div>
+            <div class="log-text" style="color:#666;">${safeSavedHtml(l.answer||'-')}</div>
           </div>
           <div class="log-detail-box"><div class="log-label">🤔 Reflection</div><div class="log-text">${escapeHtml(l.reflection||'-')}</div></div>
           ${l.image ? `<img src="${l.image}" style="width:100%;border-radius:10px;margin-top:8px;">` : ''}
@@ -3004,22 +3070,23 @@ function switchStudentModal(type) {
             <div class="log-label">📝 초안</div>
             <div class="log-text">${escapeHtml(s.draft||'-')}</div>
             <div class="log-label" style="color:#d9534f; margin-top:8px;">👽 Zeeto's Hint</div>
-            <div class="log-text" style="color:#666;">${escapeHtml(s.hint||'-')}</div>
+            <div class="log-text" style="color:#666;">${safeSavedHtml(s.hint||'-')}</div>
           </div>
           <div class="log-detail-box">
             <div class="log-label">✏️ 수정본</div>
             <div class="log-text">${escapeHtml(s.revision||'-')}</div>
             <div class="log-label" style="color:#ff9800; margin-top:8px;">👽 Zeeto's Feedback</div>
-            <div class="log-text" style="color:#666;">${escapeHtml(s.feedback||'-')}</div>
+            <div class="log-text" style="color:#666;">${safeSavedHtml(s.feedback||'-')}</div>
           </div>
           <div class="log-detail-box" style="border:1px solid #4a5d4e; background:#f0f7f2;">
             <div class="log-label" style="color:#4a5d4e;">✨ 최종본</div>
-            <div class="log-text">${formatForPersonal(escapeHtml(s.finalStory||'-'))}</div>
+            <div class="log-text">${formatForPersonal(safeSavedHtml(s.finalStory||'-'))}</div>
             <div class="log-label" style="color:#2196f3; margin-top:8px;">💡 Zeeto's Tip</div>
-            <div class="log-text" style="color:#0d47a1;">${formatForPersonal(escapeHtml(s.tip||'-'))}</div>
+            <div class="log-text" style="color:#0d47a1;">${formatForPersonal(safeSavedHtml(s.tip||'-'))}</div>
             <div class="log-label" style="color:#c62828; margin-top:8px;">🚨 Oops Point</div>
-            <div class="log-text" style="color:#c62828;">${formatForPersonal(escapeHtml(s.oops||'-'))}</div>
+            <div class="log-text" style="color:#c62828;">${safeSavedHtml(s.oops||'-')}</div>
           </div>
+          ${(() => { try { const corr = JSON.parse(s.corrections || '[]'); if (!corr.length) return ''; let h = '<div class="log-detail-box" style="border-left:3px solid #d9534f; background:#fffafa;"><div class="log-label" style="color:#4a5d4e;">📝 Oops Point 교정</div>'; corr.forEach(c => { h += '<div style="margin-top:8px; padding:8px; background:#fff; border-radius:8px;">'; h += '<div style="color:#c62828; font-size:0.85rem;">❌ ' + escapeHtml(c.quiz) + '</div>'; h += '<div style="color:#2e7d32; font-size:0.85rem; margin-top:3px;">✅ ' + escapeHtml(c.answer) + '</div>'; if (c.feedback) h += '<div style="color:#666; font-size:0.8rem; margin-top:3px;">👽 ' + escapeHtml(c.feedback) + '</div>'; h += '</div>'; }); h += '</div>'; return h; } catch(e) { return ''; } })()}
           <div class="log-detail-box"><div class="log-label">🤔 Reflection</div><div class="log-text">${escapeHtml(s.reflection||'-')}</div></div>
         </div>
       </details>`;
@@ -3544,7 +3611,7 @@ async function sendWeetoAuto(systemMsg) {
     if (typing) typing.remove();
     if (res.reply) {
       weetoChatHistory.push({ role: 'Weeto', text: res.reply });
-      chatBox.innerHTML += '<div class="message received">👾 ' + res.reply.replace(/\n/g, '<br>') + '</div>';
+      chatBox.innerHTML += '<div class="message received">👾 ' + safeAiRender(res.reply) + '</div>';
       chatBox.scrollTop = chatBox.scrollHeight;
     }
     // ★ Weeto 첫인사 완료 → 입력창 활성화
@@ -3615,7 +3682,7 @@ async function sendWeeto() {
         setTimeout(() => handleTeachingGG(lastMsg), 1500);
       } else {
         // 일반 대화: 채팅에 메시지 표시 + 입력 잠금 해제
-        chatBox.innerHTML += '<div class="message received">👾 ' + res.reply.replace(/\n/g, '<br>') + '</div>';
+        chatBox.innerHTML += '<div class="message received">👾 ' + safeAiRender(res.reply) + '</div>';
         chatBox.scrollTop = chatBox.scrollHeight;
         input.disabled = false;
         input.placeholder = '메시지를 입력하세요...';
@@ -3657,7 +3724,7 @@ async function handleTeachingClear(lastMsg) {
     overlay.innerHTML = '<div class="clear-emoji">🎉</div>' +
       '<div class="clear-text">Teaching Clear!</div>' +
       '<div class="clear-sub">' + escapeHtml(currentWeeetoGrammar.grammarName) + (res.alreadyCleared ? ' (이미 클리어 — 재도전 성공!)' : ' (+3점!)') + '</div>' +
-      (lastMsg ? '<div style="background:rgba(255,255,255,0.15);border-radius:12px;padding:12px 16px;margin:15px 20px 0;max-height:120px;overflow-y:auto;font-size:0.85rem;color:#eee;line-height:1.5;text-align:left;">👾 ' + escapeHtml(lastMsg).replace(/\n/g, '<br>') + '</div>' : '') +
+      (lastMsg ? '<div style="background:rgba(255,255,255,0.15);border-radius:12px;padding:12px 16px;margin:15px 20px 0;max-height:120px;overflow-y:auto;font-size:0.85rem;color:#eee;line-height:1.5;text-align:left;">👾 ' + safeAiRender(lastMsg) + '</div>' : '') +
       '<button class="clear-btn" onclick="closeClearOverlay(this)">돌아가기</button>';
     document.querySelector('.mobile-app').appendChild(overlay);
 
@@ -3708,7 +3775,7 @@ async function handleTeachingGG(lastMsg) {
   overlay.innerHTML = '<div class="clear-emoji">👾</div>' +
     '<div class="clear-text">다음에 다시 도전!</div>' +
     '<div class="clear-sub">Weeto가 아직 이해 못했어요</div>' +
-    (lastMsg ? '<div style="background:rgba(255,255,255,0.15);border-radius:12px;padding:12px 16px;margin:15px 20px 0;max-height:120px;overflow-y:auto;font-size:0.85rem;color:#eee;line-height:1.5;text-align:left;">👾 ' + escapeHtml(lastMsg).replace(/\n/g, '<br>') + '</div>' : '') +
+    (lastMsg ? '<div style="background:rgba(255,255,255,0.15);border-radius:12px;padding:12px 16px;margin:15px 20px 0;max-height:120px;overflow-y:auto;font-size:0.85rem;color:#eee;line-height:1.5;text-align:left;">👾 ' + safeAiRender(lastMsg) + '</div>' : '') +
     '<button class="clear-btn" onclick="closeGGOverlay(this)">돌아가기</button>';
   document.querySelector('.mobile-app').appendChild(overlay);
 }
