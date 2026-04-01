@@ -1125,7 +1125,7 @@
 
 <script>
   // ★ 여기에 새롭게 배포한 URL을 반드시 넣어주세요!
-  const SHEET_URL = "https://script.google.com/macros/s/AKfycbyJcvcfpY8ut65F6ZjzTfmni_7ROFWHUo3QnBT5byTkg_su7XcRrY_z9rIOyv-kEAcMLw/exec";
+  const SHEET_URL = "https://script.google.com/macros/s/AKfycbydwMu_bIcC8Jg0aIqjXlJXosNdSp7mlGWVN7PJAtXsSt6x3cTJ_rTuz2uatvoxHl6neg/exec";
 
   let currentFirstName = ""; let currentStudentId = ""; let currentUserProfile = ""; let currentLoginId = ""; let currentToken = "";
   let chatHistory = []; let allInstaPosts = []; let currentFilterUser = null; let newCommentData = { count: 0, posts: [] };
@@ -3216,6 +3216,7 @@ async function loadWeetoDetail(studentId) {
         let badges = '';
         g.attempts.forEach((a, i) => {
           if (a.clearType === 'gg') badges += '<span style="background:#ffebee;color:#c62828;font-size:0.7rem;padding:2px 5px;border-radius:6px;margin-right:3px;">❌GG</span>';
+          else if (a.clearType === 'retry') badges += '<span style="background:#e3f2fd;color:#1565c0;font-size:0.7rem;padding:2px 5px;border-radius:6px;margin-right:3px;">🔄재도전</span>';
           else badges += '<span style="background:#e8f5e9;color:#2e7d32;font-size:0.7rem;padding:2px 5px;border-radius:6px;margin-right:3px;">✅클리어</span>';
         });
         html += '<div onclick="loadWeetoAttempts(\'' + studentId + '\', \'' + lesson + '\', decodeURIComponent(\'' + encodeURIComponent(g.grammarName) + '\'))" style="background:white;border:1px solid ' + (hasNormal ? '#a8d5b6' : '#ffcdd2') + ';border-radius:12px;padding:10px 12px;margin-bottom:6px;cursor:pointer;">';
@@ -3255,9 +3256,12 @@ async function loadWeetoAttempts(studentId, lesson, grammarName) {
         const d = a.clearDate ? new Date(a.clearDate) : null;
         const dateStr = d ? d.getFullYear() + '.' + (d.getMonth()+1) + '.' + d.getDate() : '';
         const isGG = a.clearType === 'gg';
+        const isRetry = a.clearType === 'retry';
         const attemptNum = a.attempt || (i+1);
-        html += '<div onclick="loadWeetoChatDetail(\'' + studentId + '\', \'' + lesson + '\', decodeURIComponent(\'' + encodeURIComponent(grammarName) + '\'), ' + attemptNum + ')" style="background:white;border:1px solid ' + (isGG ? '#ffcdd2' : '#a8d5b6') + ';border-radius:12px;padding:10px 12px;margin-bottom:6px;cursor:pointer;display:flex;justify-content:space-between;align-items:center;">';
-        html += '<span style="font-size:0.9rem;">' + (isGG ? '❌ ' + attemptNum + '차 시도 (GG)' : '✅ ' + attemptNum + '차 시도 (클리어)') + '</span>';
+        const borderColor = isGG ? '#ffcdd2' : isRetry ? '#bbdefb' : '#a8d5b6';
+        const label = isGG ? '❌ ' + attemptNum + '차 시도 (GG)' : isRetry ? '🔄 ' + attemptNum + '차 시도 (재도전)' : '✅ ' + attemptNum + '차 시도 (클리어)';
+        html += '<div onclick="loadWeetoChatDetail(\'' + studentId + '\', \'' + lesson + '\', decodeURIComponent(\'' + encodeURIComponent(grammarName) + '\'), ' + attemptNum + ')" style="background:white;border:1px solid ' + borderColor + ';border-radius:12px;padding:10px 12px;margin-bottom:6px;cursor:pointer;display:flex;justify-content:space-between;align-items:center;">';
+        html += '<span style="font-size:0.9rem;">' + label + '</span>';
         html += '<span style="font-size:0.75rem;color:#999;">' + dateStr + ' →</span>';
         html += '</div>';
       });
