@@ -527,7 +527,7 @@
       <div id="aliens-select-view">
         <div class="chat-header">
           <div class="header-left"><span style="font-size:1.3rem">📡</span>&nbsp;&nbsp;<strong>Aliens</strong></div>
-          <div class="header-right"><span class="logout-btn" onclick="logout()">로그아웃</span></div>
+          <div class="header-right"><span id="student-notice-btn" style="font-size:0.85rem; color:#4a5d4e; cursor:pointer; font-weight:bold;" onclick="openNoticeModal()">📢 공지</span>&nbsp;&nbsp;<span class="logout-btn" onclick="logout()">로그아웃</span></div>
         </div>
         <div class="aliens-select">
           <h2>누구와 대화할까요?</h2>
@@ -1532,7 +1532,7 @@ checkNewComments();
         checkUnreadNotices();
         checkNewComments();
         changeTab('chat-screen');
-        document.getElementById('greeting-msg').innerText = `안녕, ${currentFirstName}! 나는 외계인 Zeeto. 지구 언어 영어 마스터. 질문 있음?`;
+        if(document.getElementById('greeting-msg')) { document.getElementById('greeting-msg').innerText = `안녕, ${currentFirstName}! 나는 외계인 Zeeto. 지구 언어 영어 마스터. 질문 있음?`; }
       } else if (data.pending) {
         alert("⏳ " + data.message);
       } else { alert("⚠️ " + data.message); }
@@ -1618,7 +1618,7 @@ checkNewComments();
 
     try {
       const response = await fetch(SHEET_URL, { method: 'POST', body: JSON.stringify({ type: "gemini_proxy", studentId: currentStudentId, token: currentToken, payload: {
-        systemInstruction: { parts: [{ text: `너는 중학생의 영어 학습을 돕는 친근한 외계인 'Zeeto'야. 학생 이름은 '${currentFirstName}'. 1. 분량제한: 3~4문단 이내 짧게. 2. 가독성: 의미 단위 문단 바꿈. 3. 지구 호기심 컨셉. 4. 외계인 말투 '~임/함'. 5. 우주 이모지 필수. 6. 마크다운 기호(*, #) 금지. 7. 첫인사는 이름만. 8. 부드러운 교정. 9. 마무리 영어퀴즈 1개.` }] }, contents: chatHistory
+        systemInstruction: { parts: [{ text: `너는 중학생의 영어 학습을 돕는 친근한 외계인 'Zeeto'야. 학생 이름은 '${currentFirstName}'. [세계관] 'Weeto'(위토)는 너의 신입 후배 외계인이야. 영어를 배우고 싶어서 지구에 왔고, 학생들이 Weeto한테 영어를 가르쳐주고 있음. 너는 Weeto를 아끼는 선배임. ★중요★ 학생이 Weeto에 대해 언급하거나 물어보면 반드시 자연스럽게 반응할 것! (예: "오 내 후배 Weeto! 잘 가르쳐주고 있음?", "Weeto가 요즘 열심히 하고 있다고 들었음!") Weeto를 모르는 척 하면 절대 안 됨! 1. 분량제한: 3~4문단 이내 짧게. 2. 가독성: 의미 단위 문단 바꿈. 3. 지구 호기심 컨셉. 4. 외계인 말투 '~임/함'. 5. 우주 이모지 필수. 6. 마크다운 기호(*, #) 금지. 7. 첫인사는 이름만. 8. 부드러운 교정. 9. 마무리 영어퀴즈 1개.` }] }, contents: chatHistory
       }})});
       const data = await response.json();
       if (data.error) {
@@ -2628,7 +2628,7 @@ function enterUndercoverMode() {
   document.getElementById('nav-bar').style.display = 'flex';
   
   changeTab('chat-screen');
-  document.getElementById('greeting-msg').innerText = `안녕, ${currentFirstName}! 나는 외계인 Zeeto. 지구 언어 영어 마스터. 질문 있음?`;
+  if(document.getElementById('greeting-msg')) { document.getElementById('greeting-msg').innerText = `안녕, ${currentFirstName}! 나는 외계인 Zeeto. 지구 언어 영어 마스터. 질문 있음?`; }
 }
 
 function exitUndercoverMode() {
