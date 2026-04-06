@@ -1125,7 +1125,7 @@
 
 <script>
   // ★ 여기에 새롭게 배포한 URL을 반드시 넣어주세요!
-  const SHEET_URL = "https://script.google.com/macros/s/AKfycbydwMu_bIcC8Jg0aIqjXlJXosNdSp7mlGWVN7PJAtXsSt6x3cTJ_rTuz2uatvoxHl6neg/exec";
+  const SHEET_URL = "https://script.google.com/macros/s/AKfycbygzuBCCucxfY-SWZnSXvq8qm4SU31VGIU--2drwtcEjMQBM6RchAn4lcztTYzXgoOvKA/exec";
 
   let currentFirstName = ""; let currentStudentId = ""; let currentUserProfile = ""; let currentLoginId = ""; let currentToken = "";
   let chatHistory = []; let allInstaPosts = []; let currentFilterUser = null; let newCommentData = { count: 0, posts: [] };
@@ -1672,9 +1672,10 @@ checkNewComments();
 
   // ★ 로컬(KST) 날짜를 YYYY-MM-DD로 변환하는 헬퍼
   function toLocalDateStr(d) {
-    const dt = new Date(d);
-    return `${dt.getFullYear()}-${String(dt.getMonth()+1).padStart(2,'0')}-${String(dt.getDate()).padStart(2,'0')}`;
-  }
+  if (typeof d === 'string' && /^\d{4}-\d{2}-\d{2}$/.test(d)) return d;
+  const dt = new Date(d);
+  return `${dt.getFullYear()}-${String(dt.getMonth()+1).padStart(2,'0')}-${String(dt.getDate()).padStart(2,'0')}`;
+}
 
   let isLateMode = false;
 
