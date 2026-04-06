@@ -667,12 +667,14 @@
       <div id="story-step-1" class="story-step active">
         <div class="step-title">Step 1. 초안 작성 📝</div>
         
-        <select id="ms-lesson" class="input-field" style="width:100%; box-sizing:border-box; margin-bottom:10px;">
+        <select id="ms-lesson" class="input-field" style="width:100%; box-sizing:border-box; margin-bottom:10px;" onchange="updateGrammarDropdown()">
           <option value="">Lesson 선택</option>
           <script>for(let i=1; i<=8; i++) document.write(`<option value="${i}">Lesson ${i}</option>`);</script>
         </select>
-        
-        <input type="text" id="ms-grammar" class="input-field" style="width:100%; box-sizing:border-box;" placeholder="목표 문법 (예: to부정사)">
+
+        <select id="ms-grammar" class="input-field" style="width:100%; box-sizing:border-box;">
+          <option value="">먼저 Lesson을 선택하세요</option>
+        </select>
         
         <div style="font-size:0.85rem; font-weight:bold; color:#4a5d4e; margin-bottom:5px;">필수 단어 <span class="req-star">*</span></div>
         <input type="text" id="ms-word-req1" class="input-field" style="width:100%; box-sizing:border-box; margin-bottom:5px;" placeholder="필수 단어 1">
@@ -738,29 +740,34 @@
           <div id="ms-oops-point-copy" style="font-size:0.9rem; line-height:1.4; color:#c62828; white-space: pre-wrap;">(앞에서 찾은 오류가 여기에 다시 뜹니다)</div>
         </div>
 
+        <div style="font-size:0.85rem; font-weight:bold; color:#4a5d4e; margin-bottom:8px;">👽 비문을 정문으로 고치고 이유를 적어보셈!</div>
+
         <div id="error-container">
           <div class="error-new-box">
             <textarea id="ms-error-1" class="input-field" style="width:100%; box-sizing:border-box; border-color:#d9534f; margin-bottom:8px; resize:none; line-height:1.4; background-color:#f4f4f4; color:#333;" rows="2" placeholder="Zeeto의 퀴즈가 여기에 나타납니다 👽" readonly></textarea>
+            <textarea id="ms-corrected-1" class="input-field" style="width:100%; box-sizing:border-box; border-color:#2e7d32; margin-bottom:5px; resize:none; line-height:1.4;" rows="2" placeholder="✅ 올바른 문장 (정문)"></textarea>
             <div style="display:flex; gap:5px; align-items:flex-start;">
-              <textarea id="ms-new-1" class="input-field" style="flex:1; margin-bottom:0; border-color:#4a5d4e; resize:none; line-height:1.4;" rows="2" placeholder="올바르게 고친 문장과 이유를 적으셈"></textarea>
+              <textarea id="ms-reason-1" class="input-field" style="flex:1; margin-bottom:0; border-color:#4a5d4e; resize:none; line-height:1.4;" rows="2" placeholder="💡 왜 틀렸는지 이유"></textarea>
               <button onclick="checkMsNew(1)" style="background:none; border:none; font-size:1.5rem; cursor:pointer; margin-top:5px;">✔️</button>
             </div>
             <div id="ms-feedback-1" style="font-size: 0.85rem; color: #4a5d4e; margin-top: 8px; font-weight: bold; display: none;"></div>
           </div>
-          
+
           <div class="error-new-box">
             <textarea id="ms-error-2" class="input-field" style="width:100%; box-sizing:border-box; border-color:#d9534f; margin-bottom:8px; resize:none; line-height:1.4; background-color:#f4f4f4; color:#333;" rows="2" placeholder="Zeeto의 퀴즈가 여기에 나타납니다 👽" readonly></textarea>
+            <textarea id="ms-corrected-2" class="input-field" style="width:100%; box-sizing:border-box; border-color:#2e7d32; margin-bottom:5px; resize:none; line-height:1.4;" rows="2" placeholder="✅ 올바른 문장 (정문)"></textarea>
             <div style="display:flex; gap:5px; align-items:flex-start;">
-              <textarea id="ms-new-2" class="input-field" style="flex:1; margin-bottom:0; border-color:#4a5d4e; resize:none; line-height:1.4;" rows="2" placeholder="올바르게 고친 문장과 이유를 적으셈"></textarea>
+              <textarea id="ms-reason-2" class="input-field" style="flex:1; margin-bottom:0; border-color:#4a5d4e; resize:none; line-height:1.4;" rows="2" placeholder="💡 왜 틀렸는지 이유"></textarea>
               <button onclick="checkMsNew(2)" style="background:none; border:none; font-size:1.5rem; cursor:pointer; margin-top:5px;">✔️</button>
             </div>
             <div id="ms-feedback-2" style="font-size: 0.85rem; color: #4a5d4e; margin-top: 8px; font-weight: bold; display: none;"></div>
           </div>
-          
+
           <div class="error-new-box">
             <textarea id="ms-error-3" class="input-field" style="width:100%; box-sizing:border-box; border-color:#d9534f; margin-bottom:8px; resize:none; line-height:1.4; background-color:#f4f4f4; color:#333;" rows="2" placeholder="Zeeto의 퀴즈가 여기에 나타납니다 👽" readonly></textarea>
+            <textarea id="ms-corrected-3" class="input-field" style="width:100%; box-sizing:border-box; border-color:#2e7d32; margin-bottom:5px; resize:none; line-height:1.4;" rows="2" placeholder="✅ 올바른 문장 (정문)"></textarea>
             <div style="display:flex; gap:5px; align-items:flex-start;">
-              <textarea id="ms-new-3" class="input-field" style="flex:1; margin-bottom:0; border-color:#4a5d4e; resize:none; line-height:1.4;" rows="2" placeholder="올바르게 고친 문장과 이유를 적으셈"></textarea>
+              <textarea id="ms-reason-3" class="input-field" style="flex:1; margin-bottom:0; border-color:#4a5d4e; resize:none; line-height:1.4;" rows="2" placeholder="💡 왜 틀렸는지 이유"></textarea>
               <button onclick="checkMsNew(3)" style="background:none; border:none; font-size:1.5rem; cursor:pointer; margin-top:5px;">✔️</button>
             </div>
             <div id="ms-feedback-3" style="font-size: 0.85rem; color: #4a5d4e; margin-top: 8px; font-weight: bold; display: none;"></div>
@@ -1125,7 +1132,7 @@
 
 <script>
   // ★ 여기에 새롭게 배포한 URL을 반드시 넣어주세요!
-  const SHEET_URL = "https://script.google.com/macros/s/AKfycbygzuBCCucxfY-SWZnSXvq8qm4SU31VGIU--2drwtcEjMQBM6RchAn4lcztTYzXgoOvKA/exec";
+  const SHEET_URL = "https://script.google.com/macros/s/AKfycbz6jES8BpQCv4OiT7F5fGozXVgsi9PL3ZsbNnD57Q-yS09gbx0LKFhnLt0rGhFlderjsw/exec";
 
   let currentFirstName = ""; let currentStudentId = ""; let currentUserProfile = ""; let currentLoginId = ""; let currentToken = "";
   let chatHistory = []; let allInstaPosts = []; let currentFilterUser = null; let newCommentData = { count: 0, posts: [] };
@@ -1135,6 +1142,9 @@
   let myPostCount = 0; let myCommentCount = 0;
   let myPenalties = [];
   let pendingNotices = []; let currentNoticeIndex = 0;
+
+  // ★ V8 추가: Grammar 목록 (My Story 드롭다운용)
+  let grammarList = [];
 
   // ★ Teaching Mode (Weeto) 변수들
   let myTeaching = [];
@@ -1211,6 +1221,7 @@ currentToken = data.token || "";
     myCommentCount = data.myCommentCount || 0;
     myPenalties = data.myPenalties || [];
     myTeaching = data.myTeaching || [];
+    grammarList = data.grammarList || [];
 
     if(document.getElementById('my-profile-emoji')) document.getElementById('my-profile-emoji').innerText = data.emoji;
     if(document.getElementById('my-profile-name')) document.getElementById('my-profile-name').innerText = data.firstName;
@@ -1499,6 +1510,7 @@ checkNewComments();
         myCommentCount = data.myCommentCount || 0;
         myPenalties = data.myPenalties || [];
         myTeaching = data.myTeaching || [];
+        grammarList = data.grammarList || [];
 
         document.getElementById('my-profile-emoji').innerText = data.emoji;
         document.getElementById('my-profile-name').innerText = data.firstName;
@@ -1767,7 +1779,31 @@ checkNewComments();
     .catch(e => { console.error('Log submit error:', e); hideLoading(); alert('통신 오류가 발생했어요 😵 다시 시도해주세요!'); });
   }
 
-  let msCombinedWords = ""; 
+  let msCombinedWords = "";
+
+  // ★ V8 추가: Lesson 선택 시 목표 문법 드롭다운 자동 갱신
+  function updateGrammarDropdown() {
+    const lesson = document.getElementById('ms-lesson').value;
+    const grammarSelect = document.getElementById('ms-grammar');
+    grammarSelect.innerHTML = '';
+    if (!lesson) {
+      grammarSelect.innerHTML = '<option value="">먼저 Lesson을 선택하세요</option>';
+      return;
+    }
+    const filtered = grammarList.filter(g => g.lesson === lesson);
+    if (filtered.length === 0) {
+      grammarSelect.innerHTML = '<option value="">해당 Lesson의 문법 정보가 없습니다</option>';
+      return;
+    }
+    grammarSelect.innerHTML = '<option value="">목표 문법 선택</option>';
+    filtered.forEach(g => {
+      const opt = document.createElement('option');
+      opt.value = g.grammarName;
+      opt.textContent = g.grammarName;
+      grammarSelect.appendChild(opt);
+    });
+  }
+
   async function goToStoryStep(stepNumber) {
     if(stepNumber === 2) {
       const lesson = document.getElementById('ms-lesson').value; const grammar = document.getElementById('ms-grammar').value.trim();
@@ -1800,16 +1836,20 @@ checkNewComments();
 
         const rawText = data.result;
         let feedbackPart = ""; let finalPart = ""; let tipPart = ""; let oopsPart = "";
-        
+
         try {
-            const parts = rawText.split('===');
+            // ★ V8: 유연한 파싱 — 등호 2개 이상(==, ===, ====...)과 앞뒤 공백 모두 허용
+            const parts = rawText.split(/={2,}/);
             parts.forEach((p, idx) => {
-                if(p.includes("피드백")) feedbackPart = parts[idx+1].trim();
-                if(p.includes("최종본")) finalPart = parts[idx+1].trim();
-                if(p.includes("Zeeto의 꿀팁")) tipPart = parts[idx+1].trim();
-                if(p.includes("Oops Point")) oopsPart = parts[idx+1].trim();
+                const label = p.trim().toLowerCase();
+                if(label.includes("피드백") || label.includes("feedback")) { if(parts[idx+1]) feedbackPart = parts[idx+1].trim(); }
+                else if(label.includes("최종본") || label.includes("final")) { if(parts[idx+1]) finalPart = parts[idx+1].trim(); }
+                else if(label.includes("꿀팁") || label.includes("tip")) { if(parts[idx+1]) tipPart = parts[idx+1].trim(); }
+                else if(label.includes("oops") || label.includes("오류")) { if(parts[idx+1]) oopsPart = parts[idx+1].trim(); }
             });
-        } catch(e) { finalPart = rawText; } 
+            // ★ fallback: 파싱 실패 시 전체 텍스트를 최종본에 넣기
+            if(!finalPart && rawText) finalPart = rawText;
+        } catch(e) { finalPart = rawText; }
 
         document.getElementById('ms-zeeto-feedback').innerHTML = safeAiRender(feedbackPart);
         document.getElementById('ms-zeeto-final').innerHTML = formatForPersonal(safeAiRender(finalPart));
@@ -1835,13 +1875,10 @@ checkNewComments();
         
         if (quizzes[i-1]) {
           newBox.style.display = 'block'; // 에러가 있으면 박스 보여주기
-          errorInput.value = quizzes[i-1]; // Zeeto가 낸 문제 자동 입력!
+          errorInput.value = quizzes[i-1].replace(/\^/g, ''); // ★ V8: 꺾쇠(^) 제거 후 자동 입력!
           errorInput.readOnly = true; // 학생이 문제 수정 못하게 막기
           errorInput.style.backgroundColor = '#f4f4f4'; // 문제 칸은 회색 배경으로 처리
           errorInput.style.color = '#333';
-          
-          // 아랫칸 힌트 문구 변경
-          document.getElementById(`ms-new-${i}`).placeholder = "올바른 문장과 이유를 적으셈";
         } else {
           newBox.style.display = 'none'; // 에러가 없으면 아예 박스를 깔끔하게 숨김!
         }
@@ -1854,15 +1891,15 @@ checkNewComments();
   }
 
   async function checkMsNew(boxNum) {
-    const errText = document.getElementById(`ms-error-${boxNum}`).value.trim(); 
-    const newText = document.getElementById(`ms-new-${boxNum}`).value.trim();
-    
-    // ★ 알림창 멘트 변경: 새 문장 영작하라는 말 대신, 미션 안내로 변경!
-    if(!errText || !newText) return alert("Zeeto의 틀린 문장을 올바르게 고치고, 그 이유를 적어주셈! 👽");
-    
+    const errText = document.getElementById(`ms-error-${boxNum}`).value.trim();
+    const correctedText = document.getElementById(`ms-corrected-${boxNum}`).value.trim();
+    const reasonText = document.getElementById(`ms-reason-${boxNum}`).value.trim();
+
+    if(!errText || !correctedText || !reasonText) return alert("정문과 이유 둘 다 적어야 함! 👽");
+
     showLoading(`Zeeto 채점 중... 👽`);
     try {
-      const res = await fetch(SHEET_URL, { method: 'POST', body: JSON.stringify({ type: "ms_check_new", studentId: currentStudentId, token: currentToken, errorText: errText, newText: newText }) });
+      const res = await fetch(SHEET_URL, { method: 'POST', body: JSON.stringify({ type: "ms_check_new", studentId: currentStudentId, token: currentToken, errorText: errText, correctedText: correctedText, reasonText: reasonText }) });
       const data = await res.json(); hideLoading();
       if (data.error) { alert("⚠️ 세션이 만료됐음! 다시 로그인하셈 👽"); logout(); return; }
       const fb = document.getElementById(`ms-feedback-${boxNum}`); fb.style.display = "block"; fb.innerHTML = "👽 " + safeAiRender(data.result);
@@ -1872,11 +1909,15 @@ checkNewComments();
   function submitMyStory() {
     const reflection = document.getElementById('ms-reflection').value.trim(); if(!reflection) return alert("성찰(Reflection)을 적어주셈! 🌱");
 
-    // ★ V6 추가: Oops Point 퀴즈가 있으면 교정 필수 체크
+    // ★ V6→V8: Oops Point 퀴즈가 있으면 정문+이유 모두 필수 체크
     for (let i = 1; i <= 3; i++) {
       const quizEl = document.getElementById(`ms-error-${i}`);
-      if (quizEl.value.trim() && !document.getElementById(`ms-new-${i}`).value.trim()) {
-        return alert("Oops Point 교정을 완료해주셈! 틀린 문장을 올바르게 고치고 이유를 적어야 제출 가능함 👽");
+      if (quizEl.value.trim()) {
+        const corrected = document.getElementById(`ms-corrected-${i}`).value.trim();
+        const reason = document.getElementById(`ms-reason-${i}`).value.trim();
+        if (!corrected || !reason) {
+          return alert("Oops Point 교정을 완료해주셈! 정문과 이유 둘 다 적어야 제출 가능함 👽");
+        }
       }
     }
 
@@ -1885,14 +1926,15 @@ checkNewComments();
 
     const rawFinalStory = document.getElementById('ms-zeeto-final').innerHTML.replace(/<span[^>]*>/g, '^').replace(/<\/span>/g, '^');
 
-    // ★ V6 추가: Oops Point 교정 데이터 수집
+    // ★ V6→V8: Oops Point 교정 데이터 수집 (정문+이유 분리)
     const corrections = [];
     for (let i = 1; i <= 3; i++) {
       const quiz = document.getElementById(`ms-error-${i}`).value.trim();
-      const answer = document.getElementById(`ms-new-${i}`).value.trim();
+      const corrected = document.getElementById(`ms-corrected-${i}`).value.trim();
+      const reason = document.getElementById(`ms-reason-${i}`).value.trim();
       const fbEl = document.getElementById(`ms-feedback-${i}`);
       const feedback = fbEl.style.display !== 'none' ? fbEl.innerText : '';
-      if (quiz) corrections.push({ quiz, answer, feedback });
+      if (quiz) corrections.push({ quiz, corrected, reason, feedback });
     }
 
     const payload = {
@@ -1920,8 +1962,9 @@ checkNewComments();
       if (savedLogin) { const loginData = JSON.parse(savedLogin); loginData.myStories = myStories; sessionStorage.setItem('even_login', JSON.stringify(loginData)); }
       updateDashboard(); 
 
-      const inputs = ['ms-lesson','ms-grammar','ms-word-req1','ms-word-req2','ms-word-req3','ms-word-opt1','ms-word-opt2','ms-title','ms-draft','ms-revision','ms-error-1','ms-new-1','ms-error-2','ms-new-2','ms-error-3','ms-new-3','ms-reflection'];
+      const inputs = ['ms-lesson','ms-word-req1','ms-word-req2','ms-word-req3','ms-word-opt1','ms-word-opt2','ms-title','ms-draft','ms-revision','ms-error-1','ms-corrected-1','ms-reason-1','ms-error-2','ms-corrected-2','ms-reason-2','ms-error-3','ms-corrected-3','ms-reason-3','ms-reflection'];
       inputs.forEach(id => document.getElementById(id).value = "");
+      document.getElementById('ms-grammar').innerHTML = '<option value="">먼저 Lesson을 선택하세요</option>';
       ['ms-display-draft','ms-zeeto-hint','ms-display-revision','ms-zeeto-feedback','ms-zeeto-final','ms-zeeto-tip','ms-oops-point','ms-oops-point-copy'].forEach(id => document.getElementById(id).innerHTML = "");
       ['ms-feedback-1','ms-feedback-2','ms-feedback-3'].forEach(id => document.getElementById(id).style.display = 'none');
       
@@ -2028,7 +2071,7 @@ checkNewComments();
         <div class="log-label" style="color:#c62828; margin-top:10px; margin-bottom:5px;">🚨 Oops Point</div>
         <div class="log-text" style="font-size:0.85rem; color:#c62828;">${safeSavedHtml(currentStoryData.oops || "-")}</div>
       </div>`;
-      // ★ V6 추가: Oops Point 교정 내용 표시
+      // ★ V6→V8: Oops Point 교정 내용 표시 (구형 answer / 신형 corrected+reason 호환)
       try {
         const corr = JSON.parse(currentStoryData.corrections || '[]');
         if (corr.length > 0) {
@@ -2037,7 +2080,12 @@ checkNewComments();
           corr.forEach(c => {
             htmlStory += '<div style="margin-top:8px; padding:8px; background:#fff; border-radius:8px;">';
             htmlStory += '<div style="color:#c62828; font-size:0.85rem;">❌ ' + escapeHtml(c.quiz) + '</div>';
-            htmlStory += '<div style="color:#2e7d32; font-size:0.85rem; margin-top:3px;">✅ ' + escapeHtml(c.answer) + '</div>';
+            if (c.corrected) {
+              htmlStory += '<div style="color:#2e7d32; font-size:0.85rem; margin-top:3px;">✅ ' + escapeHtml(c.corrected) + '</div>';
+              htmlStory += '<div style="color:#1565c0; font-size:0.85rem; margin-top:3px;">💡 ' + escapeHtml(c.reason) + '</div>';
+            } else if (c.answer) {
+              htmlStory += '<div style="color:#2e7d32; font-size:0.85rem; margin-top:3px;">✅ ' + escapeHtml(c.answer) + '</div>';
+            }
             if (c.feedback) htmlStory += '<div style="color:#666; font-size:0.8rem; margin-top:3px;">👽 ' + escapeHtml(c.feedback) + '</div>';
             htmlStory += '</div>';
           });
@@ -3087,7 +3135,7 @@ function switchStudentModal(type) {
             <div class="log-label" style="color:#c62828; margin-top:8px;">🚨 Oops Point</div>
             <div class="log-text" style="color:#c62828;">${safeSavedHtml(s.oops||'-')}</div>
           </div>
-          ${(() => { try { const corr = JSON.parse(s.corrections || '[]'); if (!corr.length) return ''; let h = '<div class="log-detail-box" style="border-left:3px solid #d9534f; background:#fffafa;"><div class="log-label" style="color:#4a5d4e;">📝 Oops Point 교정</div>'; corr.forEach(c => { h += '<div style="margin-top:8px; padding:8px; background:#fff; border-radius:8px;">'; h += '<div style="color:#c62828; font-size:0.85rem;">❌ ' + escapeHtml(c.quiz) + '</div>'; h += '<div style="color:#2e7d32; font-size:0.85rem; margin-top:3px;">✅ ' + escapeHtml(c.answer) + '</div>'; if (c.feedback) h += '<div style="color:#666; font-size:0.8rem; margin-top:3px;">👽 ' + escapeHtml(c.feedback) + '</div>'; h += '</div>'; }); h += '</div>'; return h; } catch(e) { return ''; } })()}
+          ${(() => { try { const corr = JSON.parse(s.corrections || '[]'); if (!corr.length) return ''; let h = '<div class="log-detail-box" style="border-left:3px solid #d9534f; background:#fffafa;"><div class="log-label" style="color:#4a5d4e;">📝 Oops Point 교정</div>'; corr.forEach(c => { h += '<div style="margin-top:8px; padding:8px; background:#fff; border-radius:8px;">'; h += '<div style="color:#c62828; font-size:0.85rem;">❌ ' + escapeHtml(c.quiz) + '</div>'; if (c.corrected) { h += '<div style="color:#2e7d32; font-size:0.85rem; margin-top:3px;">✅ ' + escapeHtml(c.corrected) + '</div>'; h += '<div style="color:#1565c0; font-size:0.85rem; margin-top:3px;">💡 ' + escapeHtml(c.reason) + '</div>'; } else if (c.answer) { h += '<div style="color:#2e7d32; font-size:0.85rem; margin-top:3px;">✅ ' + escapeHtml(c.answer) + '</div>'; } if (c.feedback) h += '<div style="color:#666; font-size:0.8rem; margin-top:3px;">👽 ' + escapeHtml(c.feedback) + '</div>'; h += '</div>'; }); h += '</div>'; return h; } catch(e) { return ''; } })()}
           <div class="log-detail-box"><div class="log-label">🤔 Reflection</div><div class="log-text">${escapeHtml(s.reflection||'-')}</div></div>
         </div>
       </details>`;
