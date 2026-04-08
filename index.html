@@ -1132,7 +1132,7 @@
 
 <script>
   // ★ 여기에 새롭게 배포한 URL을 반드시 넣어주세요!
-  const SHEET_URL = "https://script.google.com/macros/s/AKfycbz6jES8BpQCv4OiT7F5fGozXVgsi9PL3ZsbNnD57Q-yS09gbx0LKFhnLt0rGhFlderjsw/exec";
+  const SHEET_URL = "https://script.google.com/macros/s/AKfycbyGtYE6xUSzZv-eZ6KeX7X5IeyBaRNr8NvqGZiRlaWIKZuUyZ0xqpo7B_NubpvfW-kwYw/exec";
 
   let currentFirstName = ""; let currentStudentId = ""; let currentUserProfile = ""; let currentLoginId = ""; let currentToken = "";
   let chatHistory = []; let allInstaPosts = []; let currentFilterUser = null; let newCommentData = { count: 0, posts: [] };
@@ -1811,7 +1811,7 @@ checkNewComments();
       const o1 = document.getElementById('ms-word-opt1').value.trim(); const o2 = document.getElementById('ms-word-opt2').value.trim();
       const title = document.getElementById('ms-title').value.trim(); const draft = document.getElementById('ms-draft').value.trim();
       if(!lesson || !grammar || !r1 || !r2 || !r3 || !title || !draft) return alert("Lesson, 목표 문법, 필수 단어 3개, 제목, 초안은 필수임! 👽");
-      msCombinedWords = `${r1}, ${r2}, ${r3}` + (o1 || o2 ? ` (선택: ${o1}, ${o2})` : "");
+      msCombinedWords = `${r1}, ${r2}, ${r3}` + (o1 || o2 ? ` (선택: ${[o1, o2].filter(w => w).join(', ')})` : "");
       if(isLoading) return;
       showLoading("Zeeto 분석 중... 🛸");
       try {
@@ -1995,7 +1995,7 @@ checkNewComments();
       if(hasPenalty) stampHtml += `<div class="stamp-penalty">🚨</div>`;
       if(hasLog) stampHtml += `<div class="stamp-log">🤓</div>`;
       if(hasStory) stampHtml += `<div class="stamp-story">📖</div>`;
-      const hasTeaching = myTeaching.some(t => { try { const d = new Date(t.clearDate); return d.getFullYear()===year && d.getMonth()===month && d.getDate()===i; } catch(e){ return false; } });
+      const hasTeaching = myTeaching.some(t => { try { return toLocalDateStr(t.clearDate) === cellDateStr; } catch(e){ return false; } });
       if(hasTeaching) stampHtml += `<div class="stamp-teaching">👾</div>`;
 
       const hasAnything = hasLog || hasStory || hasPenalty || hasTeaching;
