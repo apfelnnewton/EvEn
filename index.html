@@ -672,9 +672,9 @@
           <script>for(let i=1; i<=8; i++) document.write(`<option value="${i}">Lesson ${i}</option>`);</script>
         </select>
 
-        <select id="ms-grammar" class="input-field" style="width:100%; box-sizing:border-box;">
-          <option value="">먼저 Lesson을 선택하세요</option>
-        </select>
+        <div style="font-size:0.85rem; font-weight:bold; color:#4a5d4e; margin-bottom:5px;">🎯 목표 문법 (자동 설정 · 2개 모두 사용)</div>
+        <div id="ms-grammar-display" class="input-field" style="width:100%; box-sizing:border-box; background:#f0f7f2; color:#4a5d4e; font-weight:600; min-height:20px; white-space:pre-line;">먼저 Lesson을 선택하세요</div>
+        <input type="hidden" id="ms-grammar" value="">
         
         <div style="font-size:0.85rem; font-weight:bold; color:#4a5d4e; margin-bottom:5px;">필수 단어 <span class="req-star">*</span></div>
         <input type="text" id="ms-word-req1" class="input-field" style="width:100%; box-sizing:border-box; margin-bottom:5px;" placeholder="필수 단어 1">
@@ -1132,7 +1132,7 @@
 
 <script>
   // ★ 여기에 새롭게 배포한 URL을 반드시 넣어주세요!
-  const SHEET_URL = "https://script.google.com/macros/s/AKfycbyGtYE6xUSzZv-eZ6KeX7X5IeyBaRNr8NvqGZiRlaWIKZuUyZ0xqpo7B_NubpvfW-kwYw/exec";
+  const SHEET_URL = "https://script.google.com/macros/s/AKfycbz2J6L29ewFimUfEOmE1dB8KbMF98TubgHC3Yuwh1bv6WdFWF1EUzkAgdOK6SonoDBUMA/exec";
 
   let currentFirstName = ""; let currentStudentId = ""; let currentUserProfile = ""; let currentLoginId = ""; let currentToken = "";
   let chatHistory = []; let allInstaPosts = []; let currentFilterUser = null; let newCommentData = { count: 0, posts: [] };
@@ -1781,27 +1781,26 @@ checkNewComments();
 
   let msCombinedWords = "";
 
-  // ★ V8 추가: Lesson 선택 시 목표 문법 드롭다운 자동 갱신
+  // ★ V9 수정: Lesson 선택 시 해당 Lesson의 핵심 문법 2개를 자동으로 모두 세팅 (학생이 선택하지 않음)
   function updateGrammarDropdown() {
     const lesson = document.getElementById('ms-lesson').value;
-    const grammarSelect = document.getElementById('ms-grammar');
-    grammarSelect.innerHTML = '';
+    const grammarHidden = document.getElementById('ms-grammar');
+    const grammarDisplay = document.getElementById('ms-grammar-display');
     if (!lesson) {
-      grammarSelect.innerHTML = '<option value="">먼저 Lesson을 선택하세요</option>';
+      grammarHidden.value = '';
+      grammarDisplay.textContent = '먼저 Lesson을 선택하세요';
       return;
     }
     const filtered = grammarList.filter(g => g.lesson === lesson);
     if (filtered.length === 0) {
-      grammarSelect.innerHTML = '<option value="">해당 Lesson의 문법 정보가 없습니다</option>';
+      grammarHidden.value = '';
+      grammarDisplay.textContent = '해당 Lesson의 문법 정보가 없습니다';
       return;
     }
-    grammarSelect.innerHTML = '<option value="">목표 문법 선택</option>';
-    filtered.forEach(g => {
-      const opt = document.createElement('option');
-      opt.value = g.grammarName;
-      opt.textContent = g.grammarName;
-      grammarSelect.appendChild(opt);
-    });
+    // 2개 모두 사용해야 하므로 " + "로 묶어서 저장/표시
+    const joined = filtered.map(g => g.grammarName).join(' + ');
+    grammarHidden.value = joined;
+    grammarDisplay.textContent = filtered.map((g, i) => `${i+1}. ${g.grammarName}`).join('\n');
   }
 
   async function goToStoryStep(stepNumber) {
@@ -1964,7 +1963,8 @@ checkNewComments();
 
       const inputs = ['ms-lesson','ms-word-req1','ms-word-req2','ms-word-req3','ms-word-opt1','ms-word-opt2','ms-title','ms-draft','ms-revision','ms-error-1','ms-corrected-1','ms-reason-1','ms-error-2','ms-corrected-2','ms-reason-2','ms-error-3','ms-corrected-3','ms-reason-3','ms-reflection'];
       inputs.forEach(id => document.getElementById(id).value = "");
-      document.getElementById('ms-grammar').innerHTML = '<option value="">먼저 Lesson을 선택하세요</option>';
+      document.getElementById('ms-grammar').value = '';
+      document.getElementById('ms-grammar-display').textContent = '먼저 Lesson을 선택하세요';
       ['ms-display-draft','ms-zeeto-hint','ms-display-revision','ms-zeeto-feedback','ms-zeeto-final','ms-zeeto-tip','ms-oops-point','ms-oops-point-copy'].forEach(id => document.getElementById(id).innerHTML = "");
       ['ms-feedback-1','ms-feedback-2','ms-feedback-3'].forEach(id => document.getElementById(id).style.display = 'none');
       
