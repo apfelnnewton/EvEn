@@ -690,6 +690,8 @@
         <textarea id="ms-draft" class="input-field" style="width:100%; box-sizing:border-box; height:120px; resize:none; margin-bottom:15px;" placeholder="배운 문법과 단어를 활용해 마음껏 글을 써보세요."></textarea>
         
         <button class="btn" style="width:100%; margin-bottom:0;" onclick="goToStoryStep(2)">Zeeto에게 힌트 받기 🛸</button>
+        <button id="retry-hint-btn" class="btn" style="display:none; width:100%; margin-top:10px; background:#ff9800;" onclick="retryMsHint()">🔄 Zeeto 다시 부르기</button>
+        <div id="retry-hint-msg" style="display:none; font-size:0.85rem; color:#d32f2f; text-align:center; margin-top:8px; line-height:1.4;"></div>
       </div>
 
       <div id="story-step-2" class="story-step">
@@ -703,10 +705,14 @@
 
         <textarea id="ms-revision" class="input-field" style="width:100%; box-sizing:border-box; height:120px; resize:none;" placeholder="힌트를 보고 수정본을 작성해 보세요!"></textarea>
         <button class="btn" style="width:100%;" onclick="goToStoryStep(3)">최종 확인받기 🚀</button>
+        <button id="retry-final-btn" class="btn" style="display:none; width:100%; margin-top:10px; background:#ff9800;" onclick="retryMsFinal()">🔄 Zeeto 다시 부르기</button>
+        <div id="retry-final-msg" style="display:none; font-size:0.85rem; color:#d32f2f; text-align:center; margin-top:8px; line-height:1.4;"></div>
       </div>
 
       <div id="story-step-3" class="story-step">
         <div class="step-title">Step 3. 완벽 확인 💯</div>
+        <button id="retry-final-btn-2" class="btn" style="display:none; width:100%; margin-bottom:12px; background:#ff9800;" onclick="retryMsFinal()">🔄 Zeeto 다시 부르기</button>
+        <div id="retry-final-msg-2" style="display:none; font-size:0.85rem; color:#d32f2f; text-align:center; margin-bottom:12px; line-height:1.4;"></div>
         <div class="readonly-box" id="ms-display-revision">나의 수정본이 여기에 표시됩니다.</div>
         
         <div class="zeeto-box" style="border-color:#ff9800;">
@@ -1132,7 +1138,7 @@
 
 <script>
   // ★ 여기에 새롭게 배포한 URL을 반드시 넣어주세요!
-  const SHEET_URL = "https://script.google.com/macros/s/AKfycbz2J6L29ewFimUfEOmE1dB8KbMF98TubgHC3Yuwh1bv6WdFWF1EUzkAgdOK6SonoDBUMA/exec";
+  const SHEET_URL = "https://script.google.com/macros/s/AKfycbwinENyGJj4PleyKMXTNJkMUFkCYvFxVYqa2IsDAJUeDLQGhWDBWde3wCmyKgQDuebW2w/exec";
 
   let currentFirstName = ""; let currentStudentId = ""; let currentUserProfile = ""; let currentLoginId = ""; let currentToken = "";
   let chatHistory = []; let allInstaPosts = []; let currentFilterUser = null; let newCommentData = { count: 0, posts: [] };
@@ -1803,6 +1809,154 @@ checkNewComments();
     grammarDisplay.textContent = filtered.map((g, i) => `${i+1}. ${g.grammarName}`).join('\n');
   }
 
+  // ★ V9 추가: Zeeto 재시도 상태 관리
+  let hintRetryCount = 0;
+  let finalRetryCount = 0;
+  const MAX_MS_RETRY = 2;
+  let hintRetryCooldown = false;
+  let finalRetryCooldown = false;
+
+  function resetMsRetryState() {
+    hintRetryCount = 0; finalRetryCount = 0;
+    hintRetryCooldown = false; finalRetryCooldown = false;
+    showHintRetryBtn(false); showFinalRetryBtn(false, '', null);
+  }
+
+  function showHintRetryBtn(show, msg) {
+    const btn = document.getElementById('retry-hint-btn');
+    const msgBox = document.getElementById('retry-hint-msg');
+    if (!show) { btn.style.display = 'none'; msgBox.style.display = 'none'; return; }
+    btn.style.display = 'block';
+    if (hintRetryCount >= MAX_MS_RETRY) {
+      btn.disabled = true; btn.style.opacity = '0.5'; btn.style.cursor = 'not-allowed';
+      btn.textContent = '🚫 재시도 한도 초과';
+      msgBox.style.display = 'block';
+      msgBox.textContent = '여러 번 시도해도 안 되면 선생님께 알려주세요 🙏 (작성한 내용은 그대로 남아있음)';
+    } else {
+      btn.disabled = false; btn.style.opacity = '1'; btn.style.cursor = 'pointer';
+      btn.textContent = `🔄 Zeeto 다시 부르기 (${MAX_MS_RETRY - hintRetryCount}회 남음)`;
+      if (msg) { msgBox.style.display = 'block'; msgBox.textContent = msg; } else { msgBox.style.display = 'none'; }
+    }
+  }
+
+  function showFinalRetryBtn(show, msg, location) {
+    // location: 'step2' | 'step3' | null
+    const btn2 = document.getElementById('retry-final-btn');
+    const msg2 = document.getElementById('retry-final-msg');
+    const btn3 = document.getElementById('retry-final-btn-2');
+    const msg3 = document.getElementById('retry-final-msg-2');
+    [btn2, btn3].forEach(b => b.style.display = 'none');
+    [msg2, msg3].forEach(m => m.style.display = 'none');
+    if (!show) return;
+    const btn = (location === 'step3') ? btn3 : btn2;
+    const msgBox = (location === 'step3') ? msg3 : msg2;
+    btn.style.display = 'block';
+    if (finalRetryCount >= MAX_MS_RETRY) {
+      btn.disabled = true; btn.style.opacity = '0.5'; btn.style.cursor = 'not-allowed';
+      btn.textContent = '🚫 재시도 한도 초과';
+      msgBox.style.display = 'block';
+      msgBox.textContent = '여러 번 시도해도 안 되면 선생님께 알려주세요 🙏 (작성한 수정본은 그대로 남아있음)';
+    } else {
+      btn.disabled = false; btn.style.opacity = '1'; btn.style.cursor = 'pointer';
+      btn.textContent = `🔄 Zeeto 다시 부르기 (${MAX_MS_RETRY - finalRetryCount}회 남음)`;
+      if (msg) { msgBox.style.display = 'block'; msgBox.textContent = msg; }
+    }
+  }
+
+  // ★ V9 추가: ms_hint 실제 호출 (재사용) — 성공 시 true 리턴
+  async function performMsHint() {
+    const title = document.getElementById('ms-title').value.trim();
+    const draft = document.getElementById('ms-draft').value.trim();
+    const grammar = document.getElementById('ms-grammar').value.trim();
+    try {
+      const res = await fetch(SHEET_URL, { method: 'POST', body: JSON.stringify({ type: "ms_hint", studentId: currentStudentId, token: currentToken, grammar: grammar, reqWords: msCombinedWords, title: title, draft: draft }) });
+      const data = await res.json();
+      if (data.error) { alert("⚠️ 세션이 만료됐음! 다시 로그인하셈 👽"); logout(); return { ok: false, sessionExpired: true }; }
+      const result = (data.result || "").trim();
+      if (!result || result.includes("Zeeto가 잠깐 멈췄음")) return { ok: false };
+      document.getElementById('ms-zeeto-hint').innerHTML = safeAiRender(result);
+      document.getElementById('ms-display-draft').innerHTML = `<b>${escapeHtml(title)}</b><br><br>${escapeHtml(draft)}`;
+      return { ok: true };
+    } catch(e) { return { ok: false }; }
+  }
+
+  // ★ V9 추가: ms_final 실제 호출 (재사용) — 성공 시 true 리턴
+  async function performMsFinal() {
+    const revision = document.getElementById('ms-revision').value.trim();
+    const hint = document.getElementById('ms-zeeto-hint').innerText;
+    const grammar = document.getElementById('ms-grammar').value.trim();
+    try {
+      const res = await fetch(SHEET_URL, { method: 'POST', body: JSON.stringify({ type: "ms_final", studentId: currentStudentId, token: currentToken, hint: hint, revision: revision, grammar: grammar, reqWords: msCombinedWords }) });
+      const data = await res.json();
+      if (data.error) { alert("⚠️ 세션이 만료됐음! 다시 로그인하셈 👽"); logout(); return { ok: false, sessionExpired: true }; }
+      const rawText = (data.result || "").trim();
+      if (!rawText || rawText.includes("Zeeto가 잠깐 멈췄음")) return { ok: false };
+
+      let feedbackPart = "", finalPart = "", tipPart = "", oopsPart = "";
+      try {
+        const parts = rawText.split(/={2,}/);
+        parts.forEach((p, idx) => {
+          const label = p.trim().toLowerCase();
+          if(label.includes("피드백") || label.includes("feedback")) { if(parts[idx+1]) feedbackPart = parts[idx+1].trim(); }
+          else if(label.includes("최종본") || label.includes("final")) { if(parts[idx+1]) finalPart = parts[idx+1].trim(); }
+          else if(label.includes("꿀팁") || label.includes("tip")) { if(parts[idx+1]) tipPart = parts[idx+1].trim(); }
+          else if(label.includes("oops") || label.includes("오류")) { if(parts[idx+1]) oopsPart = parts[idx+1].trim(); }
+        });
+      } catch(e) {}
+
+      // ★ 파싱 실패 감지: 피드백도 최종본도 비어있으면 실패로 간주
+      if (!feedbackPart && !finalPart) return { ok: false };
+
+      document.getElementById('ms-zeeto-feedback').innerHTML = safeAiRender(feedbackPart);
+      document.getElementById('ms-zeeto-final').innerHTML = formatForPersonal(safeAiRender(finalPart || rawText));
+      document.getElementById('ms-zeeto-tip').innerHTML = formatForPersonal(safeAiRender(tipPart));
+      document.getElementById('ms-oops-point').dataset.original = oopsPart;
+      const oopsDisplay = oopsPart.replace(/👽 Zeeto의 퀴즈:[\s\S]*?🎯/g, '').trim();
+      document.getElementById('ms-oops-point').innerHTML = safeAiRender(oopsDisplay);
+      document.getElementById('ms-display-revision').innerText = revision;
+      return { ok: true };
+    } catch(e) { return { ok: false }; }
+  }
+
+  async function retryMsHint() {
+    if (hintRetryCooldown || isLoading) return;
+    if (hintRetryCount >= MAX_MS_RETRY) return;
+    hintRetryCount++; hintRetryCooldown = true;
+    showLoading("Zeeto 다시 호출 중... 🛸");
+    const r = await performMsHint();
+    hideLoading();
+    if (r.sessionExpired) return;
+    if (r.ok) {
+      showHintRetryBtn(false);
+      document.querySelectorAll('.story-step').forEach(step => step.classList.remove('active'));
+      document.getElementById('story-step-2').classList.add('active');
+      document.getElementById('mystory-screen').scrollTop = 0;
+    } else {
+      showHintRetryBtn(true, "아직 Zeeto가 답을 못했음 😿 잠시 후 다시 시도하셈.");
+    }
+    setTimeout(() => { hintRetryCooldown = false; if (hintRetryCount < MAX_MS_RETRY && document.getElementById('retry-hint-btn').style.display !== 'none') showHintRetryBtn(true, document.getElementById('retry-hint-msg').textContent); }, 5000);
+  }
+
+  async function retryMsFinal() {
+    if (finalRetryCooldown || isLoading) return;
+    if (finalRetryCount >= MAX_MS_RETRY) return;
+    finalRetryCount++; finalRetryCooldown = true;
+    showLoading("Zeeto 다시 호출 중... 🪄");
+    const r = await performMsFinal();
+    hideLoading();
+    if (r.sessionExpired) return;
+    const isOnStep3 = document.getElementById('story-step-3').classList.contains('active');
+    if (r.ok) {
+      showFinalRetryBtn(false, '', null);
+      document.querySelectorAll('.story-step').forEach(step => step.classList.remove('active'));
+      document.getElementById('story-step-3').classList.add('active');
+      document.getElementById('mystory-screen').scrollTop = 0;
+    } else {
+      showFinalRetryBtn(true, "아직 Zeeto가 답을 못했음 😿 잠시 후 다시 시도하셈.", isOnStep3 ? 'step3' : 'step2');
+    }
+    setTimeout(() => { finalRetryCooldown = false; }, 5000);
+  }
+
   async function goToStoryStep(stepNumber) {
     if(stepNumber === 2) {
       const lesson = document.getElementById('ms-lesson').value; const grammar = document.getElementById('ms-grammar').value.trim();
@@ -1813,53 +1967,27 @@ checkNewComments();
       msCombinedWords = `${r1}, ${r2}, ${r3}` + (o1 || o2 ? ` (선택: ${[o1, o2].filter(w => w).join(', ')})` : "");
       if(isLoading) return;
       showLoading("Zeeto 분석 중... 🛸");
-      try {
-        const res = await fetch(SHEET_URL, { method: 'POST', body: JSON.stringify({ type: "ms_hint", studentId: currentStudentId, token: currentToken, grammar: grammar, reqWords: msCombinedWords, title: title, draft: draft }) });
-        const data = await res.json(); hideLoading();
-        if (data.error) { alert("⚠️ 세션이 만료됐음! 다시 로그인하셈 👽"); logout(); return; }
-        document.getElementById('ms-zeeto-hint').innerHTML = safeAiRender(data.result);
-      } catch(e) { hideLoading(); return alert("통신 오류 🛸"); }
-      document.getElementById('ms-display-draft').innerHTML = `<b>${escapeHtml(title)}</b><br><br>${escapeHtml(draft)}`;
+      const r = await performMsHint();
+      hideLoading();
+      if (r.sessionExpired) return;
+      if (!r.ok) {
+        showHintRetryBtn(true, "Zeeto가 잠깐 멈췄음 🛸 아래 버튼으로 다시 부르셈! (초안은 그대로 남아있음)");
+        return;
+      }
+      showHintRetryBtn(false);
     }
     if(stepNumber === 3) {
       const revision = document.getElementById('ms-revision').value.trim(); if(!revision) return alert("수정본 작성해주셈! 👽");
       if(isLoading) return;
       showLoading("최종본 만드는 중... 🪄");
-      try {
-        const hint = document.getElementById('ms-zeeto-hint').innerText;
-        const grammar = document.getElementById('ms-grammar').value.trim(); // ★ 추가됨: 목표 문법 가져오기
-        // ★ 추가됨: 서버로 보낼 때 grammar랑 reqWords(필수단어)를 같이 묶어서 쏨!
-        const res = await fetch(SHEET_URL, { method: 'POST', body: JSON.stringify({ type: "ms_final", studentId: currentStudentId, token: currentToken, hint: hint, revision: revision, grammar: grammar, reqWords: msCombinedWords }) });
-        const data = await res.json();
-        if (data.error) { hideLoading(); alert("⚠️ 세션이 만료됐음! 다시 로그인하셈 👽"); logout(); return; }
-
-        const rawText = data.result;
-        let feedbackPart = ""; let finalPart = ""; let tipPart = ""; let oopsPart = "";
-
-        try {
-            // ★ V8: 유연한 파싱 — 등호 2개 이상(==, ===, ====...)과 앞뒤 공백 모두 허용
-            const parts = rawText.split(/={2,}/);
-            parts.forEach((p, idx) => {
-                const label = p.trim().toLowerCase();
-                if(label.includes("피드백") || label.includes("feedback")) { if(parts[idx+1]) feedbackPart = parts[idx+1].trim(); }
-                else if(label.includes("최종본") || label.includes("final")) { if(parts[idx+1]) finalPart = parts[idx+1].trim(); }
-                else if(label.includes("꿀팁") || label.includes("tip")) { if(parts[idx+1]) tipPart = parts[idx+1].trim(); }
-                else if(label.includes("oops") || label.includes("오류")) { if(parts[idx+1]) oopsPart = parts[idx+1].trim(); }
-            });
-            // ★ fallback: 파싱 실패 시 전체 텍스트를 최종본에 넣기
-            if(!finalPart && rawText) finalPart = rawText;
-        } catch(e) { finalPart = rawText; }
-
-        document.getElementById('ms-zeeto-feedback').innerHTML = safeAiRender(feedbackPart);
-        document.getElementById('ms-zeeto-final').innerHTML = formatForPersonal(safeAiRender(finalPart));
-        document.getElementById('ms-zeeto-tip').innerHTML = formatForPersonal(safeAiRender(tipPart));
-        // 원본은 몰래 숨겨두고(퀴즈 추출용), 화면(빨간박스)에서는 퀴즈 부분을 싹 지워서 깔끔하게!
-        document.getElementById('ms-oops-point').dataset.original = oopsPart;
-        const oopsDisplay = oopsPart.replace(/👽 Zeeto의 퀴즈:[\s\S]*?🎯/g, '').trim();
-        document.getElementById('ms-oops-point').innerHTML = safeAiRender(oopsDisplay);
-        hideLoading();
-      } catch(e) { hideLoading(); return alert("통신 오류 🛸"); }
-      document.getElementById('ms-display-revision').innerText = revision;
+      const r = await performMsFinal();
+      hideLoading();
+      if (r.sessionExpired) return;
+      if (!r.ok) {
+        showFinalRetryBtn(true, "Zeeto가 잠깐 멈췄음 🛸 아래 버튼으로 다시 부르셈! (수정본은 그대로 남아있음)", 'step2');
+        return;
+      }
+      showFinalRetryBtn(false, '', null);
     }
     if(stepNumber === 4) { 
       document.getElementById('ms-oops-point-copy').innerHTML = document.getElementById('ms-oops-point').innerHTML; 
@@ -1970,6 +2098,7 @@ checkNewComments();
       
       document.querySelectorAll('.story-step').forEach(step => step.classList.remove('active'));
       document.getElementById('story-step-1').classList.add('active'); changeTab('mypage-screen');
+      resetMsRetryState(); // ★ V9: 새 My Story 시작 시 재시도 카운트 초기화
     })
     .catch(e => { console.error('Story submit error:', e); hideLoading(); alert('통신 오류가 발생했어요 😵 다시 시도해주세요!'); });
   }
