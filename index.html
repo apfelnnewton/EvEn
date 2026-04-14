@@ -750,7 +750,7 @@
 
         <div id="error-container">
           <div class="error-new-box">
-            <textarea id="ms-error-1" class="input-field" style="width:100%; box-sizing:border-box; border-color:#d9534f; margin-bottom:8px; resize:none; line-height:1.4; background-color:#f4f4f4; color:#333;" rows="2" placeholder="Zeeto의 퀴즈가 여기에 나타납니다 👽" readonly></textarea>
+            <textarea id="ms-error-1" class="input-field" style="width:100%; box-sizing:border-box; border-color:#d9534f; margin-bottom:8px; resize:none; line-height:1.4; background-color:#f4f4f4; color:#333;" rows="2" placeholder="Zeeto가 만든 틀린 문장이 여기에 나타납니다 👽" readonly></textarea>
             <textarea id="ms-corrected-1" class="input-field" style="width:100%; box-sizing:border-box; border-color:#2e7d32; margin-bottom:5px; resize:none; line-height:1.4;" rows="2" placeholder="✅ 올바른 문장 (정문)"></textarea>
             <div style="display:flex; gap:5px; align-items:flex-start;">
               <textarea id="ms-reason-1" class="input-field" style="flex:1; margin-bottom:0; border-color:#4a5d4e; resize:none; line-height:1.4;" rows="2" placeholder="💡 왜 틀렸는지 이유"></textarea>
@@ -760,7 +760,7 @@
           </div>
 
           <div class="error-new-box">
-            <textarea id="ms-error-2" class="input-field" style="width:100%; box-sizing:border-box; border-color:#d9534f; margin-bottom:8px; resize:none; line-height:1.4; background-color:#f4f4f4; color:#333;" rows="2" placeholder="Zeeto의 퀴즈가 여기에 나타납니다 👽" readonly></textarea>
+            <textarea id="ms-error-2" class="input-field" style="width:100%; box-sizing:border-box; border-color:#d9534f; margin-bottom:8px; resize:none; line-height:1.4; background-color:#f4f4f4; color:#333;" rows="2" placeholder="Zeeto가 만든 틀린 문장이 여기에 나타납니다 👽" readonly></textarea>
             <textarea id="ms-corrected-2" class="input-field" style="width:100%; box-sizing:border-box; border-color:#2e7d32; margin-bottom:5px; resize:none; line-height:1.4;" rows="2" placeholder="✅ 올바른 문장 (정문)"></textarea>
             <div style="display:flex; gap:5px; align-items:flex-start;">
               <textarea id="ms-reason-2" class="input-field" style="flex:1; margin-bottom:0; border-color:#4a5d4e; resize:none; line-height:1.4;" rows="2" placeholder="💡 왜 틀렸는지 이유"></textarea>
@@ -770,7 +770,7 @@
           </div>
 
           <div class="error-new-box">
-            <textarea id="ms-error-3" class="input-field" style="width:100%; box-sizing:border-box; border-color:#d9534f; margin-bottom:8px; resize:none; line-height:1.4; background-color:#f4f4f4; color:#333;" rows="2" placeholder="Zeeto의 퀴즈가 여기에 나타납니다 👽" readonly></textarea>
+            <textarea id="ms-error-3" class="input-field" style="width:100%; box-sizing:border-box; border-color:#d9534f; margin-bottom:8px; resize:none; line-height:1.4; background-color:#f4f4f4; color:#333;" rows="2" placeholder="Zeeto가 만든 틀린 문장이 여기에 나타납니다 👽" readonly></textarea>
             <textarea id="ms-corrected-3" class="input-field" style="width:100%; box-sizing:border-box; border-color:#2e7d32; margin-bottom:5px; resize:none; line-height:1.4;" rows="2" placeholder="✅ 올바른 문장 (정문)"></textarea>
             <div style="display:flex; gap:5px; align-items:flex-start;">
               <textarea id="ms-reason-3" class="input-field" style="flex:1; margin-bottom:0; border-color:#4a5d4e; resize:none; line-height:1.4;" rows="2" placeholder="💡 왜 틀렸는지 이유"></textarea>
@@ -1138,7 +1138,7 @@
 
 <script>
   // ★ 여기에 새롭게 배포한 URL을 반드시 넣어주세요!
-  const SHEET_URL = "https://script.google.com/macros/s/AKfycbwinENyGJj4PleyKMXTNJkMUFkCYvFxVYqa2IsDAJUeDLQGhWDBWde3wCmyKgQDuebW2w/exec";
+  const SHEET_URL = "https://script.google.com/macros/s/AKfycbwaTD2miH-ffRpyxq34C1GlWY_IiWvOqWlhNq3fXbLHQlILRFpxLyHKSNPXAYNZ7W923A/exec";
 
   let currentFirstName = ""; let currentStudentId = ""; let currentUserProfile = ""; let currentLoginId = ""; let currentToken = "";
   let chatHistory = []; let allInstaPosts = []; let currentFilterUser = null; let newCommentData = { count: 0, posts: [] };
@@ -1911,7 +1911,7 @@ checkNewComments();
       document.getElementById('ms-zeeto-final').innerHTML = formatForPersonal(safeAiRender(finalPart || rawText));
       document.getElementById('ms-zeeto-tip').innerHTML = formatForPersonal(safeAiRender(tipPart));
       document.getElementById('ms-oops-point').dataset.original = oopsPart;
-      const oopsDisplay = oopsPart.replace(/👽 Zeeto의 퀴즈:[\s\S]*?🎯/g, '').trim();
+      const oopsDisplay = oopsPart.replace(/👽 Zeeto의 (비문 예시|퀴즈):[\s\S]*?🎯/g, '').trim();
       document.getElementById('ms-oops-point').innerHTML = safeAiRender(oopsDisplay);
       document.getElementById('ms-display-revision').innerText = revision;
       return { ok: true };
@@ -1989,25 +1989,39 @@ checkNewComments();
       }
       showFinalRetryBtn(false, '', null);
     }
-    if(stepNumber === 4) { 
-      document.getElementById('ms-oops-point-copy').innerHTML = document.getElementById('ms-oops-point').innerHTML; 
-      
-      // 화면에선 지워졌으니, 아까 몰래 숨겨둔 원본 데이터(dataset.original)에서 퀴즈 뽑아오기!
+    if(stepNumber === 4) {
+      document.getElementById('ms-oops-point-copy').innerHTML = document.getElementById('ms-oops-point').innerHTML;
+
+      // 화면에선 지워졌으니, 아까 몰래 숨겨둔 원본 데이터(dataset.original)에서 비문 예시 뽑아오기!
+      // ★ V9: 신규 마커(비문 예시)와 구버전 마커(퀴즈) 둘 다 지원
       const oopsText = document.getElementById('ms-oops-point').dataset.original || "";
-      const quizzes = oopsText.split('👽 Zeeto의 퀴즈:').slice(1).map(s => s.split('🎯')[0].trim());
+      const quizzes = oopsText.split(/👽 Zeeto의 (?:비문 예시|퀴즈):/).slice(1).map(s => s.split('🎯')[0].trim());
+
+      // ★ V9: Zeeto가 가끔 객관식/문제집 스타일로 뽑아내는 걸 조용히 걸러내기
+      const isBadQuizFormat = (t) => {
+        if (!t) return true;
+        const lower = t.toLowerCase();
+        if (/which of the following|choose the|choose one|select the|pick the|what is correct|what's wrong|what is wrong|correct answer|correct form|the right answer/i.test(t)) return true;
+        if (/\b[A-D]\)\s|\([A-D]\)|①|②|③|④|⑤/.test(t)) return true;           // A) B) C) D) 또는 원문자 선택지
+        if (/\d+\)\s.+\s+\d+\)/.test(t)) return true;                                // 1) ... 2) ... 번호 선택지 (같은 줄 또는 여러 줄)
+        if (/_{3,}/.test(t)) return true;                                            // 빈칸 _____
+        if (t.trim().endsWith('?')) return true;                                     // 의문문은 비문 예시로 부적절
+        return false;
+      };
 
       for (let i = 1; i <= 3; i++) {
         const errorInput = document.getElementById(`ms-error-${i}`);
         const newBox = errorInput.parentElement;
-        
-        if (quizzes[i-1]) {
-          newBox.style.display = 'block'; // 에러가 있으면 박스 보여주기
-          errorInput.value = quizzes[i-1].replace(/\^/g, ''); // ★ V8: 꺾쇠(^) 제거 후 자동 입력!
+        const rawQuiz = quizzes[i-1];
+
+        if (rawQuiz && !isBadQuizFormat(rawQuiz)) {
+          newBox.style.display = 'block'; // 정상 비문만 박스 보여주기
+          errorInput.value = rawQuiz.replace(/\^/g, ''); // ★ V8: 꺾쇠(^) 제거 후 자동 입력!
           errorInput.readOnly = true; // 학생이 문제 수정 못하게 막기
-          errorInput.style.backgroundColor = '#f4f4f4'; // 문제 칸은 회색 배경으로 처리
+          errorInput.style.backgroundColor = '#f4f4f4';
           errorInput.style.color = '#333';
         } else {
-          newBox.style.display = 'none'; // 에러가 없으면 아예 박스를 깔끔하게 숨김!
+          newBox.style.display = 'none'; // 없거나 이상한 포맷이면 박스 숨김
         }
       }
     }
