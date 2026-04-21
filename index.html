@@ -556,7 +556,7 @@
           </div>
           <div class="header-right"><span class="logout-btn" onclick="logout()">로그아웃</span></div>
         </div>
-        <div class="chat-box" id="chat-box"><div class="message received">👽 Hey there, Earthling! I'm Zeeto!</div></div>
+        <div class="chat-box" id="chat-box"><div class="message received" id="greeting-msg">👽 안녕! 나는 외계인 Zeeto. 지구 언어 영어 마스터. 질문 있음?</div></div>
         <div class="input-area">
           <input type="text" class="chat-input" id="chat-input" placeholder="Send a message...">
           <button class="send-btn" onclick="sendMessage()">Send</button>
@@ -1138,7 +1138,7 @@
 
 <script>
   // ★ 여기에 새롭게 배포한 URL을 반드시 넣어주세요!
-  const SHEET_URL = "https://script.google.com/macros/s/AKfycbxhUL8BnrMguXqQ21-QFIaj6wfvugNY-dcXI_xTeOiKn0P9dG8C8XAfm21CBf5QPDngLQ/exec";
+  const SHEET_URL = "https://script.google.com/macros/s/AKfycbzDxmVhD_q1xtNI4j80FReeQ15ndSFjrUIjiFyfwoIbIr26P8a2sSaSmTrTfnvqxkFmug/exec";
 
   let currentFirstName = ""; let currentStudentId = ""; let currentUserProfile = ""; let currentLoginId = ""; let currentToken = "";
   let chatHistory = []; let allInstaPosts = []; let currentFilterUser = null; let newCommentData = { count: 0, posts: [] };
@@ -1641,7 +1641,17 @@ checkNewComments();
       const data = await response.json();
       if (data.error) {
         if (data.error === "Unauthorized") { aiMsg.textContent = "⚠️ 세션이 만료됐음! 다시 로그인하셈 👽"; setTimeout(() => logout(), 2000); }
-        else { aiMsg.textContent = "⚠️ 오류: " + (data.error.message || data.error); }
+        else {
+          // ★ V7 수정(2026-04-21): 영어 과부하 에러("This model is highly demand...")를 한국어로 변환
+          const rawMsg = (data.error.message || data.error || "").toString();
+          if (/highly demand|overload|rate limit|quota|UNAVAILABLE|RESOURCE_EXHAUSTED|503|429/i.test(rawMsg)) {
+            aiMsg.textContent = "🛸 Zeeto가 너무 바빠서 잠시 후 다시 시도해달라고 함! 10초만 기다렸다가 한 번 더 보내보셈 👽";
+            // ★ 실패한 user 메시지는 chatHistory에서 제거 (다음 시도 때 중복 방지)
+            if (chatHistory.length && chatHistory[chatHistory.length-1].role === "user") chatHistory.pop();
+          } else {
+            aiMsg.textContent = "⚠️ 오류: " + rawMsg;
+          }
+        }
       }
       else {
         const aiReply = data?.candidates?.[0]?.content?.parts?.[0]?.text;
@@ -1891,6 +1901,9 @@ checkNewComments();
       if (data.error) { alert("⚠️ 세션이 만료됐음! 다시 로그인하셈 👽"); logout(); return { ok: false, sessionExpired: true }; }
       const rawText = (data.result || "").trim();
       if (!rawText || rawText.includes("Zeeto가 잠깐 멈췄음")) return { ok: false };
+      // ★ V7 수정(2026-04-21): 응답이 잘렸으면(이어짐 생략됨) 실패 처리해서 "다시 부르기" 버튼 띄우기
+      // → 이렇게 해야 꿀팁/Oops Point가 비어있는 채로 Step 4가 망가지지 않음
+      if (rawText.includes("이어짐 생략됨") || rawText.includes("✂️")) return { ok: false, truncated: true };
 
       let feedbackPart = "", finalPart = "", tipPart = "", oopsPart = "";
       try {
@@ -1906,6 +1919,9 @@ checkNewComments();
 
       // ★ 파싱 실패 감지: 피드백도 최종본도 비어있으면 실패로 간주
       if (!feedbackPart && !finalPart) return { ok: false };
+      // ★ V7 수정(2026-04-21): Oops Point가 통째로 누락(잘림)되면 Step 4 비문 활동이 안 뜨므로 실패 처리
+      // 정상 응답에서 Zeeto가 "오류 없음"을 반환하면 oopsPart에 "오류 없음" 텍스트가 들어있으므로 빈 문자열만 잘림으로 간주
+      if (!oopsPart) return { ok: false, truncated: true };
 
       document.getElementById('ms-zeeto-feedback').innerHTML = safeAiRender(feedbackPart);
       document.getElementById('ms-zeeto-final').innerHTML = formatForPersonal(safeAiRender(finalPart || rawText));
@@ -1952,7 +1968,11 @@ checkNewComments();
       document.getElementById('story-step-3').classList.add('active');
       document.getElementById('mystory-screen').scrollTop = 0;
     } else {
-      showFinalRetryBtn(true, "아직 Zeeto가 답을 못했음 😿 잠시 후 다시 시도하셈.", isOnStep3 ? 'step3' : 'step2');
+      // ★ V7 수정(2026-04-21): 잘림(truncated)일 때는 원인을 구체적으로 안내
+      const msg = r.truncated
+        ? "Zeeto 답변이 너무 길어서 잘렸음 ✂️ 다시 부르면 끝까지 나옴! (수정본은 그대로 남아있음)"
+        : "아직 Zeeto가 답을 못했음 😿 잠시 후 다시 시도하셈.";
+      showFinalRetryBtn(true, msg, isOnStep3 ? 'step3' : 'step2');
     }
     setTimeout(() => { finalRetryCooldown = false; }, 5000);
   }
@@ -1984,7 +2004,11 @@ checkNewComments();
       hideLoading();
       if (r.sessionExpired) return;
       if (!r.ok) {
-        showFinalRetryBtn(true, "Zeeto가 잠깐 멈췄음 🛸 아래 버튼으로 다시 부르셈! (수정본은 그대로 남아있음)", 'step2');
+        // ★ V7 수정(2026-04-21): 잘림 케이스를 구체적으로 안내 — Step 4 비문 활동이 안 뜨는 원인이 여기
+        const msg = r.truncated
+          ? "Zeeto 답변이 너무 길어서 잘렸음 ✂️ 아래 버튼으로 다시 부르면 끝까지 나옴! (수정본은 그대로 남아있음)"
+          : "Zeeto가 잠깐 멈췄음 🛸 아래 버튼으로 다시 부르셈! (수정본은 그대로 남아있음)";
+        showFinalRetryBtn(true, msg, 'step2');
         return;
       }
       showFinalRetryBtn(false, '', null);
