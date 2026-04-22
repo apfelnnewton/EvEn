@@ -3962,13 +3962,19 @@ async function sendWeeto() {
       input.disabled = true;
       input.placeholder = '클리어! 🎉';
       const lastMsg = res.reply;
-      setTimeout(() => handleTeachingClear(lastMsg), 1500);
+      // ★ V8 (W-1 수정 2026-04-22): 1.5초 race 시간 동안 학생이 뒤로가기 눌러도 안전하게 — grammar/attempt 캡처
+      const capturedGrammar = currentWeeetoGrammar;
+      const capturedAttempt = currentWeetoAttempt;
+      setTimeout(() => handleTeachingClear(lastMsg, capturedGrammar, capturedAttempt), 1500);
     } else if (res.isGG) {
       // GG일 때도 채팅에 표시하지 않고 오버레이에서만 보여줌
       input.disabled = true;
       input.placeholder = '다음에 다시 도전!';
       const lastMsg = res.reply;
-      setTimeout(() => handleTeachingGG(lastMsg), 1500);
+      // ★ V8 (W-1 수정 2026-04-22): 1.5초 race 시간 동안 학생이 뒤로가기 눌러도 안전하게 — grammar/attempt 캡처
+      const capturedGrammarGG = currentWeeetoGrammar;
+      const capturedAttemptGG = currentWeetoAttempt;
+      setTimeout(() => handleTeachingGG(lastMsg, capturedGrammarGG, capturedAttemptGG), 1500);
     } else {
       // 일반 대화: 채팅에 메시지 표시 + 입력 잠금 해제
       chatBox.innerHTML += '<div class="message received">👾 ' + safeAiRender(res.reply) + '</div>';
@@ -3984,7 +3990,12 @@ async function sendWeeto() {
   }
 }
 
-async function handleTeachingClear(lastMsg) {
+async function handleTeachingClear(lastMsg, capturedGrammar, capturedAttempt) {
+  // ★ V8 (W-1 수정 2026-04-22): 인자로 받은 grammar/attempt 우선 사용 (전역 변수가 null이어도 안전)
+  // 학생이 1.5초 race 동안 뒤로가기 눌러서 currentWeeetoGrammar=null이 되어도 정상 저장됨
+  const g = capturedGrammar || currentWeeetoGrammar;
+  const att = capturedAttempt || currentWeetoAttempt;
+  if (!g) { console.error('Teaching clear: no grammar context, abort'); return; }
   // Record clear on server
   try {
     const res = await fetch(SHEET_URL, {
@@ -3993,9 +4004,9 @@ async function handleTeachingClear(lastMsg) {
         type: 'teach_complete',
         studentId: currentStudentId,
         token: currentToken,
-        lesson: currentWeeetoGrammar.lesson,
-        grammarName: currentWeeetoGrammar.grammarName,
-        attempt: currentWeetoAttempt
+        lesson: g.lesson,
+        grammarName: g.grammarName,
+        attempt: att
       })
     }).then(r => r.json());
 
@@ -4004,7 +4015,7 @@ async function handleTeachingClear(lastMsg) {
     overlay.className = 'clear-overlay';
     overlay.innerHTML = '<div class="clear-emoji">🎉</div>' +
       '<div class="clear-text">Teaching Clear!</div>' +
-      '<div class="clear-sub">' + escapeHtml(currentWeeetoGrammar.grammarName) + (res.alreadyCleared ? ' (이미 클리어 — 재도전 성공!)' : ' (+3점!)') + '</div>' +
+      '<div class="clear-sub">' + escapeHtml(g.grammarName) + (res.alreadyCleared ? ' (이미 클리어 — 재도전 성공!)' : ' (+3점!)') + '</div>' +
       (lastMsg ? '<div style="background:rgba(255,255,255,0.15);border-radius:12px;padding:12px 16px;margin:15px 20px 0;max-height:120px;overflow-y:auto;font-size:0.85rem;color:#eee;line-height:1.5;text-align:left;">👾 ' + safeAiRender(lastMsg) + '</div>' : '') +
       '<button class="clear-btn" onclick="closeClearOverlay(this)">돌아가기</button>';
     document.querySelector('.mobile-app').appendChild(overlay);
@@ -4013,13 +4024,17 @@ async function handleTeachingClear(lastMsg) {
     if (!res.alreadyCleared) {
       myTeaching.push({
         grade: currentStudentId.charAt(0),
-        lesson: currentWeeetoGrammar.lesson,
-        grammarName: currentWeeetoGrammar.grammarName,
+        lesson: g.lesson,
+        grammarName: g.grammarName,
         clearDate: new Date().toISOString()
       });
       // ★ sessionStorage 동기화 (새로고침 방어)
       const savedLogin = sessionStorage.getItem('even_login');
       if (savedLogin) { const loginData = JSON.parse(savedLogin); loginData.myTeaching = myTeaching; sessionStorage.setItem('even_login', JSON.stringify(loginData)); }
+    }
+    // ★ V8 (W-1 수정): 학생이 race로 뒤로가서 closeClearOverlay의 갱신 분기를 못 탔을 수도 있으니 여기서도 갱신
+    if (!weetoClearedList.some(c => String(c.lesson) === String(g.lesson) && c.grammarName === g.grammarName)) {
+      weetoClearedList.push({ lesson: g.lesson, grammarName: g.grammarName });
     }
   } catch(e) {
     console.error('Teaching clear save error:', e);
@@ -4028,13 +4043,17 @@ async function handleTeachingClear(lastMsg) {
     overlay.className = 'clear-overlay';
     overlay.innerHTML = '<div class="clear-emoji">🎉</div>' +
       '<div class="clear-text">Teaching Clear!</div>' +
-      '<div class="clear-sub">' + escapeHtml(currentWeeetoGrammar.grammarName) + ' (저장은 나중에 다시 시도해주세요)</div>' +
+      '<div class="clear-sub">' + escapeHtml(g.grammarName) + ' (저장은 나중에 다시 시도해주세요)</div>' +
       '<button class="clear-btn" onclick="closeClearOverlay(this)">돌아가기</button>';
     document.querySelector('.mobile-app').appendChild(overlay);
   }
 }
 
-async function handleTeachingGG(lastMsg) {
+async function handleTeachingGG(lastMsg, capturedGrammar, capturedAttempt) {
+  // ★ V8 (W-1 수정 2026-04-22): 인자로 받은 grammar/attempt 우선 사용 (전역 변수가 null이어도 안전)
+  const g = capturedGrammar || currentWeeetoGrammar;
+  const att = capturedAttempt || currentWeetoAttempt;
+  if (!g) { console.error('Teaching GG: no grammar context, abort'); return; }
   // GG: Teaching 시트에 gg로 기록 (점수/도장 없음)
   try {
     await fetch(SHEET_URL, {
@@ -4043,10 +4062,10 @@ async function handleTeachingGG(lastMsg) {
         type: 'teach_complete',
         studentId: currentStudentId,
         token: currentToken,
-        lesson: currentWeeetoGrammar.lesson,
-        grammarName: currentWeeetoGrammar.grammarName,
+        lesson: g.lesson,
+        grammarName: g.grammarName,
         clearType: 'gg',
-        attempt: currentWeetoAttempt
+        attempt: att
       })
     });
   } catch(e) { console.error('GG save error:', e); }
