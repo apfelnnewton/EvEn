@@ -1138,7 +1138,7 @@
 
 <script>
   // ★ 여기에 새롭게 배포한 URL을 반드시 넣어주세요!
-  const SHEET_URL = "https://script.google.com/macros/s/AKfycbz5eyKdvfztKXM4m7MHTCBp_3eaFQBQCsAyo2XVzpo9kWWFMo7UTM6bdU94OKxl41scVQ/exec";
+  const SHEET_URL = "https://script.google.com/macros/s/AKfycbxcQ4d3L945RgUPFDjRQ0dnJl51sCjD2rmhi_j42fyL7poLM6nMfZhUBHnVAEB9vzlpUQ/exec";
 
   let currentFirstName = ""; let currentStudentId = ""; let currentUserProfile = ""; let currentLoginId = ""; let currentToken = "";
   let chatHistory = []; let allInstaPosts = []; let currentFilterUser = null; let newCommentData = { count: 0, posts: [] };
@@ -3811,43 +3811,74 @@ async function sendWeetoAuto(systemMsg) {
   // Show typing indicator
   chatBox.innerHTML += '<div class="message received" id="weeto-typing"><div class="typing-indicator"><div class="dot" style="animation-delay:0s"></div><div class="dot" style="animation-delay:0.2s"></div><div class="dot" style="animation-delay:0.4s"></div></div></div>';
   chatBox.scrollTop = chatBox.scrollHeight;
+
+  const payload = {
+    type: 'teach_chat',
+    studentId: currentStudentId,
+    token: currentToken,
+    lesson: currentWeeetoGrammar.lesson,
+    grammarName: currentWeeetoGrammar.grammarName,
+    grammarDesc: currentWeeetoGrammar.grammarDesc,
+    exampleWrong: currentWeeetoGrammar.exampleWrong,
+    message: systemMsg,
+    history: weetoChatHistory.map(h => h.role + ': ' + h.text).join('\n'),
+    attempt: currentWeetoAttempt
+  };
+
+  // ★ V9.1: 첫 인사 실패 시 자동 1회 재시도 + 에러 폴백은 히스토리 오염 안 되게
+  let res = null;
   try {
-    const res = await fetch(SHEET_URL, {
-      method: 'POST',
-      body: JSON.stringify({
-        type: 'teach_chat',
-        studentId: currentStudentId,
-        token: currentToken,
-        lesson: currentWeeetoGrammar.lesson,
-        grammarName: currentWeeetoGrammar.grammarName,
-        grammarDesc: currentWeeetoGrammar.grammarDesc,
-        exampleWrong: currentWeeetoGrammar.exampleWrong,
-        message: systemMsg,
-        history: weetoChatHistory.map(h => h.role + ': ' + h.text).join('\n'),
-        attempt: currentWeetoAttempt
-      })
-    }).then(r => r.json());
-    const typing = document.getElementById('weeto-typing');
-    if (typing) typing.remove();
-    if (res.reply) {
-      weetoChatHistory.push({ role: 'Weeto', text: res.reply });
-      chatBox.innerHTML += '<div class="message received">👾 ' + safeAiRender(res.reply) + '</div>';
-      chatBox.scrollTop = chatBox.scrollHeight;
+    res = await fetch(SHEET_URL, { method: 'POST', body: JSON.stringify(payload) }).then(r => r.json());
+    // 서버가 에러 폴백을 반환한 경우(errorReason 존재) → 2초 대기 후 1회 재시도
+    if (res && res.errorReason) {
+      await new Promise(r => setTimeout(r, 2000));
+      try { res = await fetch(SHEET_URL, { method: 'POST', body: JSON.stringify(payload) }).then(r => r.json()); } catch(e2) { res = null; }
     }
-    // ★ Weeto 첫인사 완료 → 입력창 활성화
-    const autoInput = document.getElementById('weeto-chat-input');
-    autoInput.disabled = false;
-    autoInput.placeholder = 'Weeto에게 문법을 설명해주세요...';
-    autoInput.focus();
   } catch(e) {
-    const typing = document.getElementById('weeto-typing');
-    if (typing) typing.remove();
-    chatBox.innerHTML += '<div class="message received" style="color:red;">오류가 발생했어요. 다시 시도해주세요.</div>';
-    // ★ 에러 시에도 입력창 활성화 (재시도 가능하게)
-    const autoInput = document.getElementById('weeto-chat-input');
-    autoInput.disabled = false;
-    autoInput.placeholder = 'Weeto에게 문법을 설명해주세요...';
+    res = null;
   }
+
+  const typing = document.getElementById('weeto-typing');
+  if (typing) typing.remove();
+  const autoInput = document.getElementById('weeto-chat-input');
+
+  // ★ 네트워크 실패 (res === null)
+  if (!res) {
+    chatBox.innerHTML += '<div class="message received" style="background:#fdecea;color:#c62828;border:1px solid #f5c6cb;">⚠️ 네트워크 오류가 발생했음. 인터넷 연결 확인 후 아래 버튼 눌러주셈.<br><button onclick="retryWeetoGreeting()" style="margin-top:8px;background:#4a5d4e;color:white;border:none;padding:6px 12px;border-radius:8px;cursor:pointer;font-size:0.85rem;">🔄 Weeto 다시 부르기</button></div>';
+    chatBox.scrollTop = chatBox.scrollHeight;
+    autoInput.disabled = true;
+    autoInput.placeholder = 'Weeto를 먼저 다시 부르세요...';
+    return;
+  }
+
+  // ★ 재시도 후에도 서버 에러 폴백 → 시스템 에러 스타일 + 히스토리 push 안 함
+  if (res.errorReason) {
+    chatBox.innerHTML += '<div class="message received" style="background:#fff3cd;color:#856404;border:1px solid #ffeaa7;">🛸 Weeto 신호가 약해서 연결을 못했음! 🛰️ 잠시 후 아래 버튼 눌러서 다시 불러보셈.<br><button onclick="retryWeetoGreeting()" style="margin-top:8px;background:#4a5d4e;color:white;border:none;padding:6px 12px;border-radius:8px;cursor:pointer;font-size:0.85rem;">🔄 Weeto 다시 부르기</button></div>';
+    chatBox.scrollTop = chatBox.scrollHeight;
+    // 에러 폴백은 히스토리에 저장하지 않음 (다음 호출 컨텍스트 오염 방지)
+    autoInput.disabled = true;
+    autoInput.placeholder = 'Weeto를 먼저 다시 부르세요...';
+    return;
+  }
+
+  if (res.reply) {
+    weetoChatHistory.push({ role: 'Weeto', text: res.reply });
+    chatBox.innerHTML += '<div class="message received">👾 ' + safeAiRender(res.reply) + '</div>';
+    chatBox.scrollTop = chatBox.scrollHeight;
+  }
+  // ★ Weeto 첫인사 완료 → 입력창 활성화
+  autoInput.disabled = false;
+  autoInput.placeholder = 'Weeto에게 문법을 설명해주세요...';
+  autoInput.focus();
+}
+
+// ★ V9.1: Weeto 첫 인사 재시도 버튼 핸들러
+function retryWeetoGreeting() {
+  const chatBox = document.getElementById('weeto-chat-box');
+  // 마지막 에러 메시지 제거
+  const messages = chatBox.querySelectorAll('.message.received');
+  if (messages.length > 0) messages[messages.length - 1].remove();
+  sendWeetoAuto('(첫 만남 - 자기소개하고 이 문법 배우고 싶다고 해줘)');
 }
 
 async function sendWeeto() {
@@ -3867,57 +3898,87 @@ async function sendWeeto() {
   // Show typing indicator
   chatBox.innerHTML += '<div class="message received" id="weeto-typing"><div class="typing-indicator"><div class="dot" style="animation-delay:0s"></div><div class="dot" style="animation-delay:0.2s"></div><div class="dot" style="animation-delay:0.4s"></div></div></div>';
   chatBox.scrollTop = chatBox.scrollHeight;
+
+  const payload = {
+    type: 'teach_chat',
+    studentId: currentStudentId,
+    token: currentToken,
+    lesson: currentWeeetoGrammar.lesson,
+    grammarName: currentWeeetoGrammar.grammarName,
+    grammarDesc: currentWeeetoGrammar.grammarDesc,
+    exampleWrong: currentWeeetoGrammar.exampleWrong,
+    message: msg,
+    history: weetoChatHistory.map(h => h.role + ': ' + h.text).join('\n'),
+    attempt: currentWeetoAttempt
+  };
+
+  // ★ V9.1: 자동 1회 재시도 + 에러 폴백 시 히스토리 오염 방지
+  let res = null;
   try {
-    const res = await fetch(SHEET_URL, {
-      method: 'POST',
-      body: JSON.stringify({
-        type: 'teach_chat',
-        studentId: currentStudentId,
-        token: currentToken,
-        lesson: currentWeeetoGrammar.lesson,
-        grammarName: currentWeeetoGrammar.grammarName,
-        grammarDesc: currentWeeetoGrammar.grammarDesc,
-        exampleWrong: currentWeeetoGrammar.exampleWrong,
-        message: msg,
-        history: weetoChatHistory.map(h => h.role + ': ' + h.text).join('\n'),
-        attempt: currentWeetoAttempt
-      })
-    }).then(r => r.json());
-    const typing = document.getElementById('weeto-typing');
-    if (typing) typing.remove();
-    if (res.reply) {
-      weetoChatHistory.push({ role: 'Weeto', text: res.reply });
-      // Check for CLEAR or GG
-      if (res.isClear) {
-        // CLEAR일 때는 채팅에 표시하지 않고 오버레이에서만 보여줌
-        input.disabled = true;
-        input.placeholder = '클리어! 🎉';
-        const lastMsg = res.reply;
-        setTimeout(() => handleTeachingClear(lastMsg), 1500);
-      } else if (res.isGG) {
-        // GG일 때도 채팅에 표시하지 않고 오버레이에서만 보여줌
-        input.disabled = true;
-        input.placeholder = '다음에 다시 도전!';
-        const lastMsg = res.reply;
-        setTimeout(() => handleTeachingGG(lastMsg), 1500);
-      } else {
-        // 일반 대화: 채팅에 메시지 표시 + 입력 잠금 해제
-        chatBox.innerHTML += '<div class="message received">👾 ' + safeAiRender(res.reply) + '</div>';
-        chatBox.scrollTop = chatBox.scrollHeight;
-        input.disabled = false;
-        input.placeholder = '메시지를 입력하세요...';
-        input.focus();
-      }
-    } else {
-      // 응답이 비었을 때도 잠금 해제
-      input.disabled = false;
-      input.placeholder = '메시지를 입력하세요...';
+    res = await fetch(SHEET_URL, { method: 'POST', body: JSON.stringify(payload) }).then(r => r.json());
+    if (res && res.errorReason) {
+      await new Promise(r => setTimeout(r, 2000));
+      try { res = await fetch(SHEET_URL, { method: 'POST', body: JSON.stringify(payload) }).then(r => r.json()); } catch(e2) { res = null; }
     }
   } catch(e) {
-    const typing = document.getElementById('weeto-typing');
-    if (typing) typing.remove();
-    chatBox.innerHTML += '<div class="message received" style="color:red;">오류가 발생했어요. 다시 시도해주세요.</div>';
-    // ★ 에러 시에도 잠금 해제
+    res = null;
+  }
+
+  const typing = document.getElementById('weeto-typing');
+  if (typing) typing.remove();
+
+  // ★ 네트워크 실패 → 학생 메시지는 history에서 pop (다음 시도 시 중복 방지) + 입력 복구
+  if (!res) {
+    if (weetoChatHistory.length && weetoChatHistory[weetoChatHistory.length-1].role === '학생') {
+      weetoChatHistory.pop();
+    }
+    chatBox.innerHTML += '<div class="message received" style="background:#fdecea;color:#c62828;border:1px solid #f5c6cb;">⚠️ 네트워크 오류. 메시지를 다시 보내보셈.</div>';
+    chatBox.scrollTop = chatBox.scrollHeight;
+    input.disabled = false;
+    input.placeholder = '메시지를 입력하세요...';
+    input.focus();
+    return;
+  }
+
+  // ★ 재시도 후에도 서버 에러 폴백 → 학생 메시지 history에서 pop + 시스템 에러 표시 + 입력 복구
+  if (res.errorReason) {
+    if (weetoChatHistory.length && weetoChatHistory[weetoChatHistory.length-1].role === '학생') {
+      weetoChatHistory.pop();
+    }
+    chatBox.innerHTML += '<div class="message received" style="background:#fff3cd;color:#856404;border:1px solid #ffeaa7;">🛸 Weeto 신호가 약함! 🛰️ 10초만 기다렸다가 메시지 한 번 더 보내보셈.</div>';
+    chatBox.scrollTop = chatBox.scrollHeight;
+    // 에러 폴백은 weetoChatHistory에 push하지 않음 (다음 호출 컨텍스트 오염 방지)
+    input.disabled = false;
+    input.placeholder = '메시지를 입력하세요...';
+    input.focus();
+    return;
+  }
+
+  if (res.reply) {
+    weetoChatHistory.push({ role: 'Weeto', text: res.reply });
+    // Check for CLEAR or GG
+    if (res.isClear) {
+      // CLEAR일 때는 채팅에 표시하지 않고 오버레이에서만 보여줌
+      input.disabled = true;
+      input.placeholder = '클리어! 🎉';
+      const lastMsg = res.reply;
+      setTimeout(() => handleTeachingClear(lastMsg), 1500);
+    } else if (res.isGG) {
+      // GG일 때도 채팅에 표시하지 않고 오버레이에서만 보여줌
+      input.disabled = true;
+      input.placeholder = '다음에 다시 도전!';
+      const lastMsg = res.reply;
+      setTimeout(() => handleTeachingGG(lastMsg), 1500);
+    } else {
+      // 일반 대화: 채팅에 메시지 표시 + 입력 잠금 해제
+      chatBox.innerHTML += '<div class="message received">👾 ' + safeAiRender(res.reply) + '</div>';
+      chatBox.scrollTop = chatBox.scrollHeight;
+      input.disabled = false;
+      input.placeholder = '메시지를 입력하세요...';
+      input.focus();
+    }
+  } else {
+    // 응답이 비었을 때도 잠금 해제
     input.disabled = false;
     input.placeholder = '메시지를 입력하세요...';
   }
