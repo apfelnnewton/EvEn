@@ -1138,7 +1138,7 @@
 
 <script>
   // ★ 여기에 새롭게 배포한 URL을 반드시 넣어주세요!
-  const SHEET_URL = "https://script.google.com/macros/s/AKfycbwL3nbV-PXPoNYgN4UOfeezAcvc1kVYOTEPXqeV1z2O_Solju7b8GftGQvgWKFhtbcyDA/exec";
+  const SHEET_URL = "https://script.google.com/macros/s/AKfycbz_tVL8jCyXY34fhwmmSgpDjNBrkgMt4CxAzac3xCKkvabtS97pcDxCp2-R2-q0OcyB-A/exec";
 
   let currentFirstName = ""; let currentStudentId = ""; let currentUserProfile = ""; let currentLoginId = ""; let currentToken = "";
   let chatHistory = []; let allInstaPosts = []; let currentFilterUser = null; let newCommentData = { count: 0, posts: [] };
@@ -4072,11 +4072,15 @@ async function handleTeachingGG(lastMsg, capturedGrammar, capturedAttempt) {
 
   const overlay = document.createElement('div');
   overlay.className = 'clear-overlay';
+  // ★ V9 개편(2026-04-24): GG 문구 톤 업 + "다시 도전!" 버튼 추가
   overlay.innerHTML = '<div class="clear-emoji">👾</div>' +
-    '<div class="clear-text">다음에 다시 도전!</div>' +
-    '<div class="clear-sub">Weeto가 아직 이해 못했어요</div>' +
+    '<div class="clear-text">앗, Weeto가 아직 못 배웠나봐 😭</div>' +
+    '<div class="clear-sub">다음엔 더 잘 가르쳐줘!</div>' +
     (lastMsg ? '<div style="background:rgba(255,255,255,0.15);border-radius:12px;padding:12px 16px;margin:15px 20px 0;max-height:120px;overflow-y:auto;font-size:0.85rem;color:#eee;line-height:1.5;text-align:left;">👾 ' + safeAiRender(lastMsg) + '</div>' : '') +
-    '<button class="clear-btn" onclick="closeGGOverlay(this)">돌아가기</button>';
+    '<div style="display:flex; gap:12px; margin-top:25px;">' +
+      '<button class="clear-btn" style="margin-top:0; background:#8a9e8e;" onclick="closeGGOverlay(this)">돌아가기</button>' +
+      '<button class="clear-btn" style="margin-top:0;" onclick="retryTeachingGG(this)">다시 도전!</button>' +
+    '</div>';
   document.querySelector('.mobile-app').appendChild(overlay);
 }
 
@@ -4087,6 +4091,26 @@ function closeGGOverlay(btn) {
   // attemptCounts 증가는 backToGrammarSelect()에서 통합 처리
   backToGrammarSelect();
   renderGrammarList();
+}
+
+// ★ V9 신규(2026-04-24): GG 화면에서 바로 재도전
+// GG는 이미 서버에 기록됨 → 로컬 attemptCounts도 1 증가시키고 같은 문법으로 startTeaching 재호출
+// startTeaching 내부에서 attempt 번호 재계산되어 프롬프트로 전달됨 → Weeto가 재도전임을 인지
+function retryTeachingGG(btn) {
+  const overlay = btn.closest('.clear-overlay');
+  if (overlay) overlay.remove();
+  if (!currentWeeetoGrammar) {
+    // 방어: grammar 컨텍스트가 없으면 문법 목록으로 복귀
+    backToGrammarSelect();
+    renderGrammarList();
+    return;
+  }
+  const key = currentWeeetoGrammar.lesson + "||" + currentWeeetoGrammar.grammarName;
+  window._weetoAttemptCounts = window._weetoAttemptCounts || {};
+  window._weetoAttemptCounts[key] = (window._weetoAttemptCounts[key] || 0) + 1;
+  // 같은 문법으로 재도전 시작 (startTeaching이 내부에서 weetoChatHistory 초기화 + 새 attempt 번호 계산)
+  const g = currentWeeetoGrammar;
+  startTeaching(g.grammarName, g.lesson);
 }
 
 function closeClearOverlay(btn) {
