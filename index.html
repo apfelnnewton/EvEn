@@ -1216,8 +1216,8 @@
     const data = JSON.parse(savedLogin);
     
     currentFirstName = data.firstName; 
-currentUserProfile = `${data.emoji} ${data.firstName}`; 
-currentStudentId = data.studentId;
+currentUserProfile = `${data.emoji} ${data.firstName}`;
+currentStudentId = String(data.studentId || "");
 currentLoginId = data.loginId || "";
 currentToken = data.token || "";
     
@@ -1508,7 +1508,7 @@ checkNewComments();
       if (data.success) {
         data.loginId = id;
         sessionStorage.setItem('even_login', JSON.stringify(data));
-        currentFirstName = data.firstName; currentUserProfile = `${data.emoji} ${data.firstName}`; currentStudentId = data.studentId;
+        currentFirstName = data.firstName; currentUserProfile = `${data.emoji} ${data.firstName}`; currentStudentId = String(data.studentId || "");
         currentLoginId = id; currentToken = data.token || "";
         myLearningLogs = data.myLogs || [];
         myStories = data.myStories || [];
@@ -2019,7 +2019,13 @@ checkNewComments();
       // 화면에선 지워졌으니, 아까 몰래 숨겨둔 원본 데이터(dataset.original)에서 비문 예시 뽑아오기!
       // ★ V9: 신규 마커(비문 예시)와 구버전 마커(퀴즈) 둘 다 지원
       const oopsText = document.getElementById('ms-oops-point').dataset.original || "";
-      const quizzes = oopsText.split(/👽 Zeeto의 (?:비문 예시|퀴즈):/).slice(1).map(s => s.split('🎯')[0].trim());
+      // ★ 삼중 방어: ① 비어있지 않은 첫 줄만 추출 ② 다음 문제 마커("n. ❌") 앞에서 자르기 ③ 🎯 꿀팁 마커 앞에서 자르기
+      const quizzes = oopsText.split(/👽 Zeeto의 (?:비문 예시|퀴즈):/).slice(1).map(s => {
+        const lines = s.split('\n').map(l => l.trim()).filter(l => l.length > 0);
+        const firstLine = lines[0] || "";
+        const beforeNextMistake = firstLine.split(/\d+\.\s*❌/)[0];
+        return beforeNextMistake.split('🎯')[0].trim();
+      });
 
       // ★ V9: Zeeto가 가끔 객관식/문제집 스타일로 뽑아내는 걸 조용히 걸러내기
       const isBadQuizFormat = (t) => {
@@ -2831,7 +2837,7 @@ function enterUndercoverMode() {
     profile: currentUserProfile
   };
  isUndercover = true;
-  currentStudentId = teacherOriginalState.studentId;
+  currentStudentId = String(teacherOriginalState.studentId || "");
   currentFirstName = teacherOriginalState.firstName;
   currentUserProfile = teacherOriginalState.profile; // 🍌 가입할 때 고른 이모지 그대로 유지!
   
@@ -2850,7 +2856,7 @@ function enterUndercoverMode() {
 function exitUndercoverMode() {
   isUndercover = false;
   currentFirstName = teacherOriginalState.firstName;
-  currentStudentId = teacherOriginalState.studentId;
+  currentStudentId = String(teacherOriginalState.studentId || "");
   currentLoginId = teacherOriginalState.loginId;
   currentUserProfile = teacherOriginalState.profile;
   
@@ -4023,7 +4029,7 @@ async function handleTeachingClear(lastMsg, capturedGrammar, capturedAttempt) {
     // Update local data
     if (!res.alreadyCleared) {
       myTeaching.push({
-        grade: currentStudentId.charAt(0),
+        grade: String(currentStudentId).charAt(0),
         lesson: g.lesson,
         grammarName: g.grammarName,
         clearDate: new Date().toISOString()
