@@ -2005,6 +2005,7 @@ checkNewComments();
   }
 
   function submitLog() {
+    if (isTeacherSelf) { alert('👩‍🏫 선생님 계정은 ENGsta 글쓰기만 됨. 다른 탭은 둘러보기 전용임.'); return; }
     const lessonVal = document.getElementById('lesson-select').value; const summaryVal = document.getElementById('log-summary').value.trim();
     const newThingsVal = document.getElementById('log-new').value.trim(); const p1Val = document.getElementById('practice-1').value.trim();
     const p2Val = document.getElementById('practice-2').value.trim(); const reflectionVal = document.getElementById('log-reflection').value.trim();
@@ -3046,6 +3047,7 @@ checkNewComments();
   }
 
   async function submitOopsRetry() {
+    if (isTeacherSelf) { alert('👩‍🏫 선생님 계정은 ENGsta 글쓰기만 됨. 다른 탭은 둘러보기 전용임.'); return; }
     if (currentOopsRetryStory == null) return;
     const story = myStories[currentOopsRetryStory];
     if (!story) return alert('Story 정보가 사라짐 🛸');
@@ -3334,6 +3336,7 @@ checkNewComments();
   }
 
   function submitMyStory() {
+    if (isTeacherSelf) { alert('👩‍🏫 선생님 계정은 ENGsta 글쓰기만 됨. 다른 탭은 둘러보기 전용임.'); return; }
     const reflection = document.getElementById('ms-reflection').value.trim(); if(!reflection) return alert("성찰(Reflection)을 적어주셈! 🌱");
 
     // ★ V6→V8: Oops Point 퀴즈가 있으면 정문+이유 모두 필수 체크
@@ -3823,10 +3826,11 @@ checkNewComments();
     };
     try {
       // ★ V10 패치(2026-05-13): tempId를 서버로 보내서 서버 시트에도 같은 ID 저장 → 댓글이 새 글에 정확히 매칭됨
-      const res = await fetch(SHEET_URL, { method: 'POST', body: JSON.stringify({ type: "insta_write", tempId: tempId, userName: currentUserProfile, studentId: currentStudentId, token: currentToken, firstName: currentFirstName, content: content, image: image, exitCount: engstaExitCount }) });
+      const res = await fetch(SHEET_URL, { method: 'POST', body: JSON.stringify({ type: "insta_write", tempId: tempId, userName: currentUserProfile, studentId: currentStudentId, token: currentToken, teacherId: (isTeacherSelf ? currentLoginId : ""), teacherPw: (isTeacherSelf ? teacherPw : ""), firstName: currentFirstName, content: content, image: image, exitCount: engstaExitCount }) });
       const text = await res.text();
       if (text === "Unauthorized") {
-        rollback('세션 만료');
+        rollback('인증 실패');
+        if (isTeacherSelf) { alert('⚠️ 선생님 인증 실패. 백엔드(V14) 배포됐는지 확인하고 다시 시도해보셈.'); return; }
         alert("⚠️ 다른 기기에서 로그인해서 세션이 만료됐음! 다시 로그인하셈 👽");
         logout();
         return;
@@ -3932,6 +3936,7 @@ checkNewComments();
           postId: postId,
           userName: currentUserProfile,
           studentId: currentStudentId, token: currentToken,
+          teacherId: (isTeacherSelf ? currentLoginId : ""), teacherPw: (isTeacherSelf ? teacherPw : ""),
           comment: comment,
           commentId: newCommentId,
           parentId: currentParentId
@@ -3939,7 +3944,8 @@ checkNewComments();
       });
       const txt = await res.text();
       if (txt === "Unauthorized") {
-        rollbackComment('세션 만료');
+        rollbackComment('인증 실패');
+        if (isTeacherSelf) { alert('⚠️ 선생님 인증 실패. 백엔드(V14) 배포됐는지 확인하고 다시 시도해보셈.'); return; }
         alert("⚠️ 다른 기기에서 로그인해서 세션이 만료됐음! 다시 로그인하셈 👽");
         logout();
         return;
@@ -4284,7 +4290,7 @@ async function openNoticeModal() {
       method: 'POST', mode: 'no-cors',
       body: JSON.stringify({
         type: "showcase_like", postId: postId, postTitle: post.title,
-        authorInfo: `${post.studentId}(${post.userName})`, reactorId: safeStudentId, reactorName: currentFirstName, token: currentToken
+        authorInfo: `${post.studentId}(${post.userName})`, reactorId: safeStudentId, reactorName: currentFirstName, token: currentToken, teacherId: (isTeacherSelf ? currentLoginId : ""), teacherPw: (isTeacherSelf ? teacherPw : "")
       })
     });
   }
@@ -4326,7 +4332,7 @@ async function openNoticeModal() {
       method: 'POST', mode: 'no-cors',
       body: JSON.stringify({
         type: "showcase_comment", postId: postId, postTitle: post.title,
-        authorInfo: `${post.studentId}(${post.userName})`, reactorId: safeStudentId, reactorName: currentFirstName, token: currentToken, comment: comment,
+        authorInfo: `${post.studentId}(${post.userName})`, reactorId: safeStudentId, reactorName: currentFirstName, token: currentToken, teacherId: (isTeacherSelf ? currentLoginId : ""), teacherPw: (isTeacherSelf ? teacherPw : ""), comment: comment,
         commentId: tempCommentId,
         parentId: parentId
       })
@@ -4336,6 +4342,7 @@ async function openNoticeModal() {
 // ★ 선생님 관리 시스템
 // ========================================
 let teacherPw = "";
+let isTeacherSelf = false; // ★ V12(2026-06-09): "내 계정 유지" 모드 — 선생님이 본인 정체성으로 학생 앱 진입(ENGsta 글쓰기 허용)
 let dashboardData = null;
 let allStudentsData = [];
 let currentGradeFilter = 'all';
@@ -4383,9 +4390,14 @@ function openUndercoverStudentPicker() {
   modal.style.cssText = 'position:absolute; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.5); z-index:3500; display:flex; align-items:center; justify-content:center;';
   modal.innerHTML = `<div style="width:90%; max-width:420px; max-height:85%; background:white; border-radius:20px; padding:18px; box-sizing:border-box; display:flex; flex-direction:column;">
     <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:10px;">
-      <b style="color:#4a5d4e; font-size:1.05rem;">🕵️ 어느 학생으로 잠입할까?</b>
+      <b style="color:#4a5d4e; font-size:1.05rem;">🕵️ EvEn 앱 어떻게 들어갈까?</b>
       <span style="cursor:pointer; font-size:1.3rem;" onclick="document.getElementById('undercover-picker-modal').remove()">✕</span>
     </div>
+    <div onclick="enterAsMyself()" style="background:#EAF3DE; border:1px solid #97C459; border-radius:10px; padding:11px 12px; margin-bottom:10px; cursor:pointer; display:flex; justify-content:space-between; align-items:center;">
+      <span style="color:#27500A; font-weight:600; font-size:0.9rem;">👩‍🏫 내 계정 유지 <span style="font-weight:400; font-size:0.78rem;">(ENGsta에 내 이름으로 글쓰기)</span></span>
+      <span style="color:#27500A; font-weight:500;">→</span>
+    </div>
+    <div style="font-size:0.78rem; color:#888; margin-bottom:6px;">또는 아래에서 학생을 골라 잠입(그 학생 화면 보기):</div>
     <input type="text" id="undercover-search" placeholder="🔍 이름/학번 검색..." oninput="filterUndercoverList(this.value)" style="width:100%; box-sizing:border-box; padding:8px 10px; border:1px solid #ccc; border-radius:8px; margin-bottom:8px; font-size:0.9rem;">
     <div id="undercover-student-list" style="flex:1; overflow-y:auto; padding-right:4px;">${listHtml}</div>
   </div>`;
@@ -4477,7 +4489,42 @@ async function enterUndercoverAsStudent(studentId, firstName, emoji) {
   }
 }
 
+// ★ V12(2026-06-09): "내 계정 유지" — 선생님이 본인 정체성으로 학생 앱 진입(ENGsta 글쓰기 가능, 다른 탭은 둘러보기 전용)
+function enterAsMyself() {
+  const m = document.getElementById('undercover-picker-modal');
+  if (m) m.remove();
+  // 선생님 본인 상태 백업(나갈 때 복원)
+  teacherOriginalState = {
+    firstName: currentFirstName, studentId: currentStudentId, loginId: currentLoginId, profile: currentUserProfile,
+    myLogs: myLearningLogs, myStories: myStories, myPenalties: myPenalties, myTeaching: myTeaching,
+    myPostCount: myPostCount, myCommentCount: myCommentCount, myOopsRetries: myOopsRetries
+  };
+  isUndercover = true;
+  isTeacherSelf = true;
+  // 정체성은 선생님 그대로. ★currentUserProfile(로그인 시 "이모지 이름")은 안 건드림 → 선생님 본인 프로필 이모지+이름으로 글/댓글 게재. 백엔드는 teacherId/teacherPw 인증.
+  const _myEmoji = (String(currentUserProfile || '').trim().split(' ')[0]) || '👤';
+  myLearningLogs = []; myStories = []; myPenalties = []; myTeaching = []; myOopsRetries = [];
+  myPostCount = 0; myCommentCount = 0;
+  document.getElementById('my-profile-emoji').innerText = _myEmoji;
+  document.getElementById('my-profile-name').innerText = (currentFirstName || '선생님');
+  document.getElementById('undercover-return-btn').style.display = 'block';
+  document.getElementById('teacher-screen').style.display = 'none';
+  document.getElementById('main-content').style.display = 'flex';
+  document.getElementById('nav-bar').style.display = 'flex';
+  let banner = document.getElementById('undercover-banner');
+  if (!banner) {
+    banner = document.createElement('div');
+    banner.id = 'undercover-banner';
+    document.getElementById('main-content').insertBefore(banner, document.getElementById('main-content').firstChild);
+  }
+  banner.style.cssText = 'background:#EAF3DE; color:#27500A; padding:6px 12px; text-align:center; font-size:0.8rem; font-weight:500; border-bottom:1px solid #97C459;';
+  banner.textContent = '👩‍🏫 내 계정으로 보는 중 — ENGsta에만 글/댓글 가능 (다른 탭은 둘러보기 전용)';
+  if (typeof updateDashboard === 'function') updateDashboard();
+  changeTab('insta-screen');
+}
+
 function exitUndercoverMode() {
+  isTeacherSelf = false;
   if (!teacherOriginalState || teacherOriginalState.studentId === undefined) {
     // 비정상 상태 — 그냥 teacher-screen으로 강제 복귀
     document.getElementById('undercover-return-btn').style.display = 'none';
