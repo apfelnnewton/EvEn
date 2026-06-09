@@ -1843,6 +1843,16 @@ checkNewComments();
     localStorage.setItem(key, JSON.stringify(zdc));
     return { allowed: true, count: zdc.count };
   }
+  // ★ V12(2026-06-09): Zeeto 통신 실패 시 카운트 환불 (응답 못 받았는데 한도만 깎이던 문제)
+  function decrementZeetoCount() {
+    const key = 'zeetoDailyCount_' + (currentStudentId || 'guest');
+    const today = new Date().toDateString();
+    let zdc;
+    try { zdc = JSON.parse(localStorage.getItem(key) || 'null'); } catch(e) { zdc = null; }
+    if (!zdc || zdc.date !== today) return;
+    zdc.count = Math.max(0, zdc.count - 1);
+    localStorage.setItem(key, JSON.stringify(zdc));
+  }
   async function sendMessage() {
     if (isZeetoSending) return; // 진행 중인 요청 있으면 무시
     const input = document.getElementById('chat-input'); const text = input.value.trim(); if(!text) return;
@@ -1883,6 +1893,7 @@ checkNewComments();
     aiMsg.innerHTML = `<div class="typing-indicator"><div class="dot"></div><div class="dot"></div><div class="dot"></div></div>`;
     chatBox.appendChild(aiMsg); chatBox.scrollTop = chatBox.scrollHeight;
 
+    let zeetoSucceeded = false; // ★ V12(2026-06-09): 성공 못하면 finally에서 50회 카운트 환불
     try {
       const response = await fetch(SHEET_URL, { method: 'POST', body: JSON.stringify({ type: "gemini_proxy", studentId: currentStudentId, token: currentToken, payload: {
         systemInstruction: { parts: [{ text: `너는 중학생의 영어 학습을 돕는 친근한 외계인 'Zeeto'야. 학생 이름은 '${currentFirstName}'. [세계관] 'Weeto'(위토)는 너의 신입 후배 외계인이야. 영어를 배우고 싶어서 지구에 왔고, 학생들이 Weeto한테 영어를 가르쳐주고 있음. 너는 Weeto를 아끼는 선배임. ★중요★ 학생이 Weeto에 대해 언급하거나 물어보면 반드시 자연스럽게 반응할 것! (예: "오 내 후배 Weeto! 잘 가르쳐주고 있음?", "Weeto가 요즘 열심히 하고 있다고 들었음!") Weeto를 모르는 척 하면 절대 안 됨! 1. 분량제한: 3~4문단 이내 짧게. 2. 가독성: 의미 단위 문단 바꿈. 3. 지구 호기심 컨셉. 4. 외계인 말투 '~임/함'. 5. 우주 이모지 필수. 6. 마크다운 기호(*, #) 금지. 7. 첫인사는 이름만. 8. 부드러운 교정. 9. 마무리 영어퀴즈 1개.` }] }, contents: chatHistory
@@ -1905,7 +1916,7 @@ checkNewComments();
       else {
         const aiReply = data?.candidates?.[0]?.content?.parts?.[0]?.text;
         if (!aiReply) { aiMsg.textContent = "😵 Zeeto가 잠깐 멈췄음! 다시 말해봐!"; }
-        else { aiMsg.innerHTML = safeAiRender(aiReply); sendChatToSheet("Zeeto", aiReply); chatHistory.push({ role: "model", parts: [{ text: aiReply }] }); }
+        else { aiMsg.innerHTML = safeAiRender(aiReply); sendChatToSheet("Zeeto", aiReply); chatHistory.push({ role: "model", parts: [{ text: aiReply }] }); zeetoSucceeded = true; }
       }
       chatBox.scrollTop = chatBox.scrollHeight;
     } catch(e) { aiMsg.textContent = "⚠️ 통신 오류"; }
@@ -1913,6 +1924,7 @@ checkNewComments();
       // ★ V11 패치(2026-05-13): 모든 경로에서 락 해제 + 입력창 활성화
       isZeetoSending = false;
       if (input) { input.disabled = false; input.focus(); }
+      if (!zeetoSucceeded) decrementZeetoCount(); // ★ V12(2026-06-09): 통신 실패 시 50회 카운트 환불
     }
   }
   // ★ V11 패치(2026-05-13): keypress → keydown + isComposing 체크. 한글 조합 중 Enter 미완성 전송 방지.
@@ -2005,7 +2017,7 @@ checkNewComments();
   }
 
   function submitLog() {
-    if (isTeacherSelf) { alert('👩‍🏫 선생님 계정은 ENGsta 글쓰기만 됨. 다른 탭은 둘러보기 전용임.'); return; }
+    if (isTeacherSelf || isUndercover) { alert('👩‍🏫 둘러보기/잠입 모드에선 제출이 안 됨 (ENGsta 글쓰기만 가능).'); return; }
     const lessonVal = document.getElementById('lesson-select').value; const summaryVal = document.getElementById('log-summary').value.trim();
     const newThingsVal = document.getElementById('log-new').value.trim(); const p1Val = document.getElementById('practice-1').value.trim();
     const p2Val = document.getElementById('practice-2').value.trim(); const reflectionVal = document.getElementById('log-reflection').value.trim();
@@ -2040,6 +2052,7 @@ checkNewComments();
     .then(text => {
         // ★ V11 패치(2026-05-13): 응답 검증 강화 — 정확히 "Log Saved"일 때만 성공 처리 (My Story Bug #1 패턴)
         if (text === "Unauthorized") { hideLoading(); alert("⚠️ 다른 기기에서 로그인해서 세션이 만료됐음! 다시 로그인하셈 👽"); logout(); return; }
+        if (text === "Duplicate Log") { hideLoading(); alert("이 날짜엔 이미 학습 기록이 있음 😎 (서버에서 중복 확인됨)"); return; }
         if (text !== "Log Saved") {
           hideLoading();
           console.error('Unexpected log submit response:', text);
@@ -2342,6 +2355,11 @@ checkNewComments();
           errorInput.style.color = '#333';
         } else {
           newBox.style.display = 'none'; // 없거나 이상한 포맷이면 박스 숨김
+          // ★ V12(2026-06-09): 숨긴 박스의 stale 입력값/비문도 클리어 (안 그러면 제출 영구 차단/오염 데이터 저장)
+          errorInput.value = '';
+          const _cEl = document.getElementById(`ms-corrected-${i}`); if (_cEl) _cEl.value = '';
+          const _rEl = document.getElementById(`ms-reason-${i}`); if (_rEl) _rEl.value = '';
+          const _fEl = document.getElementById(`ms-feedback-${i}`); if (_fEl) { _fEl.innerHTML = ''; _fEl.style.display = 'none'; }
         }
 
         // ★ V10: 비문이 바뀐 박스는 학생 입력값과 피드백을 클리어
@@ -2380,6 +2398,9 @@ checkNewComments();
       let data;
       try { data = JSON.parse(raw); } catch(pe) { alert("Zeeto 응답 형식 오류 🛸 다시 시도해보셈"); return; }
       if (data.error) { alert("⚠️ " + (data.error === "Unauthorized" ? "세션이 만료됐음! 다시 로그인하셈 👽" : ("Zeeto 응답 오류: " + data.error))); if (data.error === "Unauthorized") logout(); return; }
+      // ★ V12(2026-06-09): degenerate("앗! 앗!..." 반복) 응답 노출 방지
+      const _r = String(data.result || ''); const _t = _r.replace(/\s+/g,'');
+      if (_t.length > 40) { const _c = {}; let _mx = 0, _u = 0; for (const ch of _t) { _c[ch] = (_c[ch]||0)+1; } for (const k in _c) { _u++; if (_c[k] > _mx) _mx = _c[k]; } if ((_mx/_t.length > 0.45) || (_t.length > 120 && _u < 12)) { alert('Zeeto가 헷갈렸음 😵 다시 채점받아줘!'); return; } }
       const fb = document.getElementById(`ms-feedback-${boxNum}`); fb.style.display = "block"; fb.innerHTML = "👽 " + safeAiRender(data.result);
     } catch(e) { hideLoading(); alert("통신 오류 🛸"); }
   }
@@ -2887,7 +2908,10 @@ checkNewComments();
     let corrections;
     try { corrections = JSON.parse(story.corrections || '[]'); } catch(e) { corrections = []; }
     if (!Array.isArray(corrections)) corrections = [];
-    const hasRealQuiz = corrections.some(item => item && item.quiz && String(item.quiz).trim());
+    // ★ V12(2026-06-09): quiz가 "비문답게" 생겼는지 검사 — 5/12 수정 전 옛 글의 오염된 quiz(설명 텍스트/한글 섞임/너무 김)는 정상 비문으로 안 침 → 옛 글 경로(새 비문 생성)로 보냄
+    const _looksLikeBiumun = (q) => { const s = String(q || '').trim(); return s.length > 0 && s.length <= 120 && /[A-Za-z]/.test(s) && !/[가-힣]/.test(s); };
+    const _nonEmptyQuizzes = corrections.map(c => (c && c.quiz) ? String(c.quiz).trim() : '').filter(s => s);
+    const hasRealQuiz = _nonEmptyQuizzes.length > 0 && _nonEmptyQuizzes.every(_looksLikeBiumun);
     const isOldStory = !hasRealQuiz;
 
     // ★ V11 패치(2026-05-13): 옛 글이면 finalStory가 있어야 Zeeto가 새 비문 만들 수 있음
@@ -2974,8 +2998,8 @@ checkNewComments();
       }
       } // ★ V11 패치(2026-05-13, 3차-6): cache miss 분기 닫기
     } else {
-      // 정상 글: corrections의 quiz 사용
-      biumunList = corrections.map(c => c && c.quiz ? c.quiz.trim() : '').filter(s => s);
+      // 정상 글: corrections의 quiz 사용 (비문답게 생긴 것만 — 오염된 옛 데이터 방어)
+      biumunList = corrections.map(c => c && c.quiz ? c.quiz.trim() : '').filter(s => _looksLikeBiumun(s));
     }
     // ★ V11: 상태에 비문 목록 저장 (제출/재생성 시 참조)
     currentOopsRetryBiumuns = biumunList.slice(0, 3);
@@ -3047,7 +3071,7 @@ checkNewComments();
   }
 
   async function submitOopsRetry() {
-    if (isTeacherSelf) { alert('👩‍🏫 선생님 계정은 ENGsta 글쓰기만 됨. 다른 탭은 둘러보기 전용임.'); return; }
+    if (isTeacherSelf || isUndercover) { alert('👩‍🏫 둘러보기/잠입 모드에선 제출이 안 됨 (ENGsta 글쓰기만 가능).'); return; }
     if (currentOopsRetryStory == null) return;
     const story = myStories[currentOopsRetryStory];
     if (!story) return alert('Story 정보가 사라짐 🛸');
@@ -3336,7 +3360,7 @@ checkNewComments();
   }
 
   function submitMyStory() {
-    if (isTeacherSelf) { alert('👩‍🏫 선생님 계정은 ENGsta 글쓰기만 됨. 다른 탭은 둘러보기 전용임.'); return; }
+    if (isTeacherSelf || isUndercover) { alert('👩‍🏫 둘러보기/잠입 모드에선 제출이 안 됨 (ENGsta 글쓰기만 가능).'); return; }
     const reflection = document.getElementById('ms-reflection').value.trim(); if(!reflection) return alert("성찰(Reflection)을 적어주셈! 🌱");
 
     // ★ V6→V8: Oops Point 퀴즈가 있으면 정문+이유 모두 필수 체크
@@ -3418,7 +3442,7 @@ checkNewComments();
     .catch(e => { console.error('Story submit error:', e); hideLoading(); if (submitBtn) { submitBtn.disabled = false; submitBtn.style.opacity = '1'; } alert('통신 오류가 발생했어요 😵 작성 내용은 그대로 남아있으니 다시 시도해주세요!'); });
   }
 
-  function changeMonth(step) { currentDate.setMonth(currentDate.getMonth() + step); renderCalendar(); }
+  function changeMonth(step) { currentDate.setDate(1); currentDate.setMonth(currentDate.getMonth() + step); renderCalendar(); }
 
   function renderCalendar() {
     const year = currentDate.getFullYear(); const month = currentDate.getMonth();
@@ -3665,11 +3689,10 @@ checkNewComments();
   function clearFilter() {
     currentFilterUser = null;
     instaDisplayCount = 10;
-    instaServerOffset = allInstaPosts.length; // 전체 캐시 끝부터 이어서
-    instaHasMore = true; // 더 있을 수 있으니 시도
     allInstaPostsFiltered = [];
     document.getElementById('insta-back-btn').style.display = 'none';
-    renderInstaPosts();
+    // ★ V12(2026-06-09): 전체 피드를 서버에서 새로 가져옴 — 필터 보는 동안 올라온 새 글까지 반영 (옛 캐시만 보이던 문제)
+    loadInstaPosts(true);
   }
 
   // ★ V10 패치(2026-05-13): ENGsta 서버 페이지네이션 — 처음 10개만 가져오고 "더 보기" 시 추가 fetch
@@ -3760,7 +3783,7 @@ checkNewComments();
         `;
       }).join('');
 
-      let imgHtml = post.image ? `<img src="${post.image}" class="post-img">` : "";
+      let imgHtml = post.image ? `<img src="${escapeHtml(post.image)}" class="post-img">` : "";
       const postDiv = document.createElement('div'); postDiv.className = 'insta-post';
       postDiv.setAttribute('data-post-id', post.id);
 
@@ -3803,6 +3826,7 @@ checkNewComments();
   async function uploadPost() {
     if(isLoading) return;
     const content = document.getElementById('insta-content').value.trim(); if(!content) return alert("글을 적어주세요!");
+    if (currentFilterUser) clearFilter(); // ★ V12(2026-06-09): 필터 보는 중 글쓰면 전체 피드로 복귀 (낙관적 삽입이 화면에 반영되도록)
     let image = document.getElementById('insta-preview').style.display === 'block' ? document.getElementById('insta-preview').src : "";
     const tempId = "P" + new Date().getTime();
     allInstaPosts.unshift({ id: tempId, date: new Date().toISOString(), name: currentUserProfile, content: content, image: image, comments: [] });
@@ -3894,8 +3918,8 @@ checkNewComments();
       currentParentId = engstaReplyingTo.parentId;
     }
 
-    const targetPost = allInstaPosts.find(p => p.id === postId);
-    if(targetPost) { 
+    const targetPost = (currentFilterUser ? allInstaPostsFiltered : allInstaPosts).find(p => p.id === postId); // ★ V12(2026-06-09): 필터 모드면 필터 배열에서 찾아야 화면 반영
+    if(targetPost) {
       targetPost.comments.push({ 
         id: newCommentId, 
         parentId: currentParentId, 
@@ -3916,7 +3940,7 @@ checkNewComments();
 
     // ★ V10 보안 패치(2026-05-12): mode:'no-cors' 제거 → 응답 검증해서 실패 시 롤백
     const rollbackComment = (reason) => {
-      const tp = allInstaPosts.find(p => p.id === postId);
+      const tp = (currentFilterUser ? allInstaPostsFiltered : allInstaPosts).find(p => p.id === postId);
       if (tp && tp.comments) {
         const ci = tp.comments.findIndex(c => c.id === newCommentId);
         if (ci !== -1) tp.comments.splice(ci, 1);
@@ -4259,7 +4283,7 @@ async function openNoticeModal() {
   }
 
   // ★ 하트 로딩창 제거 (뒤에서 몰래 서버랑 통신하는 마법!)
-  function toggleShowcaseLike(postId) {
+  async function toggleShowcaseLike(postId) {
     const post = allShowcasePosts.find(p => p.id === postId);
     if (!post) return;
     const safeStudentId = String(currentStudentId);
@@ -4273,10 +4297,11 @@ async function openNoticeModal() {
 
     // 1. 서버 결과 기다리지 말고, 화면부터 즉시 하트 채우기/빼기
     const idx = post.likes.indexOf(safeStudentId);
-    if (idx > -1) post.likes.splice(idx, 1);
+    const wasLiked = idx > -1;
+    if (wasLiked) post.likes.splice(idx, 1);
     else post.likes.push(safeStudentId);
 
-    // 2. 화면 0.1초 만에 새로고침! (체감 속도 빛의 속도)
+    // 2. 화면 즉시 새로고침
     renderShowcase();
 
     // ★ 저장해둔 댓글 입력값 복원
@@ -4285,18 +4310,25 @@ async function openNoticeModal() {
       if (inp) inp.value = savedInputs[pid];
     });
 
-    // 3. 우주 서버에는 뒤에서 몰래 조용히 전송 (await 없이 던져놓고 잊어버림)
-    fetch(SHEET_URL, {
-      method: 'POST', mode: 'no-cors',
-      body: JSON.stringify({
+    // ★ V12(2026-06-09): no-cors 제거 → 응답 검증 + 실패 시 롤백 (저장 실패해도 화면에 남아 새로고침에 사라지던 문제)
+    const _restoreLike = () => {
+      const j = post.likes.indexOf(safeStudentId);
+      if (wasLiked && j === -1) post.likes.push(safeStudentId);
+      if (!wasLiked && j > -1) post.likes.splice(j, 1);
+      renderShowcase();
+    };
+    try {
+      const res = await fetch(SHEET_URL, { method: 'POST', body: JSON.stringify({
         type: "showcase_like", postId: postId, postTitle: post.title,
         authorInfo: `${post.studentId}(${post.userName})`, reactorId: safeStudentId, reactorName: currentFirstName, token: currentToken, teacherId: (isTeacherSelf ? currentLoginId : ""), teacherPw: (isTeacherSelf ? teacherPw : "")
-      })
-    });
+      })});
+      const txt = await res.text();
+      if (txt !== "Like Added" && txt !== "Like Removed") _restoreLike();
+    } catch(e) { _restoreLike(); }
   }
 
   // ★ 하트처럼 로딩창 없애고 빛의 속도로 대댓글 달기 + 럭키 잭팟 시스템!
-  function addShowcaseComment(postId) {
+  async function addShowcaseComment(postId) {
     const input = document.getElementById(`comment-input-${postId}`); 
     const comment = input.value.trim(); 
     if(!comment) return;
@@ -4327,16 +4359,30 @@ async function openNoticeModal() {
       document.getElementById('jackpot-popup').style.display = 'flex';
     }
 
-    // 4. 우주 서버에는 앱이 만든 번호(tempCommentId)를 꼬리표로 달아서 조용히 전송
-    fetch(SHEET_URL, {
-      method: 'POST', mode: 'no-cors',
-      body: JSON.stringify({
-        type: "showcase_comment", postId: postId, postTitle: post.title,
-        authorInfo: `${post.studentId}(${post.userName})`, reactorId: safeStudentId, reactorName: currentFirstName, token: currentToken, teacherId: (isTeacherSelf ? currentLoginId : ""), teacherPw: (isTeacherSelf ? teacherPw : ""), comment: comment,
-        commentId: tempCommentId,
-        parentId: parentId
-      })
-    });
+    // ★ V12(2026-06-09): no-cors 제거 → 응답 검증 + 실패 시 롤백 (저장 실패해도 화면에 남아 새로고침에 사라지던 문제)
+    try {
+      const res = await fetch(SHEET_URL, {
+        method: 'POST',
+        body: JSON.stringify({
+          type: "showcase_comment", postId: postId, postTitle: post.title,
+          authorInfo: `${post.studentId}(${post.userName})`, reactorId: safeStudentId, reactorName: currentFirstName, token: currentToken, teacherId: (isTeacherSelf ? currentLoginId : ""), teacherPw: (isTeacherSelf ? teacherPw : ""), comment: comment,
+          commentId: tempCommentId,
+          parentId: parentId
+        })
+      });
+      const txt = await res.text();
+      if (txt.indexOf("Showcase Comment Saved") === -1) {
+        const ci = post.comments.findIndex(c => c.commentId === tempCommentId);
+        if (ci !== -1) post.comments.splice(ci, 1);
+        renderShowcase();
+        alert('⚠️ 댓글이 안 올라갔음 🛸 다시 시도해보셈!');
+      }
+    } catch(e) {
+      const ci = post.comments.findIndex(c => c.commentId === tempCommentId);
+      if (ci !== -1) post.comments.splice(ci, 1);
+      renderShowcase();
+      alert('⚠️ 댓글이 안 올라갔음 🛸 다시 시도해보셈!');
+    }
   }
 // ========================================
 // ★ 선생님 관리 시스템
