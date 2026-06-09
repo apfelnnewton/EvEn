@@ -132,8 +132,13 @@
   #mypage-screen { background-color: #f9fbf9; }
   
   .mypage-dashboard { display: flex; gap: 10px; padding: 15px; align-items: stretch; margin-bottom: 5px; }
-  .dash-profile { flex: 0.8; background: #fff; border-radius: 20px; display: flex; flex-direction: column; justify-content: center; align-items: center; padding: 20px 10px; box-shadow: 0 4px 10px rgba(0,0,0,0.04); border: 1px solid #eee; }
-  .dash-profile-emoji { font-size: 3.5rem; margin-bottom: 5px; line-height: 1.2; }
+  /* ★ V12(2026-06-09): 좌측 컬럼 = 프로필(위) + Oops 복습 버튼(아래) 세로 2단 (옵션 A) */
+  .dash-left-col { flex: 0.8; display: flex; flex-direction: column; gap: 8px; }
+  .dash-profile { flex: 1; background: #fff; border-radius: 20px; display: flex; flex-direction: column; justify-content: center; align-items: center; padding: 14px 10px; box-shadow: 0 4px 10px rgba(0,0,0,0.04); border: 1px solid #eee; }
+  /* ★ V12(2026-06-09): 프로필 아래 Oops 복습 진입 버튼 */
+  .dash-oops-btn { background: #EEEDFE; border: 1px solid #AFA9EC; border-radius: 16px; padding: 10px 8px; display: flex; justify-content: center; align-items: center; gap: 5px; cursor: pointer; color: #3C3489; font-weight: 600; font-size: 0.85rem; white-space: nowrap; transition: background 0.15s; }
+  .dash-oops-btn:active { background: #CECBF6; }
+  .dash-profile-emoji { font-size: 3rem; margin-bottom: 4px; line-height: 1.2; }
   .dash-profile-name { font-size: 1.2rem; font-weight: 700; color: #333; margin: 0; }
   
   .dash-stats { flex: 1.2; display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
@@ -750,7 +755,10 @@
 
         <div id="error-container">
           <div class="error-new-box">
-            <textarea id="ms-error-1" class="input-field" style="width:100%; box-sizing:border-box; border-color:#d9534f; margin-bottom:8px; resize:none; line-height:1.4; background-color:#f4f4f4; color:#333;" rows="2" placeholder="Zeeto가 만든 틀린 문장이 여기에 나타납니다 👽" readonly></textarea>
+            <textarea id="ms-error-1" class="input-field" style="width:100%; box-sizing:border-box; border-color:#d9534f; margin-bottom:4px; resize:none; line-height:1.4; background-color:#f4f4f4; color:#333;" rows="2" placeholder="Zeeto가 만든 틀린 문장이 여기에 나타납니다 👽" readonly></textarea>
+            <div style="display:flex; justify-content:flex-end; margin-bottom:8px;">
+              <button onclick="regenBiumun(1)" id="ms-regen-1" style="background:none; border:1px solid #d9534f; color:#d9534f; padding:3px 8px; font-size:0.9rem; border-radius:10px; cursor:pointer; line-height:1;" title="이 비문 새로 만들기">🔁</button>
+            </div>
             <textarea id="ms-corrected-1" class="input-field" style="width:100%; box-sizing:border-box; border-color:#2e7d32; margin-bottom:5px; resize:none; line-height:1.4;" rows="2" placeholder="✅ 올바른 문장 (정문)"></textarea>
             <div style="display:flex; gap:5px; align-items:flex-start;">
               <textarea id="ms-reason-1" class="input-field" style="flex:1; margin-bottom:0; border-color:#4a5d4e; resize:none; line-height:1.4;" rows="2" placeholder="💡 왜 틀렸는지 이유"></textarea>
@@ -760,7 +768,10 @@
           </div>
 
           <div class="error-new-box">
-            <textarea id="ms-error-2" class="input-field" style="width:100%; box-sizing:border-box; border-color:#d9534f; margin-bottom:8px; resize:none; line-height:1.4; background-color:#f4f4f4; color:#333;" rows="2" placeholder="Zeeto가 만든 틀린 문장이 여기에 나타납니다 👽" readonly></textarea>
+            <textarea id="ms-error-2" class="input-field" style="width:100%; box-sizing:border-box; border-color:#d9534f; margin-bottom:4px; resize:none; line-height:1.4; background-color:#f4f4f4; color:#333;" rows="2" placeholder="Zeeto가 만든 틀린 문장이 여기에 나타납니다 👽" readonly></textarea>
+            <div style="display:flex; justify-content:flex-end; margin-bottom:8px;">
+              <button onclick="regenBiumun(2)" id="ms-regen-2" style="background:none; border:1px solid #d9534f; color:#d9534f; padding:3px 8px; font-size:0.9rem; border-radius:10px; cursor:pointer; line-height:1;" title="이 비문 새로 만들기">🔁</button>
+            </div>
             <textarea id="ms-corrected-2" class="input-field" style="width:100%; box-sizing:border-box; border-color:#2e7d32; margin-bottom:5px; resize:none; line-height:1.4;" rows="2" placeholder="✅ 올바른 문장 (정문)"></textarea>
             <div style="display:flex; gap:5px; align-items:flex-start;">
               <textarea id="ms-reason-2" class="input-field" style="flex:1; margin-bottom:0; border-color:#4a5d4e; resize:none; line-height:1.4;" rows="2" placeholder="💡 왜 틀렸는지 이유"></textarea>
@@ -770,7 +781,10 @@
           </div>
 
           <div class="error-new-box">
-            <textarea id="ms-error-3" class="input-field" style="width:100%; box-sizing:border-box; border-color:#d9534f; margin-bottom:8px; resize:none; line-height:1.4; background-color:#f4f4f4; color:#333;" rows="2" placeholder="Zeeto가 만든 틀린 문장이 여기에 나타납니다 👽" readonly></textarea>
+            <textarea id="ms-error-3" class="input-field" style="width:100%; box-sizing:border-box; border-color:#d9534f; margin-bottom:4px; resize:none; line-height:1.4; background-color:#f4f4f4; color:#333;" rows="2" placeholder="Zeeto가 만든 틀린 문장이 여기에 나타납니다 👽" readonly></textarea>
+            <div style="display:flex; justify-content:flex-end; margin-bottom:8px;">
+              <button onclick="regenBiumun(3)" id="ms-regen-3" style="background:none; border:1px solid #d9534f; color:#d9534f; padding:3px 8px; font-size:0.9rem; border-radius:10px; cursor:pointer; line-height:1;" title="이 비문 새로 만들기">🔁</button>
+            </div>
             <textarea id="ms-corrected-3" class="input-field" style="width:100%; box-sizing:border-box; border-color:#2e7d32; margin-bottom:5px; resize:none; line-height:1.4;" rows="2" placeholder="✅ 올바른 문장 (정문)"></textarea>
             <div style="display:flex; gap:5px; align-items:flex-start;">
               <textarea id="ms-reason-3" class="input-field" style="flex:1; margin-bottom:0; border-color:#4a5d4e; resize:none; line-height:1.4;" rows="2" placeholder="💡 왜 틀렸는지 이유"></textarea>
@@ -824,10 +838,17 @@
           <span class="logout-btn" onclick="logout()">로그아웃</span>
         </div>
       </div> <div class="mypage-dashboard">
-        
-        <div class="dash-profile">
-          <div class="dash-profile-emoji" id="my-profile-emoji">🍕</div>
-          <div class="dash-profile-name" id="my-profile-name">지민</div>
+
+        <!-- ★ V12(2026-06-09): 좌측 컬럼 = 프로필 + Oops 복습 버튼 세로 2단 (옵션 A) -->
+        <div class="dash-left-col">
+          <div class="dash-profile">
+            <div class="dash-profile-emoji" id="my-profile-emoji">🍕</div>
+            <div class="dash-profile-name" id="my-profile-name">지민</div>
+          </div>
+          <!-- ★ V12(2026-06-09): Oops Point 다시 풀기 진입 — 기존 전체폭 가로 띠에서 프로필 아래로 이동 -->
+          <div id="oops-retry-entry" onclick="openOopsRetryModal()" class="dash-oops-btn">
+            <span>🔁 Oops 복습</span>
+          </div>
         </div>
 
         <div class="dash-stats">
@@ -853,14 +874,61 @@
       </div>
     </div>
 
+    <!-- ★ V10 Phase 2(2026-05-12): Oops Retry 모달 (Lesson 리스트 + 다시 풀기 화면) -->
+    <div id="oops-retry-modal" style="display:none; position:absolute; top:0; left:0; width:100%; height:100%; background:#f9fbf9; z-index:1500; flex-direction:column; box-sizing:border-box;">
+      <div style="display:flex; justify-content:space-between; align-items:center; padding:15px; background:white; border-bottom:1px solid #eee; flex-shrink:0;">
+        <span id="oops-retry-back-btn" style="cursor:pointer; font-size:1.2rem; color:#4a5d4e; display:none;" onclick="oopsRetryGoBack()">⬅️</span>
+        <b style="color:#4a5d4e; font-size:1.1rem;" id="oops-retry-title">🔁 Oops Point 다시 풀기</b>
+        <span style="cursor:pointer; font-size:1.2rem;" onclick="closeOopsRetryModal()">✖️</span>
+      </div>
+
+      <!-- View 1: Lesson + Story 리스트 -->
+      <div id="oops-retry-lesson-view" style="flex:1; overflow-y:auto; padding:15px;">
+        <div style="text-align:center; color:#888; margin-top:30px;">데이터를 불러오는 중... 🛸</div>
+      </div>
+
+      <!-- View 2: 다시 풀기 화면 -->
+      <div id="oops-retry-practice-view" style="display:none; flex:1; overflow-y:auto; padding:15px;">
+        <div id="oops-retry-practice-header" style="margin-bottom:12px;">
+          <div style="font-size:0.85rem; color:#888;" id="oops-retry-lesson-label">Lesson —</div>
+          <div style="font-weight:700; color:#4a5d4e; font-size:1.05rem;" id="oops-retry-story-title">제목</div>
+          <div style="font-size:0.75rem; color:#888;" id="oops-retry-original-date">처음 작성: —</div>
+          <!-- ★ V11 신규(2026-05-13): 도전 히스토리 스트립 -->
+          <div id="oops-retry-history-strip" style="margin-top:8px; padding:8px 10px; background:#f0f5f0; border-radius:8px; font-size:0.78rem; line-height:1.5;"></div>
+        </div>
+
+        <!-- 접힘/펼침 토글 박스 (기본 접힘) -->
+        <div id="oops-retry-hint-box" style="border: 1px dashed #d9534f; background: #fffafa; border-radius:10px; margin-bottom:12px;">
+          <div onclick="toggleOopsHint()" style="padding:10px 12px; display:flex; justify-content:space-between; align-items:center; cursor:pointer;">
+            <span style="color:#c62828; font-weight:500; font-size:0.9rem;">🚨 My Oops Point 설명 보기</span>
+            <span id="oops-retry-hint-chevron" style="color:#c62828; font-size:0.95rem;">▶</span>
+          </div>
+          <div id="oops-retry-hint-content" style="display:none; padding:10px 12px; border-top:1px solid #f0c0c0; font-size:0.85rem; line-height:1.5; color:#791f1f; white-space:pre-wrap;"></div>
+        </div>
+
+        <!-- 비문 박스 3개 -->
+        <div id="oops-retry-error-container"></div>
+
+        <button class="btn" style="width:100%; margin-top:10px;" onclick="submitOopsRetry()" id="oops-retry-submit-btn">👽 Zeeto에게 평가받기</button>
+
+        <!-- 평가 결과 영역 (제출 후 표시) -->
+        <div id="oops-retry-result" style="display:none; margin-top:15px;">
+          <div id="oops-retry-result-feedback" style="border:1px solid #4a5d4e; background:#e8f0eb; border-radius:10px; padding:10px 12px; margin-bottom:8px; font-size:0.9rem; color:#26321f; line-height:1.5;"></div>
+          <div id="oops-retry-result-master" style="border-radius:10px; padding:10px 12px; text-align:center; font-weight:700;"></div>
+        </div>
+      </div>
+    </div>
+
     <div id="planet-screen" class="screen">
       <div class="planet-screen-header">Planet Builders</div>
       <div id="planet-cards"></div>
       <div class="planet-explanation">
         <b>🎯 행성 발전 시스템</b><br>
-        학년 전체의 평균 점수로 행성이 발전합니다!<br>
+        학년 전체 학생의 점수 달성률 <b>중앙값(median)</b>으로 행성이 발전합니다!<br>
+        <span style="font-size:0.78rem; color:#666;">(중앙값 = 학년 학생들을 점수 순으로 줄 세웠을 때 가운데 학생의 점수)</span><br>
         <br>
         <b>점수 계산:</b> (Daily Log × 2) + (My Story × 5) + (ENGsta × 1) + (Comments × 1) + (Weeto × 3)<br>
+        <b>패널티:</b> 로그 지각 -1 / 로그 미제출 -2 / 스토리 지각 -2 / 스토리 미제출 -5<br>
         <b>단계:</b> 황무지 (~20%) → 생명 탄생 (21%) → 마을 형성 (41%) → 도시 건설 (61%) → 미래 도시 (81%) → 🛸 우주 진출 (100%)
       </div>
     </div>
@@ -875,11 +943,13 @@
       <div class="modal-tab-bar" id="modal-tabs" style="display:none;">
         <div class="modal-tab active" id="tab-btn-log" onclick="switchModalTab('log')">🤓 Daily Log</div>
         <div class="modal-tab" id="tab-btn-story" onclick="switchModalTab('story')">📖 My Story</div>
+        <div class="modal-tab" id="tab-btn-oops" onclick="switchModalTab('oops')" style="display:none;">🔁 Oops 연습</div>
       </div>
 
       <div id="detail-content-penalty" style="padding-bottom:10px; display:none;"></div>
       <div id="detail-content-log" style="overflow-y:auto; padding-right:5px; padding-bottom:10px; display:none;"></div>
       <div id="detail-content-story" style="overflow-y:auto; padding-right:5px; padding-bottom:10px; display:none;"></div>
+      <div id="detail-content-oops" style="overflow-y:auto; padding-right:5px; padding-bottom:10px; display:none;"></div>
     </div>
 
   </div>
@@ -1043,12 +1113,13 @@
       <div id="t-modal-title" style="font-weight:bold; color:#4a5d4e; font-size:1.1rem;"></div>
       <span onclick="document.getElementById('t-student-modal').style.display='none'" style="cursor:pointer; font-size:1.2rem;">✖️</span>
     </div>
-    <div style="display:flex; gap:6px; margin-bottom:12px; flex-shrink:0;">
+    <div style="display:flex; gap:6px; margin-bottom:12px; flex-shrink:0; flex-wrap:wrap;">
       <div onclick="switchStudentModal('log')" id="t-smodal-tab-log" style="flex:1; text-align:center; padding:8px; border-radius:10px; background:#4a5d4e; color:white; font-weight:bold; font-size:0.8rem; cursor:pointer;">🤓 Log</div>
       <div onclick="switchStudentModal('story')" id="t-smodal-tab-story" style="flex:1; text-align:center; padding:8px; border-radius:10px; background:#eee; color:#999; font-weight:bold; font-size:0.8rem; cursor:pointer;">📖 Story</div>
       <div onclick="switchStudentModal('insta')" id="t-smodal-tab-insta" style="flex:1; text-align:center; padding:8px; border-radius:10px; background:#eee; color:#999; font-weight:bold; font-size:0.8rem; cursor:pointer;">📸 Post</div>
       <div onclick="switchStudentModal('penalty')" id="t-smodal-tab-penalty" style="flex:1; text-align:center; padding:8px; border-radius:10px; background:#eee; color:#999; font-weight:bold; font-size:0.8rem; cursor:pointer;">🚨</div>
       <div onclick="switchStudentModal('weeto')" id="t-smodal-tab-weeto" style="flex:1; text-align:center; padding:8px; border-radius:10px; background:#eee; color:#999; font-weight:bold; font-size:0.8rem; cursor:pointer;">👾</div>
+      <div onclick="switchStudentModal('oops')" id="t-smodal-tab-oops" style="flex:1; text-align:center; padding:8px; border-radius:10px; background:#eee; color:#999; font-weight:bold; font-size:0.8rem; cursor:pointer;">🔁</div>
     </div>
     <div id="t-smodal-summary"></div>
     <div id="t-smodal-content" style="flex:1; overflow-y:auto;"></div>
@@ -1163,7 +1234,10 @@
   // ★ 행성 개발 프로젝트
   let planetData = null;
 
-  const badWords = ["씨발", "시발", "슈발", "썅", "개새끼", "개새", "새끼", "병신", "븅신", "지랄", "염병", "ㅅㅂ", "ㅂㅅ", "ㅈㄹ", "ㄱㅅㄲ", "존나", "ㅈ나", "졸라", "줫나", "18놈", "18년", "바보", "멍청이", "찐따", "찌질이", "관종", "닥쳐", "아가리", "꺼져", "뒤져", "뒈져", "미친", "돌아이", "섹스", "야동", "느금마", "니애미", "엄준식", "패드립"];
+  // ★ V10 패치(2026-05-13): 욕설 필터에서 일상에서 자주 쓰이는 단어 제거 (false-positive 줄임)
+  // 제거된 단어: "바보", "멍청이", "꺼져", "미친", "새끼" (단독) — "이거 미친 듯이 어려움" 같은 정상 표현 차단되던 문제
+  // 유지: 실제 욕설 + 합성어("개새끼" 등은 유지) + 초성표현 + 18놈/18년 (실질적 욕설)
+  const badWords = ["씨발", "시발", "슈발", "썅", "개새끼", "개새", "병신", "븅신", "지랄", "염병", "ㅅㅂ", "ㅂㅅ", "ㅈㄹ", "ㄱㅅㄲ", "존나", "ㅈ나", "졸라", "줫나", "18놈", "18년", "찐따", "찌질이", "관종", "닥쳐", "아가리", "뒤져", "뒈져", "돌아이", "섹스", "야동", "느금마", "니애미", "엄준식", "패드립"];
 
   // 🛡️ 중2병 해커 차단막 (여기 쏙 들어갔습니다!)
   function escapeHtml(str) {
@@ -1286,13 +1360,36 @@ checkNewComments();
   }
 
   function changeTab(screenId) {
-    // ★ 네비게이션 탈주 방어: Weeto 대화 중 다른 탭으로 이동 시 (학생이 실제 대화한 경우만 카운트)
+    // ★ V10 Phase 2(2026-05-12): Oops Retry 모달이 열려있으면 닫기 (탭 이동 시 모달이 떠있는 문제 방지)
+    // ★ V11 패치(2026-05-13): 제출 중일 땐 확인 후 닫음 — 캐시된 AI 평가 손실 방지
+    const oopsModal = document.getElementById('oops-retry-modal');
+    if (oopsModal && oopsModal.style.display !== 'none' && oopsModal.style.display !== '') {
+      if (_oopsSubmitInFlight) {
+        const ok = confirm('⚠️ Oops 평가 제출 중임. 정말 나갈래?\n나가면 Zeeto 평가 결과가 사라져서 다시 받아야 함.');
+        if (!ok) return; // 탭 전환 취소
+      }
+      closeOopsRetryModal();
+    }
+    // ★ V11 패치(2026-05-13): Weeto 탭 중도 이탈 시 attempt count desync 해결
+    // 이전: window._weetoAttemptCounts만 클라이언트에서 증가 → 서버 DB는 모르고, 새로고침하면 desync.
+    // 이전의 문제: 단순 카운트 제거하면 학생이 GG 직전 탭 전환으로 도전 횟수 우회 가능 (꼼수).
+    // 새 해결책: 진행 중인 대화를 sessionStorage에 저장하여 돌아오면 그대로 이어서 진행.
+    //   - attempt count 증가시키지 않음 (이번 도전 미완료 상태)
+    //   - sessionStorage(_weetoActiveSession)에 grammar + chatHistory 보관
+    //   - showWeeto 시 세션 있으면 복원
+    //   - GG/CLEAR로 정식 종료 시에만 세션 클리어
     if (currentWeeetoGrammar) {
       const studentSentMsg = weetoChatHistory.some(h => h.role === '학생');
       if (studentSentMsg) {
-        const key = currentWeeetoGrammar.lesson + "||" + currentWeeetoGrammar.grammarName;
-        window._weetoAttemptCounts = window._weetoAttemptCounts || {};
-        window._weetoAttemptCounts[key] = (window._weetoAttemptCounts[key] || 0) + 1;
+        try {
+          const sessionKey = '_weetoActiveSession_' + (currentStudentId || 'guest');
+          sessionStorage.setItem(sessionKey, JSON.stringify({
+            grammar: currentWeeetoGrammar,
+            chatHistory: weetoChatHistory,
+            attempt: currentWeetoAttempt,
+            savedAt: Date.now()
+          }));
+        } catch(e) { console.warn('Weeto session save failed:', e); }
       }
       weetoChatHistory = [];
       currentWeeetoGrammar = null;
@@ -1307,9 +1404,17 @@ checkNewComments();
       document.getElementById('weeto-view').style.display = 'none';
     }
     else if(screenId === 'log-screen') { document.getElementById('nav-log').classList.add('active'); document.getElementById('log-date').value = new Date().toLocaleDateString('ko-KR'); if (isLateMode) exitLateMode(); }
-    else if(screenId === 'mystory-screen') { document.getElementById('nav-mystory').classList.add('active'); }
+    else if(screenId === 'mystory-screen') { document.getElementById('nav-mystory').classList.add('active'); attachMyStoryAutosave(); restoreMyStoryDraft(); }
     else if(screenId === 'insta-screen') { document.getElementById('nav-insta').classList.add('active'); openInsta(); showCommentBanner(); markCommentsRead(); }
-    else if(screenId === 'mypage-screen') { document.getElementById('nav-mypage').classList.add('active'); updateDashboard(); renderCalendar(); }
+    else if(screenId === 'mypage-screen') {
+      document.getElementById('nav-mypage').classList.add('active');
+      updateDashboard();
+      // ★ V10 패치(2026-05-13): My Page 진입 시 서버에서 myLogs/myStories/myPenalties/myTeaching 새로 가져옴
+      // (다른 기기에서 활동했거나 선생님이 패널티 부여한 경우 즉시 반영)
+      refreshMyDataFromServer().then(() => {
+        return loadMyOopsRetries();
+      }).then(() => renderCalendar());
+    }
     else if(screenId === 'planet-screen') { document.getElementById('nav-planet').classList.add('active'); loadPlanetData(); }
   }
 
@@ -1346,12 +1451,27 @@ checkNewComments();
     if (feed) feed.parentElement.insertBefore(banner, feed);
   }
 
-  function markCommentsRead() {
+  // ★ V11 보안 패치(2026-05-13): mode:'no-cors' 제거 + token 전달 + 응답 검증
+  // - 이전엔 백엔드가 응답을 못 검증해서 토큰 만료/권한 오류 감지 불가능했음
+  // - Unauthorized 시 logout (학생 본인 액션이라 안전 처리 필요)
+  // - 기타 실패는 console.warn (백그라운드 동기화라 학생 UX 안 끊음)
+  async function markCommentsRead() {
     if (!newCommentData || newCommentData.count === 0) return;
     const badge = document.getElementById('insta-badge');
     if (badge) badge.style.display = 'none';
     newCommentData = { count: 0, posts: [] };
-    fetch(SHEET_URL, { method: 'POST', mode: 'no-cors', body: JSON.stringify({ type: "update_comment_check", studentId: currentStudentId }) });
+    try {
+      const res = await fetch(SHEET_URL, { method: 'POST', body: JSON.stringify({ type: "update_comment_check", studentId: currentStudentId, token: currentToken }) });
+      const txt = await res.text();
+      if (txt === "Unauthorized") {
+        alert('⚠️ 세션이 만료됐음! 다시 로그인하셈 👽');
+        logout();
+      } else if (txt !== "OK") {
+        console.warn('markCommentsRead unexpected response:', txt);
+      }
+    } catch(e) {
+      console.warn('markCommentsRead network error:', e);
+    }
   }
 
   function logout() { sessionStorage.removeItem('even_login'); location.reload(); }
@@ -1392,14 +1512,28 @@ checkNewComments();
       const stage = getPlanetStage(avgPct);
       const memberCount = gData ? gData.memberCount : 0;
 
-      // Progress calculation (퍼센트 기준)
-      let progressPct = 100;
-      let progressText = '🎉 MAX';
-      if (stage.nextThreshold !== null) {
-        const prevThreshold = stage.level === 1 ? 0 : stage.level === 2 ? 21 : stage.level === 3 ? 41 : stage.level === 4 ? 61 : 81;
-        progressPct = Math.min(100, Math.round((avgPct - prevThreshold) / (stage.nextThreshold - prevThreshold) * 100));
-        progressText = `${avgPct}%`;
+      // ★ V11 패치(2026-05-13): 학생 0명 학년은 황무지가 아닌 "빈 상태" UI로 표시
+      if (memberCount === 0) {
+        html += `
+        <div class="planet-card" style="border-left: 4px solid ${gradeColors[g]}; opacity:0.7;">
+          <div class="planet-card-header">
+            <span class="planet-grade" style="color:${gradeColors[g]};">${gradeNames[g]}</span>
+            <span class="planet-members">0명</span>
+          </div>
+          <div class="planet-scene" style="font-size:1.4rem;">🛸🌌🛸</div>
+          <div class="planet-stage-name" style="color:#888;">아직 학생이 없는 학년 🌟</div>
+          <div class="planet-desc" style="font-size:0.85rem; color:#999;">학생이 가입하고 활동을 시작하면 이 행성이 생겨납니다!</div>
+        </div>`;
+        return; // 다음 학년으로
       }
+
+      // ★ V11 패치(2026-05-13): 진행률 표시 방식 개선 — 절대 % 기반으로 누적 표시
+      // - 이전엔 단계 내 상대 % (0~100%)로 표시해서 레벨업 시 100% → 0% 급격히 떨어짐
+      // - 이제 전체 행성 발전(0~100%) 기반으로 표시 — 레벨업해도 진행률은 그대로 유지
+      const progressPct = Math.min(100, Math.max(0, avgPct));
+      const progressText = stage.nextThreshold !== null
+        ? `${avgPct}% (다음: Lv.${stage.level + 1} ${stage.nextThreshold}%)`
+        : '🎉 MAX 100%';
 
       // Build the planet visual - a layered emoji scene
       let sceneEmojis = '';
@@ -1423,7 +1557,7 @@ checkNewComments();
         <div class="planet-desc">${stage.desc}</div>
         <div class="planet-progress-wrap">
           <div class="planet-progress-bar">
-            <div class="planet-progress-fill" style="width:${progressPct}%; background:${stage.color};"></div>
+            <div class="planet-progress-fill" style="width:${progressPct}%; background:${stage.color}; transition: width 0.4s ease-out;"></div>
           </div>
           <div class="planet-progress-text">${progressText}</div>
         </div>
@@ -1557,74 +1691,189 @@ checkNewComments();
     } catch(e) { hideLoading(); alert("로그인 처리 중 오류가 발생했습니다."); }
   }
 
-  function sendChatToSheet(sender, msg) { fetch(SHEET_URL, { method: 'POST', mode: 'no-cors', body: JSON.stringify({ type: "chat", userName: currentUserProfile, sender: sender, message: msg }) }); }
+  // ★ V10 보안 패치(2026-05-12): 백엔드 토큰 검증과 호환되도록 studentId/token 전달
+  // ★ V10 보안 패치(2026-05-13): mode:'no-cors' 제거 → 응답 검증해서 토큰 만료 감지
+  // ★ V11 패치(2026-05-13): UI 롤백 — 학생 메시지가 시트 저장 실패하면 msgEl에 ⚠️ 시각 표시 + 안내
+  //   (chat은 진행되지만 학생이 "저장 실패"를 알 수 있도록)
+  async function sendChatToSheet(sender, msg, msgEl) {
+    try {
+      const res = await fetch(SHEET_URL, {
+        method: 'POST',
+        body: JSON.stringify({ type: "chat", studentId: currentStudentId, token: currentToken, userName: currentUserProfile, sender: sender, message: msg })
+      });
+      const txt = await res.text();
+      if (txt === "Unauthorized") {
+        if (sender === "학생") {
+          alert('⚠️ 다른 기기에서 로그인해서 세션이 만료됐음! 다시 로그인하셈 👽');
+          logout();
+        } else {
+          console.warn('Zeeto response save Unauthorized — likely token expired but student is mid-chat');
+        }
+      } else if (txt !== "Chat Saved") {
+        console.warn('sendChatToSheet unexpected response:', txt);
+        // 학생 메시지면 시각적 표시 (Zeeto 저장 실패는 무시 — 흐름 안 끊음)
+        if (sender === "학생" && msgEl) markChatMsgSaveFail(msgEl, '저장 실패');
+      }
+    } catch(e) {
+      console.warn('sendChatToSheet network error:', e);
+      if (sender === "학생" && msgEl) markChatMsgSaveFail(msgEl, '네트워크 오류');
+    }
+  }
+
+  // ★ V11 헬퍼(2026-05-13): 시트 저장 실패한 메시지에 ⚠️ 표시 + tooltip 안내
+  function markChatMsgSaveFail(msgEl, reason) {
+    if (!msgEl || msgEl._saveFailMarked) return;
+    msgEl._saveFailMarked = true;
+    msgEl.style.opacity = '0.7';
+    msgEl.title = '⚠️ 시트에 저장 안 됐을 수 있음 (' + reason + '). 새로고침 시 사라질 수 있음.';
+    const warn = document.createElement('span');
+    warn.textContent = ' ⚠️';
+    warn.style.cssText = 'color:#A32D2D; font-size:0.85rem; margin-left:4px;';
+    warn.title = msgEl.title;
+    msgEl.appendChild(warn);
+  }
   function containsBadWord(text) { const cleanText = text.replace(/\s+/g, ""); return badWords.some(w => cleanText.includes(w)); }
 
   // ★ 사진 압축 공통 함수 (Timeout 방지용 — 최대 800px, 품질 80%로 축소)
-  function compressImage(file, callback) {
+  // ★ V10 패치(2026-05-13): img.onerror + reader.onerror 추가 + onError 콜백 + 1MB 사이즈 가드
+  function compressImage(file, callback, onError) {
+    if (!file) { if (onError) onError('파일이 없음'); return; }
+    // 파일 사이즈 가드 (15MB 초과 = 너무 큼)
+    if (file.size > 15 * 1024 * 1024) {
+      if (onError) onError('사진이 너무 큼 (15MB 초과). 다른 사진을 골라보셈!');
+      return;
+    }
     const reader = new FileReader();
+    reader.onerror = function() {
+      if (onError) onError('사진 파일을 읽을 수 없음 (손상되었거나 지원 안 되는 형식)');
+    };
     reader.onload = function(e) {
       const img = new Image();
+      img.onerror = function() {
+        if (onError) onError('사진 형식이 지원 안 됨 (HEIC 등). JPG/PNG로 다시 시도해보셈');
+      };
       img.onload = function() {
-        const MAX = 800;
-        let w = img.width, h = img.height;
-        if (w > MAX || h > MAX) {
-          if (w > h) { h = Math.round(h * MAX / w); w = MAX; }
-          else { w = Math.round(w * MAX / h); h = MAX; }
+        try {
+          const MAX = 800;
+          let w = img.width, h = img.height;
+          if (w > MAX || h > MAX) {
+            if (w > h) { h = Math.round(h * MAX / w); w = MAX; }
+            else { w = Math.round(w * MAX / h); h = MAX; }
+          }
+          const canvas = document.createElement('canvas');
+          canvas.width = w; canvas.height = h;
+          canvas.getContext('2d').drawImage(img, 0, 0, w, h);
+          const dataUrl = canvas.toDataURL('image/jpeg', 0.8);
+          if (!dataUrl || dataUrl === 'data:,') {
+            if (onError) onError('사진 압축 실패. 다른 사진을 골라보셈');
+            return;
+          }
+          callback(dataUrl);
+        } catch(e) {
+          console.error('compressImage canvas error:', e);
+          if (onError) onError('사진 압축 중 오류 발생. 다시 시도해보셈');
         }
-        const canvas = document.createElement('canvas');
-        canvas.width = w; canvas.height = h;
-        canvas.getContext('2d').drawImage(img, 0, 0, w, h);
-        callback(canvas.toDataURL('image/jpeg', 0.8));
       };
       img.src = e.target.result;
     };
     reader.readAsDataURL(file);
   }
 
-  // ★ Daily Log 사진 미리보기
+  // ★ Daily Log 사진 미리보기 + 로딩 인디케이터
   function previewImage(input) {
     if (!input.files || !input.files[0]) return;
+    const preview = document.getElementById('photo-preview');
+    // 압축 중 시각적 피드백
+    preview.style.display = 'block';
+    preview.style.opacity = '0.4';
+    preview.src = '';
+    preview.alt = '🛸 사진 압축 중...';
+    showLoading('🛸 사진 압축 중...');
     compressImage(input.files[0], function(compressed) {
-      const preview = document.getElementById('photo-preview');
+      hideLoading();
       preview.src = compressed;
-      preview.style.display = 'block';
+      preview.style.opacity = '1';
+      preview.alt = '';
+    }, function(errMsg) {
+      hideLoading();
+      preview.style.display = 'none';
+      preview.src = '';
+      input.value = ''; // input 초기화해서 다시 시도 가능하게
+      alert('⚠️ ' + errMsg + ' 🛸');
     });
   }
 
-  // ★ ENGstagram 사진 미리보기
+  // ★ ENGstagram 사진 미리보기 (Daily Log와 동일한 폴백 패턴)
   function previewInstaImage(input) {
     if (!input.files || !input.files[0]) return;
+    const preview = document.getElementById('insta-preview');
+    preview.style.display = 'block';
+    preview.style.opacity = '0.4';
+    preview.src = '';
+    showLoading('🛸 사진 압축 중...');
     compressImage(input.files[0], function(compressed) {
-      const preview = document.getElementById('insta-preview');
+      hideLoading();
       preview.src = compressed;
-      preview.style.display = 'block';
+      preview.style.opacity = '1';
+    }, function(errMsg) {
+      hideLoading();
+      preview.style.display = 'none';
+      preview.src = '';
+      input.value = '';
+      alert('⚠️ ' + errMsg + ' 🛸');
     });
   }
 
+  // ★ V11 패치(2026-05-13): Zeeto sendMessage 더블클릭/스팸 가드 (Weeto의 isWeetoSending 패턴 적용)
+  let isZeetoSending = false;
+
+  // ★ V11 패치(2026-05-13): Zeeto 50회 카운터 race 보호 — read/modify/write를 단일 헬퍼로 묶음
+  // - isZeetoSending이 동일 탭 race는 막아주지만, 다중 탭/창에서 동시 호출 시 cross-tab race 가능성 존재
+  // - 이 헬퍼는 매번 최신 값을 읽고 1회 setItem으로 끝내서 race window 최소화
+  // - cross-tab 동시 호출 시에도 최악의 경우 1-2회 under-count 정도라 학생 한도에 유리한 방향 (선생님 비용에 약간 손해)
+  // 반환: { allowed: boolean, count: number }
+  function incrementZeetoCount() {
+    const key = 'zeetoDailyCount_' + (currentStudentId || 'guest');
+    const today = new Date().toDateString();
+    let zdc;
+    try { zdc = JSON.parse(localStorage.getItem(key) || 'null'); } catch(e) { zdc = null; }
+    if (!zdc || zdc.date !== today) zdc = { date: today, count: 0 };
+    if (zdc.count >= 50) return { allowed: false, count: zdc.count };
+    zdc.count++;
+    localStorage.setItem(key, JSON.stringify(zdc));
+    return { allowed: true, count: zdc.count };
+  }
   async function sendMessage() {
+    if (isZeetoSending) return; // 진행 중인 요청 있으면 무시
     const input = document.getElementById('chat-input'); const text = input.value.trim(); if(!text) return;
+    isZeetoSending = true;
+    if (input) input.disabled = true;
     const chatBox = document.getElementById('chat-box');
     const myMsg = document.createElement('div'); myMsg.className = 'message sent'; myMsg.textContent = text;
     chatBox.appendChild(myMsg); input.value = ""; chatBox.scrollTop = chatBox.scrollHeight;
-    sendChatToSheet("학생", text);
 
+    // ★ V10 보안 패치(2026-05-12): 욕설 감지를 시트 저장 *전*에 수행 — 욕설 메시지가 영구 기록되는 문제 방지
     if(containsBadWord(text)) {
       const warn = document.createElement('div'); warn.className = 'message received'; warn.style.cssText = 'background-color:#ffebee; color:#c62828; font-weight:bold;';
       warn.innerHTML = "👮 [경고] 부적절한 언어 사용 감지. 대화를 리셋합니다.";
-      chatBox.appendChild(warn); chatBox.scrollTop = chatBox.scrollHeight; chatHistory = []; return;
+      chatBox.appendChild(warn); chatBox.scrollTop = chatBox.scrollHeight; chatHistory = [];
+      isZeetoSending = false; if (input) input.disabled = false; // ★ V11: 락 해제
+      return;
     }
 
-    // ★ 하루 대화 횟수 제한 (API 비용 방어 — sessionStorage 기반, 새로고침해도 유지)
-    let zdc = JSON.parse(sessionStorage.getItem('zeetoDailyCount') || 'null');
-    if (!zdc || zdc.date !== new Date().toDateString()) zdc = { date: new Date().toDateString(), count: 0 };
-    if (zdc.count >= 50) {
+    // ★ V11 패치(2026-05-13): 카운터 race 보호 — incrementZeetoCount 헬퍼로 단일 호출
+    const counterResult = incrementZeetoCount();
+    if (!counterResult.allowed) {
       const limitMsg = document.createElement('div'); limitMsg.className = 'message received';
-      limitMsg.textContent = "🛸 [자동응답] Zeeto는 현재 우주 본부 회의 중이라 바쁨! 내일 다시 연락하셈~ 🪐";
-      chatBox.appendChild(limitMsg); chatBox.scrollTop = chatBox.scrollHeight; return;
+      limitMsg.textContent = "🛸 [Zeeto 일일 통신 한도 도달!] 오늘 50개 다 채웠음. 내일 우주에서 다시 만나자~ 🪐";
+      chatBox.appendChild(limitMsg); chatBox.scrollTop = chatBox.scrollHeight;
+      isZeetoSending = false; if (input) input.disabled = false;
+      return;
     }
-    zdc.count++;
-    sessionStorage.setItem('zeetoDailyCount', JSON.stringify(zdc));
+
+    // ★ V10 패치(2026-05-13): 한도 체크 통과한 경우에만 시트 저장 (욕설 + 한도 둘 다 통과해야 영구 기록)
+    // ★ V11 패치(2026-05-13): myMsg 전달하여 저장 실패 시 시각적 ⚠️ 표시
+    sendChatToSheet("학생", text, myMsg);
 
     chatHistory.push({ role: "user", parts: [{ text: text }] });
     // ★ chatHistory 최근 20턴(40개)만 유지 — 토큰 폭발 방지
@@ -1660,10 +1909,22 @@ checkNewComments();
       }
       chatBox.scrollTop = chatBox.scrollHeight;
     } catch(e) { aiMsg.textContent = "⚠️ 통신 오류"; }
+    finally {
+      // ★ V11 패치(2026-05-13): 모든 경로에서 락 해제 + 입력창 활성화
+      isZeetoSending = false;
+      if (input) { input.disabled = false; input.focus(); }
+    }
   }
-  document.getElementById('chat-input').addEventListener('keypress', (e) => { if(e.key === 'Enter') sendMessage(); });
+  // ★ V11 패치(2026-05-13): keypress → keydown + isComposing 체크. 한글 조합 중 Enter 미완성 전송 방지.
+  document.getElementById('chat-input').addEventListener('keydown', (e) => {
+    if (e.key === 'Enter' && !e.shiftKey && !e.isComposing && e.keyCode !== 229) {
+      e.preventDefault();
+      sendMessage();
+    }
+  });
 
   async function checkPractice(step) {
+    if (isLoading) return; // ★ V11 패치(2026-05-13): ✔️ 스팸 클릭 방지 (병렬 Gemini 호출 차단)
     const input = document.getElementById(`practice-${step}`).value.trim(); if(!input) return;
     const summary = document.getElementById('log-summary').value.trim();
     const newThings = document.getElementById('log-new').value.trim();
@@ -1682,7 +1943,17 @@ checkNewComments();
       if (!result) return alert("😵 Zeeto가 응답을 못했어요. 다시 시도해주세요!");
       if(step === 1) {
         document.getElementById('hint-area').style.display = "block";
-        if (result.includes("CORRECT")) {
+        // ★ V11 패치(2026-05-13): CORRECT 매칭을 단어 경계 + 부정어 제외로 강화
+        // - 이전엔 `includes("CORRECT")`라 "Not CORRECT"/"incorrect" 모두 false positive로 통과시킴
+        // - 이제: CORRECT 단어가 단독으로 등장하되, 부정 표현 옆에 있으면 무시
+        const isCorrect = (() => {
+          // 단어 경계 검사: CORRECT 앞뒤가 영문자가 아니어야 함 (incorrect의 CORRECT는 제외됨)
+          if (!/(^|[^A-Za-z])CORRECT([^A-Za-z]|$)/.test(result)) return false;
+          // 부정 표현 체크: "not CORRECT", "isn't CORRECT", "but not CORRECT" 등 거부
+          if (/\b(not|isn'?t|aren'?t|never|but|however|but not|never)\s+CORRECT\b/i.test(result)) return false;
+          return true;
+        })();
+        if (isCorrect) {
           document.getElementById('hint-text').innerHTML = safeAiRender(result);
           // ★ Practice 1 정답 → Practice 2 자동 패스
           document.getElementById('practice-2').value = input;
@@ -1766,7 +2037,14 @@ checkNewComments();
     fetch(SHEET_URL, { method: 'POST', body: JSON.stringify(payload) })
     .then(res => res.text())
     .then(text => {
+        // ★ V11 패치(2026-05-13): 응답 검증 강화 — 정확히 "Log Saved"일 때만 성공 처리 (My Story Bug #1 패턴)
         if (text === "Unauthorized") { hideLoading(); alert("⚠️ 다른 기기에서 로그인해서 세션이 만료됐음! 다시 로그인하셈 👽"); logout(); return; }
+        if (text !== "Log Saved") {
+          hideLoading();
+          console.error('Unexpected log submit response:', text);
+          alert("⚠️ 저장에 실패했음! 작성 내용은 그대로 남아있으니 잠시 후 다시 시도해보셈 🛸");
+          return;
+        }
         if (isLateMode) {
           // 지각 제출: 패널티는 서버 log 핸들러에서 자동 부과됨
           const selectedDate = document.getElementById('log-date-late').value;
@@ -1917,14 +2195,16 @@ checkNewComments();
         });
       } catch(e) {}
 
-      // ★ 파싱 실패 감지: 피드백도 최종본도 비어있으면 실패로 간주
-      if (!feedbackPart && !finalPart) return { ok: false };
-      // ★ V7 수정(2026-04-21): Oops Point가 통째로 누락(잘림)되면 Step 4 비문 활동이 안 뜨므로 실패 처리
-      // 정상 응답에서 Zeeto가 "오류 없음"을 반환하면 oopsPart에 "오류 없음" 텍스트가 들어있으므로 빈 문자열만 잘림으로 간주
-      if (!oopsPart) return { ok: false, truncated: true };
+      // ★ V10(2026-05-12): 파싱 실패 감지 강화 — 4개 섹션 중 하나라도 비면 실패로 간주
+      // 기존엔 feedback+final 둘 다 비어야 실패였는데, finalPart만 빈 케이스에서 rawText가 통째로 "완벽 최종본" 박스에 노출되는 버그가 있어 엄격하게 바꿈
+      // ★ V10 수정: truncated와 parseFailed를 별개 플래그로 구분 (M6 fix)
+      // - rawText에 잘림 마커("이어짐 생략됨"/"✂️")가 있으면 위에서 truncated:true로 이미 return됨
+      // - 여기 도달했는데 섹션이 비었으면 형식 어긋남(parseFailed)이지 잘림이 아님
+      if (!feedbackPart || !finalPart || !tipPart || !oopsPart) return { ok: false, parseFailed: true };
 
       document.getElementById('ms-zeeto-feedback').innerHTML = safeAiRender(feedbackPart);
-      document.getElementById('ms-zeeto-final').innerHTML = formatForPersonal(safeAiRender(finalPart || rawText));
+      // ★ V10(2026-05-12): finalPart || rawText 폴백 제거 — 파싱 실패하면 위에서 이미 return함
+      document.getElementById('ms-zeeto-final').innerHTML = formatForPersonal(safeAiRender(finalPart));
       document.getElementById('ms-zeeto-tip').innerHTML = formatForPersonal(safeAiRender(tipPart));
       document.getElementById('ms-oops-point').dataset.original = oopsPart;
       const oopsDisplay = oopsPart.replace(/👽 Zeeto의 (비문 예시|퀴즈):[\s\S]*?🎯/g, '').trim();
@@ -1968,10 +2248,12 @@ checkNewComments();
       document.getElementById('story-step-3').classList.add('active');
       document.getElementById('mystory-screen').scrollTop = 0;
     } else {
-      // ★ V7 수정(2026-04-21): 잘림(truncated)일 때는 원인을 구체적으로 안내
+      // ★ V10 수정(M6 fix): truncated와 parseFailed를 구분해서 안내
       const msg = r.truncated
         ? "Zeeto 답변이 너무 길어서 잘렸음 ✂️ 다시 부르면 끝까지 나옴! (수정본은 그대로 남아있음)"
-        : "아직 Zeeto가 답을 못했음 😿 잠시 후 다시 시도하셈.";
+        : r.parseFailed
+          ? "Zeeto 답변 형식이 이상함 🛸 다시 부르면 제대로 나올 거임! (수정본은 그대로 남아있음)"
+          : "아직 Zeeto가 답을 못했음 😿 잠시 후 다시 시도하셈.";
       showFinalRetryBtn(true, msg, isOnStep3 ? 'step3' : 'step2');
     }
     setTimeout(() => { finalRetryCooldown = false; }, 5000);
@@ -2004,10 +2286,12 @@ checkNewComments();
       hideLoading();
       if (r.sessionExpired) return;
       if (!r.ok) {
-        // ★ V7 수정(2026-04-21): 잘림 케이스를 구체적으로 안내 — Step 4 비문 활동이 안 뜨는 원인이 여기
+        // ★ V10 수정(M6 fix): truncated / parseFailed / 일반 실패를 구분
         const msg = r.truncated
           ? "Zeeto 답변이 너무 길어서 잘렸음 ✂️ 아래 버튼으로 다시 부르면 끝까지 나옴! (수정본은 그대로 남아있음)"
-          : "Zeeto가 잠깐 멈췄음 🛸 아래 버튼으로 다시 부르셈! (수정본은 그대로 남아있음)";
+          : r.parseFailed
+            ? "Zeeto 답변 형식이 이상함 🛸 아래 버튼으로 다시 부르면 제대로 나올 거임! (수정본은 그대로 남아있음)"
+            : "Zeeto가 잠깐 멈췄음 🛸 아래 버튼으로 다시 부르셈! (수정본은 그대로 남아있음)";
         showFinalRetryBtn(true, msg, 'step2');
         return;
       }
@@ -2043,22 +2327,38 @@ checkNewComments();
         const errorInput = document.getElementById(`ms-error-${i}`);
         const newBox = errorInput.parentElement;
         const rawQuiz = quizzes[i-1];
+        // ★ V10(2026-05-12): 새 비문이 옛 비문과 다르면 학생의 옛 정문/이유/피드백을 같이 초기화
+        // - 학생이 어떤 경로로 Step 4에 다시 들어와도 stale 답이 새 문제 옆에 남지 않음
+        const prevQuizValue = errorInput.value;
+        const incomingQuiz = (rawQuiz && !isBadQuizFormat(rawQuiz)) ? rawQuiz.replace(/\^/g, '') : '';
+        const quizChanged = incomingQuiz && incomingQuiz.trim() !== prevQuizValue.trim();
 
         if (rawQuiz && !isBadQuizFormat(rawQuiz)) {
           newBox.style.display = 'block'; // 정상 비문만 박스 보여주기
-          errorInput.value = rawQuiz.replace(/\^/g, ''); // ★ V8: 꺾쇠(^) 제거 후 자동 입력!
+          errorInput.value = incomingQuiz;
           errorInput.readOnly = true; // 학생이 문제 수정 못하게 막기
           errorInput.style.backgroundColor = '#f4f4f4';
           errorInput.style.color = '#333';
         } else {
           newBox.style.display = 'none'; // 없거나 이상한 포맷이면 박스 숨김
         }
+
+        // ★ V10: 비문이 바뀐 박스는 학생 입력값과 피드백을 클리어
+        if (quizChanged) {
+          const correctedEl = document.getElementById(`ms-corrected-${i}`);
+          const reasonEl = document.getElementById(`ms-reason-${i}`);
+          const fbEl = document.getElementById(`ms-feedback-${i}`);
+          if (correctedEl) correctedEl.value = '';
+          if (reasonEl) reasonEl.value = '';
+          if (fbEl) { fbEl.innerHTML = ''; fbEl.style.display = 'none'; }
+        }
       }
     }
     
     document.querySelectorAll('.story-step').forEach(step => step.classList.remove('active'));
-    document.getElementById(`story-step-${stepNumber}`).classList.add('active'); 
+    document.getElementById(`story-step-${stepNumber}`).classList.add('active');
     document.getElementById('mystory-screen').scrollTop = 0;
+    if (typeof autoSaveMyStoryDraft === 'function') autoSaveMyStoryDraft(); // ★ V10: 스텝 전환 시 자동저장
   }
 
   async function checkMsNew(boxNum) {
@@ -2067,14 +2367,970 @@ checkNewComments();
     const reasonText = document.getElementById(`ms-reason-${boxNum}`).value.trim();
 
     if(!errText || !correctedText || !reasonText) return alert("정문과 이유 둘 다 적어야 함! 👽");
+    if(isLoading) return; // ★ V10(2026-05-12): 병렬 클릭 방지
 
     showLoading(`Zeeto 채점 중... 👽`);
     try {
       const res = await fetch(SHEET_URL, { method: 'POST', body: JSON.stringify({ type: "ms_check_new", studentId: currentStudentId, token: currentToken, errorText: errText, correctedText: correctedText, reasonText: reasonText }) });
-      const data = await res.json(); hideLoading();
-      if (data.error) { alert("⚠️ 세션이 만료됐음! 다시 로그인하셈 👽"); logout(); return; }
+      // ★ V11 패치(2026-05-13): 응답을 텍스트로 먼저 받아 Unauthorized 평문도 처리 가능하게
+      const raw = await res.text();
+      hideLoading();
+      if (raw === "Unauthorized") { alert("⚠️ 세션이 만료됐음! 다시 로그인하셈 👽"); logout(); return; }
+      let data;
+      try { data = JSON.parse(raw); } catch(pe) { alert("Zeeto 응답 형식 오류 🛸 다시 시도해보셈"); return; }
+      if (data.error) { alert("⚠️ " + (data.error === "Unauthorized" ? "세션이 만료됐음! 다시 로그인하셈 👽" : ("Zeeto 응답 오류: " + data.error))); if (data.error === "Unauthorized") logout(); return; }
       const fb = document.getElementById(`ms-feedback-${boxNum}`); fb.style.display = "block"; fb.innerHTML = "👽 " + safeAiRender(data.result);
     } catch(e) { hideLoading(); alert("통신 오류 🛸"); }
+  }
+
+  // ★ V10(2026-05-12) 확장: 학생이 🔁 누르면 → ① Zeeto가 검증, ② 진짜 비문이면 설명만, 정문이면 새 비문 생성
+  // forceRegen=true이면 검증 건너뛰고 바로 새 비문 (학생이 "그래도 새로 만들기" 선택한 경우)
+  async function regenBiumun(boxNum, forceRegen) {
+    const errEl = document.getElementById(`ms-error-${boxNum}`);
+    const regenBtn = document.getElementById(`ms-regen-${boxNum}`);
+    const correctedEl = document.getElementById(`ms-corrected-${boxNum}`);
+    const reasonEl = document.getElementById(`ms-reason-${boxNum}`);
+    const fbEl = document.getElementById(`ms-feedback-${boxNum}`);
+    const previousBiumun = errEl.value.trim();
+    if (!previousBiumun) return alert("이 칸엔 아직 비문이 없음 👽");
+
+    // ★ V10 확장: 학생 입력값 있으면 한 번 확인. forceRegen일 땐 이미 동의했으니 스킵.
+    if (!forceRegen) {
+      const hasInput = (correctedEl.value || '').trim() || (reasonEl.value || '').trim();
+      if (hasInput) {
+        const ok = confirm("⚠️ 이 비문 새로 만들거임?\n적어놓은 정문/이유는 사라짐.\n\n(Zeeto가 먼저 이 문장이 진짜 비문인지 확인해줌)");
+        if (!ok) return;
+      }
+    }
+
+    // Oops Point 원본에서 해당 번호의 블록 정확히 추출 (C1 fix 유지)
+    const oopsRaw = (document.getElementById('ms-oops-point').dataset.original) || '';
+    let errorContext = '', studentSentence = '';
+    try {
+      const blocks = oopsRaw.split(/(?:^|\n)\s*\d+\.\s*❌/);
+      const block = blocks[boxNum];
+      if (block) {
+        const sentMatch = block.match(/실수한 문장[:：]?\s*([^\n]+)/);
+        const whyMatch = block.match(/왜 틀렸을까[?？]?[:：]?\s*([^\n]+)/);
+        if (sentMatch) studentSentence = sentMatch[1].trim();
+        if (whyMatch) errorContext = whyMatch[1].trim();
+      }
+    } catch(e) {}
+
+    if (regenBtn) { regenBtn.disabled = true; regenBtn.style.opacity = '0.5'; regenBtn.textContent = '⏳'; }
+    const checkBtn = document.querySelector(`#story-step-4 button[onclick="checkMsNew(${boxNum})"]`);
+    if (checkBtn) { checkBtn.disabled = true; checkBtn.style.opacity = '0.5'; }
+    showLoading(forceRegen ? 'Zeeto가 새 비문 만드는 중... 👽' : 'Zeeto가 이 문장 확인 중... 🔎');
+
+    try {
+      const res = await fetch(SHEET_URL, { method: 'POST', body: JSON.stringify({
+        type: "ms_regen_biumun", studentId: currentStudentId, token: currentToken,
+        errorContext: errorContext, previousBiumun: previousBiumun, studentSentence: studentSentence,
+        forceRegen: !!forceRegen
+      }) });
+      const data = await res.json();
+      hideLoading();
+      if (data.error) { alert("⚠️ 세션이 만료됐음! 다시 로그인하셈 👽"); logout(); return; }
+      const result = (data.result || '').trim();
+      if (!result || result.includes('멈췄음')) {
+        alert('Zeeto가 응답을 못함 😵 잠시 후 다시 시도해보셈!');
+        return;
+      }
+
+      // ★ V10 확장: 응답 형식에 따라 분기
+      // TYPE: WRONG → 비문 맞음, 설명만 표시
+      // TYPE: CORRECT_REGEN → 정문이었음, 새 비문 교체
+      // forceRegen 모드 → NEW_BIUMUN: 한 줄만 옴
+      const typeMatch = result.match(/TYPE:\s*(WRONG|CORRECT_REGEN)/i);
+      const aiType = typeMatch ? typeMatch[1].toUpperCase() : null;
+      const newBiumunMatch = result.match(/NEW_BIUMUN:\s*([^\n]+)/i);
+      // ★ V10 안전 패치(M1): EXPLANATION이 NEW_BIUMUN이나 TYPE 라인 직전에서 끝나도록 lookahead 조임
+      const explanationMatch = result.match(/EXPLANATION:\s*([\s\S]+?)(?=\n*(?:NEW_BIUMUN:|TYPE:|$))/i);
+
+      // ★ V10 안전 패치(M2): 검증 모드에서 TYPE 라인이 아예 없는 응답은 파싱 실패로 처리
+      // - 이 가드 없으면 NEW_BIUMUN만 있는 응답을 조용히 CORRECT_REGEN처럼 처리해서 학생이 영문도 모르고 비문이 바뀜
+      if (!forceRegen && !aiType) {
+        alert('Zeeto 응답 형식이 이상함 🛸 다시 한 번 🔁 눌러보셈!');
+        return;
+      }
+
+      // 케이스 A: 검증 결과 "진짜 비문" — 학생이 못 알아본 거임
+      if (!forceRegen && aiType === 'WRONG') {
+        const explanation = explanationMatch ? explanationMatch[1].trim() : '(설명을 못 가져옴)';
+        const override = confirm(`👽 이거 진짜 비문 맞음!\n\n${explanation}\n\n다시 한 번 잘 보고 정문으로 고쳐봐!\n\n──────\n그래도 새로 만들거임? (Zeeto의 판정 무시)`);
+        if (override) {
+          // 사용자가 오버라이드 선택 → forceRegen으로 재호출
+          // 버튼 잠금은 finally에서 풀고, 새 호출이 다시 잠금
+          if (regenBtn) { regenBtn.disabled = false; regenBtn.style.opacity = '1'; regenBtn.textContent = '🔁'; }
+          if (checkBtn) { checkBtn.disabled = false; checkBtn.style.opacity = '1'; }
+          return regenBiumun(boxNum, true);
+        }
+        // 학생이 "다시 볼게" 선택 → 박스 그대로 유지, 입력값/피드백 보존
+        return;
+      }
+
+      // 케이스 B: 검증 결과 "정문이었음" OR forceRegen 모드 — 새 비문 교체
+      let newBiumun = newBiumunMatch ? newBiumunMatch[1].trim() : '';
+      // 정제: 꺾쇠/마크다운 제거 + 영어 평서문 골라내기
+      const lines = newBiumun.replace(/\^/g, '').replace(/[*#`"']/g, '').split('\n').map(s=>s.trim()).filter(s=>s.length>0);
+      let cleaned = lines.find(s => /^[A-Z]/.test(s) && !/[가-힣]/.test(s) && s.length >= 5) || lines[0] || newBiumun;
+      if (!cleaned) {
+        alert('Zeeto 응답 형식이 이상함 🛸 다시 시도해보셈!');
+        return;
+      }
+      if (cleaned.length > 200) {
+        alert('Zeeto가 너무 길게 만들었음 😵 다시 시도해보셈!');
+        return;
+      }
+      // 이전 비문과 정규화 비교
+      const normalize = (s) => (s || '').toLowerCase().replace(/[.,!?;:]/g, '').replace(/\s+/g, ' ').trim();
+      if (normalize(cleaned) === normalize(previousBiumun)) {
+        alert('Zeeto가 거의 똑같이 만들었음 😵 한 번 더 눌러보셈!');
+        return;
+      }
+
+      // 새 비문 적용 + 학생 입력값 초기화
+      errEl.value = cleaned;
+      if (correctedEl) correctedEl.value = '';
+      if (reasonEl) reasonEl.value = '';
+      if (fbEl) { fbEl.innerHTML = ''; fbEl.style.display = 'none'; }
+      if (forceRegen) {
+        // 오버라이드로 새로 만든 거니까 소소한 알림
+        // (조용히 — 학생이 이미 충분히 안내 받음)
+      } else if (aiType === 'CORRECT_REGEN') {
+        // AI가 "Zeeto 실수했음" 인정 → 작은 안내
+        alert('🔁 Zeeto가 실수해서 정문 만들었었음 😅 새 비문으로 바꿨음! 다시 풀어봐 👽');
+      }
+      if (typeof autoSaveMyStoryDraft === 'function') autoSaveMyStoryDraft();
+
+    } catch(e) {
+      hideLoading();
+      console.error('regenBiumun error:', e);
+      alert('통신 오류가 발생했음 🛸 잠시 후 다시 시도해보셈!');
+    } finally {
+      if (regenBtn) { regenBtn.disabled = false; regenBtn.style.opacity = '1'; regenBtn.textContent = '🔁'; }
+      if (checkBtn) { checkBtn.disabled = false; checkBtn.style.opacity = '1'; }
+    }
+  }
+
+  // ★ V10 Phase 2(2026-05-12): Oops Point 다시 풀기 관련 전체 코드 묶음
+  let myOopsRetries = [];           // 현재 학생의 Oops 다시 풀기 기록 전체
+  let currentOopsRetryStory = null; // 현재 다시 풀기 화면에서 선택된 Story (myStories 인덱스)
+  let currentOopsRetryExpanded = false; // 학생이 설명 박스를 열어봤는지
+  let _cachedOopsEval = null;       // ★ V10 Phase 2: eval 결과 캐시 — 저장 실패 시 재제출하면 평가 안 다시 하게
+  let _oopsSubmitInFlight = false;  // ★ V11 Phase 2: submitOopsRetry 진행 중 표시 — 탭 전환 시 race 방지
+  let currentOopsRetryIsOldStory = false; // ★ V11: 현재 다시 풀기가 옛 글(비문 새로 생성됨)인지
+  let currentOopsRetryBiumuns = [];       // ★ V11: 현재 화면의 비문 3개 (옛 글이면 Zeeto 생성, 정상 글이면 corrections.quiz)
+
+  // ★ V11 패치(2026-05-13, 3차-6): 옛 글 비문 sessionStorage 캐싱 — 새로고침 시 API 재호출 방지 (Gemini 비용 + 학습 일관성)
+  // 24시간 TTL — 같은 글 같은 세션 내에서는 같은 비문 풀기, 그 후엔 새 비문 (간격 반복 학습 효과 유지)
+  const OOPS_BIUMUN_CACHE_TTL_MS = 24 * 60 * 60 * 1000;
+  function getOopsBiumunCacheKey(story) {
+    if (!story) return null;
+    const sid = currentStudentId || 'guest';
+    const storyKey = story.date ? ('S' + new Date(story.date).getTime()) : ('S_' + (story.title || '').replace(/\s+/g, '_') + '_L' + story.lesson);
+    return '_oopsBiumunCache_' + sid + '_' + storyKey;
+  }
+  function getCachedOopsBiumuns(story) {
+    const key = getOopsBiumunCacheKey(story);
+    if (!key) return null;
+    try {
+      const raw = sessionStorage.getItem(key);
+      if (!raw) return null;
+      const parsed = JSON.parse(raw);
+      if (!parsed || !Array.isArray(parsed.biumuns) || !parsed.savedAt) return null;
+      if (Date.now() - parsed.savedAt > OOPS_BIUMUN_CACHE_TTL_MS) {
+        sessionStorage.removeItem(key);
+        return null;
+      }
+      return parsed.biumuns.filter(b => b && String(b).trim());
+    } catch(e) { return null; }
+  }
+  function setCachedOopsBiumuns(story, biumuns) {
+    const key = getOopsBiumunCacheKey(story);
+    if (!key) return;
+    try {
+      sessionStorage.setItem(key, JSON.stringify({ biumuns: biumuns.slice(0, 3), savedAt: Date.now() }));
+    } catch(e) { /* 용량 초과 등은 무시 */ }
+  }
+  function clearCachedOopsBiumuns(story) {
+    const key = getOopsBiumunCacheKey(story);
+    if (!key) return;
+    try { sessionStorage.removeItem(key); } catch(e) {}
+  }
+
+  async function loadMyOopsRetries() {
+    if (!currentStudentId || !currentToken) return;
+    try {
+      const res = await fetch(SHEET_URL, { method: 'POST', body: JSON.stringify({
+        type: "get_my_oops_retries", studentId: currentStudentId, token: currentToken
+      }) });
+      const data = await res.json();
+      if (data.error) { return; }
+      myOopsRetries = data.retries || [];
+    } catch(e) { console.warn('loadMyOopsRetries failed:', e); }
+  }
+
+  // ★ V10 패치(2026-05-13): My Page 진입 시 학생 본인 데이터를 서버에서 새로 가져옴
+  // - 다른 기기에서 활동하거나 선생님이 패널티 부여해도 sessionStorage 캐시만 보던 문제 해결
+  // - 실패 시 silent fail (기존 캐시 그대로 유지 — 화면이 갑자기 비지 않게)
+  // ★ V10 안전 패치(2026-05-13): 잠입 모드 중엔 학생 ID + 선생님 token이라 Unauthorized → logout 트리거 위험
+  //   잠입 중엔 refresh 스킵 (학생 데이터는 enterUndercoverAsStudent에서 get_student_detail로 이미 fetch됨)
+  async function refreshMyDataFromServer() {
+    if (!currentStudentId || !currentToken) return;
+    if (typeof isUndercover !== 'undefined' && isUndercover) return; // 잠입 중엔 스킵
+    try {
+      const res = await fetch(SHEET_URL, { method: 'POST', body: JSON.stringify({
+        type: "refresh_my_data", studentId: currentStudentId, token: currentToken
+      }) });
+      const data = await res.json();
+      if (data.error) {
+        if (data.error === 'Unauthorized') {
+          alert('⚠️ 세션이 만료됐음! 다시 로그인하셈 👽');
+          logout();
+        }
+        return;
+      }
+      // 전역 변수 + sessionStorage 동기화
+      if (Array.isArray(data.myLogs)) myLearningLogs = data.myLogs;
+      if (Array.isArray(data.myStories)) myStories = data.myStories;
+      if (Array.isArray(data.myPenalties)) myPenalties = data.myPenalties;
+      if (Array.isArray(data.myTeaching)) myTeaching = data.myTeaching;
+      if (typeof data.myPostCount === 'number') myPostCount = data.myPostCount;
+      if (typeof data.myCommentCount === 'number') myCommentCount = data.myCommentCount;
+      // sessionStorage 통합 캐시 갱신 (새로고침 후 일관성 유지)
+      try {
+        const savedLogin = sessionStorage.getItem('even_login');
+        if (savedLogin) {
+          const ld = JSON.parse(savedLogin);
+          ld.myLogs = myLearningLogs; ld.myStories = myStories;
+          ld.myPenalties = myPenalties; ld.myTeaching = myTeaching;
+          ld.myPostCount = myPostCount; ld.myCommentCount = myCommentCount;
+          sessionStorage.setItem('even_login', JSON.stringify(ld));
+        }
+      } catch(e) {}
+      // 대시보드 카운터 갱신
+      if (typeof updateDashboard === 'function') updateDashboard();
+    } catch(e) { console.warn('refreshMyDataFromServer failed:', e); }
+  }
+
+  function isStoryMastered(storyIndex) {
+    if (storyIndex == null) return false;
+    const story = myStories[storyIndex];
+    if (!story) return false;
+    // ★ V10 Phase 2 수정: lesson+title+originalDate 셋 다 매칭 (제목 중복 방지)
+    const storyOrigDate = story.date ? toLocalDateStr(story.date) : '';
+    return myOopsRetries.some(r =>
+      String(r.lesson) === String(story.lesson) &&
+      r.storyTitle === story.title &&
+      (!storyOrigDate || toLocalDateStr(r.originalDate) === storyOrigDate) &&
+      r.isMaster === true
+    );
+  }
+
+  function getRetriesForDate(yyyymmdd) {
+    // ★ V10 Phase 2 수정: Sheets가 날짜를 Date 객체로 자동 변환할 수 있으므로 toLocalDateStr로 정규화 후 비교
+    return myOopsRetries.filter(r => toLocalDateStr(r.date) === yyyymmdd);
+  }
+
+  function openOopsRetryModal() {
+    document.getElementById('oops-retry-modal').style.display = 'flex';
+    showOopsRetryLessonView();
+    renderOopsLessonList();
+  }
+  function closeOopsRetryModal() {
+    document.getElementById('oops-retry-modal').style.display = 'none';
+    currentOopsRetryStory = null;
+    currentOopsRetryExpanded = false;
+    _cachedOopsEval = null; // ★ V10 Phase 2: 모달 닫으면 캐시도 비움
+  }
+  function oopsRetryGoBack() {
+    // 다시 풀기 화면에 있으면 → Lesson 리스트로 돌아감
+    if (document.getElementById('oops-retry-practice-view').style.display !== 'none') {
+      showOopsRetryLessonView();
+      renderOopsLessonList();
+    } else {
+      closeOopsRetryModal();
+    }
+  }
+  function showOopsRetryLessonView() {
+    document.getElementById('oops-retry-lesson-view').style.display = 'block';
+    document.getElementById('oops-retry-practice-view').style.display = 'none';
+    document.getElementById('oops-retry-back-btn').style.display = 'none';
+    document.getElementById('oops-retry-title').textContent = '🔁 Oops Point 다시 풀기';
+  }
+  function showOopsRetryPracticeView() {
+    document.getElementById('oops-retry-lesson-view').style.display = 'none';
+    document.getElementById('oops-retry-practice-view').style.display = 'block';
+    document.getElementById('oops-retry-back-btn').style.display = 'inline';
+    document.getElementById('oops-retry-title').textContent = '🔁 다시 풀기';
+  }
+
+  function renderOopsLessonList() {
+    const view = document.getElementById('oops-retry-lesson-view');
+    if (!myStories || myStories.length === 0) {
+      view.innerHTML = '<div style="text-align:center; color:#888; margin-top:30px; padding:20px; font-size:0.9rem; line-height:1.6;">아직 My Story 작성한 게 없음 🛸<br>먼저 My Story 탭에서 글을 써야 다시 풀 비문이 생김!</div>';
+      return;
+    }
+    // ★ V11 패치(2026-05-13): 정상 글 + 옛 글(corrections 비어있음) 둘 다 포함 + 분류
+    // - 정상 글 (corrections에 진짜 quiz 1개 이상): 일반 표시
+    // - 옛 글 (corrections 비어있거나 quiz 다 빈 상태): 🆕 새 비문 배지 + Zeeto가 새로 생성
+    // - 그 외 (finalStory도 없는 진짜 빈 글): 리스트에서 제외
+    const storiesWithOops = myStories.map((s, idx) => ({ ...s, _idx: idx })).filter(s => {
+      try {
+        const c = JSON.parse(s.corrections || '[]');
+        if (!Array.isArray(c)) return false;
+        const hasRealQuiz = c.some(item => item && item.quiz && String(item.quiz).trim());
+        const isOldStory = !hasRealQuiz;
+        s._oopsState = isOldStory ? 'oldStory' : 'normal';
+        // 옛 글은 finalStory가 있어야 새 비문 생성 가능
+        return hasRealQuiz || (isOldStory && s.finalStory && String(s.finalStory).trim());
+      } catch(e) { return false; }
+    });
+    if (storiesWithOops.length === 0) {
+      view.innerHTML = '<div style="text-align:center; color:#888; margin-top:30px; padding:20px; font-size:0.9rem; line-height:1.6;">아직 풀 거리가 있는 Story가 없음 🎉<br>(My Story 탭에서 글을 써야 다시 풀 비문이 생김!)</div>';
+      return;
+    }
+    // Lesson별 그룹핑
+    const byLesson = {};
+    storiesWithOops.forEach(s => {
+      const lesson = s.lesson || '미지정';
+      if (!byLesson[lesson]) byLesson[lesson] = [];
+      byLesson[lesson].push(s);
+    });
+    // Lesson 번호순 정렬
+    const lessons = Object.keys(byLesson).sort((a, b) => {
+      const an = parseInt(a, 10); const bn = parseInt(b, 10);
+      if (isNaN(an) && isNaN(bn)) return a.localeCompare(b);
+      if (isNaN(an)) return 1; if (isNaN(bn)) return -1;
+      return an - bn;
+    });
+    let html = '';
+    lessons.forEach(lesson => {
+      const stories = byLesson[lesson];
+      html += `<div style="margin-bottom:14px;"><div style="font-weight:700; color:#4a5d4e; font-size:1rem; margin-bottom:6px;">📚 Lesson ${lesson} <span style="font-size:0.8rem; color:#888; font-weight:normal;">(${stories.length}편)</span></div>`;
+      stories.forEach(s => {
+        const mastered = isStoryMastered(s._idx);
+        const dateStr = s.date ? new Date(s.date).toLocaleDateString('ko-KR') : '';
+        const titleSafe = escapeHtml(s.title || '(제목 없음)');
+        const btnHtml = mastered
+          ? '<span style="color:#1D9E75; font-weight:500; font-size:0.85rem;">✅ 마스터</span>'
+          : '<span style="color:#534AB7; font-weight:500; font-size:0.85rem;">도전 →</span>';
+        // ★ V11: 옛 글 🆕 배지 + 보라 테두리
+        const isOld = s._oopsState === 'oldStory';
+        const newBadge = isOld ? '<span style="background:#EEEDFE; color:#3C3489; padding:1px 5px; border-radius:6px; font-size:0.65rem; font-weight:700; margin-left:4px;">🆕 새 비문</span>' : '';
+        const cardBorder = isOld ? '#AFA9EC' : '#d4d4d4';
+        // ★ V11: 도전 횟수 표시 (성장 기록)
+        const attemptCount = countAttemptsForStory(s._idx);
+        const attemptStr = attemptCount > 0 ? ` · ${attemptCount}회 도전` : '';
+        html += `<div onclick="selectOopsStory(${s._idx})" style="background:white; border:1px solid ${cardBorder}; border-radius:10px; padding:10px 12px; margin-bottom:6px; display:flex; justify-content:space-between; align-items:center; cursor:pointer; gap:4px;"><div style="flex:1; min-width:0;"><div style="font-weight:500; color:#26321f; font-size:0.9rem;">${titleSafe}${newBadge}</div><div style="font-size:0.75rem; color:#888;">${dateStr}${attemptStr}</div></div>${btnHtml}</div>`;
+      });
+      html += '</div>';
+    });
+    view.innerHTML = html;
+  }
+
+  // ★ V11 헬퍼(2026-05-13): 특정 Story의 도전 횟수 카운트 (성장 기록용)
+  function countAttemptsForStory(storyIndex) {
+    if (storyIndex == null) return 0;
+    const story = myStories[storyIndex];
+    if (!story) return 0;
+    const storyOrigDate = story.date ? toLocalDateStr(story.date) : '';
+    return myOopsRetries.filter(r =>
+      String(r.lesson) === String(story.lesson) &&
+      r.storyTitle === story.title &&
+      (!storyOrigDate || toLocalDateStr(r.originalDate) === storyOrigDate)
+    ).length;
+  }
+
+  // ★ V11 헬퍼(2026-05-13): Story별 모든 시도 기록 (시간순 정렬) — 히스토리 스트립용
+  function getAttemptsForStory(storyIndex) {
+    if (storyIndex == null) return [];
+    const story = myStories[storyIndex];
+    if (!story) return [];
+    const storyOrigDate = story.date ? toLocalDateStr(story.date) : '';
+    return myOopsRetries.filter(r =>
+      String(r.lesson) === String(story.lesson) &&
+      r.storyTitle === story.title &&
+      (!storyOrigDate || toLocalDateStr(r.originalDate) === storyOrigDate)
+    ).sort((a, b) => new Date(a.timestamp) - new Date(b.timestamp));
+  }
+
+  // ★ V11 헬퍼(2026-05-13): 다시 풀기 화면 상단 도전 히스토리 스트립 렌더링
+  function renderAttemptHistory(storyIndex) {
+    const stripEl = document.getElementById('oops-retry-history-strip');
+    if (!stripEl) return;
+    const attempts = getAttemptsForStory(storyIndex);
+    if (attempts.length === 0) {
+      stripEl.innerHTML = '<div style="font-size:0.8rem; color:#3C3489;">🌱 첫 도전! 화이팅 ✨</div>';
+      return;
+    }
+    let html = '<div style="font-weight:500; margin-bottom:4px; color:#26321f; font-size:0.78rem;">🌱 내 도전 기록</div><div style="display:flex; align-items:center; gap:4px; flex-wrap:wrap;">';
+    attempts.forEach((r, idx) => {
+      const dot = r.isMaster
+        ? '<span style="background:#EAF3DE; color:#27500A; width:18px; height:18px; border-radius:50%; display:inline-flex; align-items:center; justify-content:center; font-size:0.6rem; font-weight:700;" title="' + (idx+1) + '차: 마스터">✅</span>'
+        : '<span style="background:#FCEBEB; color:#A32D2D; width:18px; height:18px; border-radius:50%; display:inline-flex; align-items:center; justify-content:center; font-size:0.6rem; font-weight:700;" title="' + (idx+1) + '차: 미마스터">❌</span>';
+      if (idx > 0) html += '<span style="color:#888; font-size:0.65rem;">→</span>';
+      html += dot;
+    });
+    // 이번 시도(?) 추가
+    html += '<span style="color:#888; font-size:0.65rem;">→</span><span style="background:#FAEEDA; color:#633806; width:18px; height:18px; border-radius:50%; display:inline-flex; align-items:center; justify-content:center; font-size:0.6rem; font-weight:700;" title="이번 시도">?</span>';
+    html += '<span style="margin-left:6px; font-size:0.7rem; color:#534AB7; font-weight:500;">이번이 ' + (attempts.length + 1) + '번째!</span></div>';
+    stripEl.innerHTML = html;
+  }
+
+  // ★ V11 헬퍼(2026-05-13): 옵션 B — Oops Retry 박스의 🔁 버튼 클릭 시 비문 검증/재생성
+  // - 학생이 "이거 정문 같음" 신고 → Zeeto 검증 → 진짜 비문이면 설명만, 정문이면 새 비문 교체
+  // - 시트의 원본 corrections는 안 건드림. 화면의 textarea와 currentOopsRetryBiumuns만 갱신.
+  async function regenOopsRetryBiumun(boxNum, forceRegen) {
+    const errEl = document.getElementById('oops-retry-error-' + boxNum);
+    const regenBtn = document.getElementById('oops-retry-regen-' + boxNum);
+    const correctedEl = document.getElementById('oops-retry-corrected-' + boxNum);
+    const reasonEl = document.getElementById('oops-retry-reason-' + boxNum);
+    if (!errEl) return;
+    const previousBiumun = errEl.value.trim();
+    if (!previousBiumun) return alert('이 칸엔 아직 비문이 없음 👽');
+
+    // 학생 입력값이 있으면 한 번 확인 (forceRegen일 땐 이미 동의했으니 스킵)
+    if (!forceRegen) {
+      const hasInput = (correctedEl && correctedEl.value.trim()) || (reasonEl && reasonEl.value.trim());
+      if (hasInput) {
+        const ok = confirm('⚠️ 이 비문 새로 만들거임?\n적어놓은 정문/이유는 사라짐.\n\n(Zeeto가 먼저 이 문장이 진짜 비문인지 확인해줌)');
+        if (!ok) return;
+      }
+    }
+
+    // Story 정보 (errorContext용)
+    const story = myStories[currentOopsRetryStory];
+    let errorContext = '';
+    if (story && story.grammar) errorContext = String(story.grammar);
+
+    if (regenBtn) { regenBtn.disabled = true; regenBtn.style.opacity = '0.5'; regenBtn.textContent = '⏳'; }
+    showLoading(forceRegen ? 'Zeeto가 새 비문 만드는 중... 👽' : 'Zeeto가 이 문장 확인 중... 🔎');
+
+    try {
+      const res = await fetch(SHEET_URL, { method: 'POST', body: JSON.stringify({
+        type: "ms_regen_biumun", studentId: currentStudentId, token: currentToken,
+        errorContext: errorContext, previousBiumun: previousBiumun, studentSentence: '',
+        forceRegen: !!forceRegen
+      }) });
+      const data = await res.json();
+      hideLoading();
+      if (data.error) {
+        if (data.error === 'Unauthorized') { alert('⚠️ 세션 만료. 다시 로그인하셈 👽'); logout(); return; }
+        alert('🛸 Zeeto가 응답을 못함. 다시 시도해보셈!');
+        return;
+      }
+      const result = (data.result || '').trim();
+      if (!result || result.includes('멈췄음')) {
+        alert('🛸 Zeeto가 응답을 못함. 다시 시도해보셈!');
+        return;
+      }
+
+      const typeMatch = result.match(/TYPE:\s*(WRONG|CORRECT_REGEN)/i);
+      const aiType = typeMatch ? typeMatch[1].toUpperCase() : null;
+      const newBiumunMatch = result.match(/NEW_BIUMUN:\s*([^\n]+)/i);
+      const explanationMatch = result.match(/EXPLANATION:\s*([\s\S]+?)(?=\n*(?:NEW_BIUMUN:|TYPE:|$))/i);
+
+      if (!forceRegen && !aiType) {
+        alert('Zeeto 응답 형식이 이상함 🛸 다시 한 번 🔁 눌러보셈!');
+        return;
+      }
+
+      // 케이스 A: 진짜 비문 — 학생이 못 알아본 거임
+      if (!forceRegen && aiType === 'WRONG') {
+        const explanation = explanationMatch ? explanationMatch[1].trim() : '(설명을 못 가져옴)';
+        const override = confirm('👽 이거 진짜 비문 맞음!\n\n' + explanation + '\n\n다시 한 번 잘 보고 정문으로 고쳐봐!\n\n──────\n그래도 새로 만들거임? (Zeeto 판정 무시)');
+        if (override) {
+          if (regenBtn) { regenBtn.disabled = false; regenBtn.style.opacity = '1'; regenBtn.textContent = '🔁'; }
+          return regenOopsRetryBiumun(boxNum, true);
+        }
+        return;
+      }
+
+      // 케이스 B: 정문이었음 OR forceRegen 모드 — 새 비문 교체
+      let newBiumun = newBiumunMatch ? newBiumunMatch[1].trim() : '';
+      const lines = newBiumun.replace(/\^/g, '').replace(/[*#`"']/g, '').split('\n').map(s=>s.trim()).filter(s=>s.length>0);
+      let cleaned = lines.find(s => /^[A-Z]/.test(s) && !/[가-힣]/.test(s) && s.length >= 5) || lines[0] || newBiumun;
+      if (!cleaned) { alert('Zeeto 응답 형식이 이상함 🛸'); return; }
+      if (cleaned.length > 200) { alert('Zeeto가 너무 길게 만들었음 😵'); return; }
+      const normalize = (s) => (s || '').toLowerCase().replace(/[.,!?;:]/g, '').replace(/\s+/g, ' ').trim();
+      if (normalize(cleaned) === normalize(previousBiumun)) { alert('Zeeto가 거의 똑같이 만들었음 😵 한 번 더 눌러보셈!'); return; }
+
+      // 새 비문 적용
+      errEl.value = cleaned;
+      if (currentOopsRetryBiumuns && boxNum <= currentOopsRetryBiumuns.length) {
+        currentOopsRetryBiumuns[boxNum - 1] = cleaned;
+      }
+      // ★ V11 패치(2026-05-13, 3차-6): 옛 글일 때 sessionStorage 캐시도 갱신 → 새로고침해도 🔁 결과 유지
+      if (currentOopsRetryIsOldStory && story) {
+        setCachedOopsBiumuns(story, currentOopsRetryBiumuns);
+      }
+      if (correctedEl) correctedEl.value = '';
+      if (reasonEl) reasonEl.value = '';
+      if (!forceRegen && aiType === 'CORRECT_REGEN') {
+        alert('🔁 Zeeto가 실수해서 정문 만들었었음 😅 새 비문으로 바꿨음! 다시 풀어봐 👽');
+      }
+    } catch(e) {
+      hideLoading();
+      console.error('regenOopsRetryBiumun error:', e);
+      alert('🛸 통신 오류. 잠시 후 다시 시도하셈!');
+    } finally {
+      if (regenBtn) { regenBtn.disabled = false; regenBtn.style.opacity = '1'; regenBtn.textContent = '🔁'; }
+    }
+  }
+
+  async function selectOopsStory(storyIndex) {
+    const story = myStories[storyIndex];
+    if (!story) return alert('Story를 못 찾음 🛸');
+    let corrections;
+    try { corrections = JSON.parse(story.corrections || '[]'); } catch(e) { corrections = []; }
+    if (!Array.isArray(corrections)) corrections = [];
+    const hasRealQuiz = corrections.some(item => item && item.quiz && String(item.quiz).trim());
+    const isOldStory = !hasRealQuiz;
+
+    // ★ V11 패치(2026-05-13): 옛 글이면 finalStory가 있어야 Zeeto가 새 비문 만들 수 있음
+    if (isOldStory && !(story.finalStory && String(story.finalStory).trim())) {
+      return alert('이 글은 완벽 최종본도 없어서 비문 생성이 안 됨 🛸');
+    }
+
+    currentOopsRetryStory = storyIndex;
+    currentOopsRetryExpanded = false;
+    _cachedOopsEval = null; // ★ V10 Phase 2: 다른 Story 선택 시 캐시 비움
+    currentOopsRetryIsOldStory = isOldStory; // ★ V11: 제출 시 표시용
+
+    // 헤더 채우기
+    document.getElementById('oops-retry-lesson-label').textContent = 'Lesson ' + (story.lesson || '—');
+    document.getElementById('oops-retry-story-title').textContent = story.title || '(제목 없음)';
+    document.getElementById('oops-retry-original-date').textContent = '처음 작성: ' + (story.date ? new Date(story.date).toLocaleDateString('ko-KR') : '—');
+
+    // 설명 박스 (접힘 상태 초기화)
+    const hintContent = document.getElementById('oops-retry-hint-content');
+    // ★ V10 Phase 2 M8 fix: 다른 곳들과 일관성 위해 safeSavedHtml로 sanitize (혹시라도 위험한 태그 막기)
+    // ★ V11: 옛 글은 oops 필드가 비어있으므로 안내 문구로 대체
+    if (isOldStory) {
+      hintContent.innerHTML = '<div style="color:#3C3489;">🛸 이 글은 옛날에 비문 활동을 못 했음. Zeeto가 매번 새 비문을 만들어줘서 풀이 가능함! (같은 문법 카테고리, 다른 문장)</div>';
+    } else {
+      hintContent.innerHTML = safeSavedHtml(story.oops || '(설명 없음)');
+    }
+    hintContent.style.display = 'none';
+    document.getElementById('oops-retry-hint-chevron').textContent = '▶';
+
+    // ★ V11: 도전 기록 스트립 그리기
+    renderAttemptHistory(storyIndex);
+
+    // ★ V11: 옛 글이면 Zeeto가 비문 새로 만듦 (호출 후 박스 렌더링)
+    let biumunList;
+    if (isOldStory) {
+      // ★ V11 패치(2026-05-13, 3차-6): sessionStorage 캐시 먼저 체크 → API 비용 절감 + 새로고침해도 같은 비문 유지
+      const cached = getCachedOopsBiumuns(story);
+      if (cached && cached.length > 0) {
+        biumunList = cached;
+        showOopsRetryPracticeView();
+      } else {
+      // 비문 컨테이너에 로딩 표시
+      const container = document.getElementById('oops-retry-error-container');
+      container.innerHTML = '<div style="text-align:center; color:#3C3489; padding:20px; font-size:0.9rem;">🛸 Zeeto가 새 비문 만드는 중... (옛 글이라 매번 새로 만들어줌)</div>';
+      // 제출 버튼 잠시 숨김 (생성 완료 후 표시)
+      const submitBtnPre = document.getElementById('oops-retry-submit-btn');
+      submitBtnPre.style.display = 'none';
+      showOopsRetryPracticeView();
+      try {
+        const res = await fetch(SHEET_URL, { method: 'POST', body: JSON.stringify({
+          type: "ms_generate_biumun_from_story", studentId: currentStudentId, token: currentToken,
+          finalStory: story.finalStory || '', revision: story.revision || '', grammar: story.grammar || ''
+        }) });
+        const data = await res.json();
+        if (data.error) {
+          if (data.error === 'Unauthorized') { alert('⚠️ 세션 만료. 다시 로그인하셈 👽'); logout(); return; }
+          container.innerHTML = '<div style="text-align:center; color:#A32D2D; padding:20px;">🛸 비문 생성 실패. 잠시 후 다시 시도하셈! <br><button onclick="selectOopsStory(' + storyIndex + ')" style="margin-top:10px; padding:8px 16px; background:#4a5d4e; color:white; border:none; border-radius:8px; cursor:pointer;">🔄 다시 시도</button></div>';
+          return;
+        }
+        biumunList = (data.biumuns || []).filter(b => b && b.trim());
+        if (biumunList.length === 0) {
+          container.innerHTML = '<div style="text-align:center; color:#A32D2D; padding:20px;">🛸 Zeeto가 비문을 못 만들었음. 다시 시도해보셈!</div>';
+          return;
+        }
+        // ★ V11 패치(2026-05-13, 3차-6): 옛 글 비문은 sessionStorage에 저장 → 새로고침해도 같은 비문 유지 (API 재호출 방지)
+        // 3개 다 받았을 때만 캐시 (잘린 경우 캐시 안 함 → 학생이 새로고침으로 재시도 가능)
+        if (biumunList.length === 3 && !data.truncated) {
+          setCachedOopsBiumuns(story, biumunList);
+        }
+        // ★ V11 패치(2026-05-13): MAX_TOKENS 잘림으로 비문이 3개 미만일 때 학생에게 안내
+        if (data.truncated || biumunList.length < 3) {
+          const partialNote = document.createElement('div');
+          partialNote.style.cssText = 'background:#FAEEDA; color:#633806; border-radius:8px; padding:8px 10px; margin-bottom:10px; font-size:0.8rem; line-height:1.5;';
+          partialNote.textContent = '✂️ Zeeto가 ' + biumunList.length + '개만 만들 수 있었음 (응답 길이 한계). 새로고침 후 다시 시도하면 3개 다 받을 수 있음!';
+          // 박스 렌더 시작 전에 안내 삽입 (아래 코드에서 container.innerHTML로 덮어쓰므로, 박스 박은 다음에 삽입해야 함)
+          // → 임시로 변수에 저장해서 박스 렌더 후 prepend
+          window._oopsPartialNote = partialNote;
+        } else {
+          window._oopsPartialNote = null;
+        }
+      } catch(e) {
+        container.innerHTML = '<div style="text-align:center; color:#A32D2D; padding:20px;">🛸 통신 오류. 다시 시도하셈!</div>';
+        return;
+      }
+      } // ★ V11 패치(2026-05-13, 3차-6): cache miss 분기 닫기
+    } else {
+      // 정상 글: corrections의 quiz 사용
+      biumunList = corrections.map(c => c && c.quiz ? c.quiz.trim() : '').filter(s => s);
+    }
+    // ★ V11: 상태에 비문 목록 저장 (제출/재생성 시 참조)
+    currentOopsRetryBiumuns = biumunList.slice(0, 3);
+
+    // 비문 박스 렌더 (최대 3개)
+    const container = document.getElementById('oops-retry-error-container');
+    let boxesHtml = '';
+    for (let i = 0; i < Math.min(3, biumunList.length); i++) {
+      const biumun = biumunList[i];
+      if (!biumun) continue;
+      const biumunSafe = escapeHtml(biumun);
+      // ★ V11: 각 박스에 🔁 검증 버튼 추가
+      boxesHtml += `<div class="error-new-box" style="background:#fffafa; border:1px solid #d9534f; border-radius:10px; padding:10px; margin-bottom:8px;">
+        <textarea id="oops-retry-error-${i+1}" class="input-field" style="width:100%; box-sizing:border-box; border-color:#d9534f; margin-bottom:4px; resize:none; line-height:1.4; background-color:#f4f4f4; color:#333;" rows="2" readonly>${biumunSafe}</textarea>
+        <div style="display:flex; justify-content:flex-end; margin-bottom:6px;">
+          <button onclick="regenOopsRetryBiumun(${i+1})" id="oops-retry-regen-${i+1}" style="background:none; border:1px solid #d9534f; color:#d9534f; padding:3px 8px; font-size:0.85rem; border-radius:10px; cursor:pointer; line-height:1;" title="이 비문 새로 만들기">🔁</button>
+        </div>
+        <textarea id="oops-retry-corrected-${i+1}" class="input-field" style="width:100%; box-sizing:border-box; border-color:#2e7d32; margin-bottom:6px; resize:none; line-height:1.4;" rows="2" placeholder="✅ 올바른 문장 (정문)"></textarea>
+        <textarea id="oops-retry-reason-${i+1}" class="input-field" style="width:100%; box-sizing:border-box; border-color:#4a5d4e; margin-bottom:0; resize:none; line-height:1.4;" rows="2" placeholder="💡 왜 틀렸는지 이유"></textarea>
+      </div>`;
+    }
+    container.innerHTML = boxesHtml;
+    // ★ V11 패치(2026-05-13): MAX_TOKENS 잘림 시 부분 응답 안내 prepend
+    if (window._oopsPartialNote) {
+      container.insertBefore(window._oopsPartialNote, container.firstChild);
+      window._oopsPartialNote = null;
+    }
+
+    // 결과 영역 초기화
+    document.getElementById('oops-retry-result').style.display = 'none';
+    const submitBtn = document.getElementById('oops-retry-submit-btn');
+    submitBtn.disabled = false;
+    submitBtn.style.opacity = '1';
+    submitBtn.style.display = ''; // ★ V10 Phase 2 수정: 직전 제출에서 숨겨졌던 거 복구
+    submitBtn.textContent = '👽 Zeeto에게 평가받기';
+
+    // ★ V10 Phase 2: 입력 수정 시 평가 캐시 무효화 (수정한 답에 대해 옛 피드백 저장되는 거 방지)
+    for (let i = 1; i <= 3; i++) {
+      const corrEl = document.getElementById('oops-retry-corrected-' + i);
+      const reasonEl = document.getElementById('oops-retry-reason-' + i);
+      [corrEl, reasonEl].forEach(el => {
+        if (el) el.addEventListener('input', () => {
+          if (_cachedOopsEval) {
+            _cachedOopsEval = null;
+            // 결과 영역 숨기고 버튼 텍스트 원래대로 (재평가 필요함을 시각적으로 알림)
+            const r = document.getElementById('oops-retry-result');
+            if (r) r.style.display = 'none';
+            const sb = document.getElementById('oops-retry-submit-btn');
+            if (sb) { sb.style.display = ''; sb.disabled = false; sb.style.opacity = '1'; sb.textContent = '👽 Zeeto에게 평가받기'; }
+          }
+        });
+      });
+    }
+
+    showOopsRetryPracticeView();
+  }
+
+  function toggleOopsHint() {
+    const content = document.getElementById('oops-retry-hint-content');
+    const chevron = document.getElementById('oops-retry-hint-chevron');
+    if (content.style.display === 'none') {
+      content.style.display = 'block';
+      chevron.textContent = '▼';
+      currentOopsRetryExpanded = true; // 펼친 거 기록
+    } else {
+      content.style.display = 'none';
+      chevron.textContent = '▶';
+    }
+  }
+
+  async function submitOopsRetry() {
+    if (currentOopsRetryStory == null) return;
+    const story = myStories[currentOopsRetryStory];
+    if (!story) return alert('Story 정보가 사라짐 🛸');
+
+    // ★ V11 패치(2026-05-13): 비문은 readonly textarea(`oops-retry-error-N`)에서 직접 읽음
+    // - 정상 글: corrections.quiz가 들어가 있음
+    // - 옛 글: Zeeto가 생성한 새 비문이 들어가 있음
+    // - 🔁 재생성된 경우: 새 비문이 들어가 있음
+    // → 화면에 보이는 게 진실의 원천
+    const inputs = [];
+    for (let i = 1; i <= 3; i++) {
+      const errEl = document.getElementById(`oops-retry-error-${i}`);
+      const corrEl = document.getElementById(`oops-retry-corrected-${i}`);
+      const reasonEl = document.getElementById(`oops-retry-reason-${i}`);
+      if (!errEl || !corrEl || !reasonEl) continue;
+      inputs.push({
+        biumun: errEl.value.trim(),
+        corrected: corrEl.value.trim(),
+        reason: reasonEl.value.trim()
+      });
+    }
+    // 모든 정문/이유 입력 필수
+    const incomplete = inputs.some(x => x.biumun && (!x.corrected || !x.reason));
+    if (incomplete) return alert('정문과 이유를 모두 적어야 평가 가능함! 👽');
+    if (inputs.length === 0) return alert('풀 비문이 없음 🛸');
+
+    if (isLoading) return;
+    const submitBtn = document.getElementById('oops-retry-submit-btn');
+    submitBtn.disabled = true; submitBtn.style.opacity = '0.5';
+    _oopsSubmitInFlight = true; // ★ V11 패치(2026-05-13): 탭 전환 시 race 방지 플래그
+    showLoading('Zeeto가 평가하는 중... 🌌');
+    try {
+      let feedback, isMaster;
+
+      // ★ V10 Phase 2: 이전에 받은 eval 결과가 있으면 재평가 안 함 (저장만 재시도)
+      if (_cachedOopsEval) {
+        feedback = _cachedOopsEval.feedback;
+        isMaster = _cachedOopsEval.isMaster;
+      } else {
+        submitBtn.textContent = '⏳ Zeeto가 평가 중...';
+        // 1. AI 평가
+        const evalRes = await fetch(SHEET_URL, { method: 'POST', body: JSON.stringify({
+          type: "oops_retry_evaluate", studentId: currentStudentId, token: currentToken,
+          error1: inputs[0]?.biumun || '',   corrected1: inputs[0]?.corrected || '', reason1: inputs[0]?.reason || '',
+          error2: inputs[1]?.biumun || '',   corrected2: inputs[1]?.corrected || '', reason2: inputs[1]?.reason || '',
+          error3: inputs[2]?.biumun || '',   corrected3: inputs[2]?.corrected || '', reason3: inputs[2]?.reason || ''
+        }) });
+        const evalData = await evalRes.json();
+        if (evalData.error) {
+          hideLoading();
+          submitBtn.disabled = false; submitBtn.style.opacity = '1'; submitBtn.textContent = '👽 Zeeto에게 평가받기';
+          const isUnauth = (evalData.error === 'Unauthorized');
+          alert('⚠️ ' + (isUnauth ? '세션이 만료됐음! 다시 로그인하셈 👽' : 'Zeeto 평가 실패. 다시 시도해보셈 🛸'));
+          if (isUnauth) logout();
+          if (evalData.errorReason) console.warn('eval errorReason:', evalData.errorReason);
+          return;
+        }
+        feedback = evalData.feedback || '(피드백 못 받음)';
+        isMaster = !!evalData.isMaster;
+        // 평가 결과 캐싱 (재제출 시 평가 안 다시 함)
+        _cachedOopsEval = { feedback, isMaster };
+
+        // ★ V10 Phase 2 M2 fix: eval 성공 직후 학생에게 결과 먼저 보여주기 (저장 실패해도 손실 안 됨)
+        document.getElementById('oops-retry-result-feedback').innerHTML = '👽 ' + safeAiRender(feedback);
+        const masterBoxPre = document.getElementById('oops-retry-result-master');
+        if (isMaster) {
+          masterBoxPre.innerHTML = '✅ 마스터 완료!';
+          masterBoxPre.style.background = '#EAF3DE';
+          masterBoxPre.style.color = '#27500A';
+        } else {
+          masterBoxPre.innerHTML = '💪 아직 마스터 아님 — 다시 도전 가능!';
+          masterBoxPre.style.background = '#FAEEDA';
+          masterBoxPre.style.color = '#633806';
+        }
+        document.getElementById('oops-retry-result').style.display = 'block';
+        submitBtn.textContent = '💾 저장 중...';
+      }
+
+      // 2. 시트에 저장
+      // ★ V10 Phase 2 수정: storyKey는 'S' 접두사 + 밀리초 timestamp (Sheets Date 자동 변환 방지)
+      // ★ V10 Phase 2 M9 fix: originalDate는 toLocalDateStr 사용 (timezone 일관성)
+      const storyKey = story.date ? ('S' + new Date(story.date).getTime()) : ('S_' + (story.title || '').replace(/\s+/g, '_') + '_L' + story.lesson);
+      const saveRes = await fetch(SHEET_URL, { method: 'POST', body: JSON.stringify({
+        type: "oops_retry_save", studentId: currentStudentId, token: currentToken,
+        userName: currentUserProfile, grade: (currentStudentId ? String(currentStudentId).charAt(0) : ''),
+        lesson: story.lesson || '',
+        originalStoryRow: storyKey,
+        storyTitle: story.title || '',
+        originalDate: story.date ? toLocalDateStr(story.date) : '',
+        error1: inputs[0]?.biumun || '',   corrected1: inputs[0]?.corrected || '', reason1: inputs[0]?.reason || '',
+        error2: inputs[1]?.biumun || '',   corrected2: inputs[1]?.corrected || '', reason2: inputs[1]?.reason || '',
+        error3: inputs[2]?.biumun || '',   corrected3: inputs[2]?.corrected || '', reason3: inputs[2]?.reason || '',
+        zeetoFeedback: feedback, isMaster: isMaster, expandedHint: currentOopsRetryExpanded
+      }) });
+      const saveText = await saveRes.text();
+      hideLoading();
+      // ★ V10 Phase 2 M2 fix: 저장 실패 분기 — Unauthorized 명시 처리 + 평가는 이미 화면에 떠있음
+      if (saveText === "Unauthorized") {
+        submitBtn.disabled = false; submitBtn.style.opacity = '1'; submitBtn.textContent = '💾 다시 저장 시도';
+        alert('⚠️ 세션이 만료됐음! 다시 로그인하셈 👽');
+        logout();
+        return;
+      }
+      if (saveText !== "OopsRetry Saved") {
+        submitBtn.disabled = false; submitBtn.style.opacity = '1'; submitBtn.textContent = '💾 다시 저장 시도';
+        alert('저장 실패 🛸 평가 결과는 위에 보이지만 시트에 못 들어감. 다시 저장 시도 눌러보셈! (평가는 캐시되어 있어서 AI 안 다시 부름)');
+        return;
+      }
+
+      // 3. 결과 표시 (위에서 이미 그렸지만 cached 케이스에서도 확실히 보이게 한 번 더 갱신)
+      document.getElementById('oops-retry-result-feedback').innerHTML = '👽 ' + safeAiRender(feedback);
+      const masterBox = document.getElementById('oops-retry-result-master');
+      if (isMaster) {
+        masterBox.innerHTML = '✅ 마스터 완료!';
+        masterBox.style.background = '#EAF3DE';
+        masterBox.style.color = '#27500A';
+      } else {
+        masterBox.innerHTML = '💪 아직 마스터 아님 — 다시 도전 가능!';
+        masterBox.style.background = '#FAEEDA';
+        masterBox.style.color = '#633806';
+      }
+      document.getElementById('oops-retry-result').style.display = 'block';
+      submitBtn.style.display = 'none'; // 제출 완료 → 버튼 숨김
+      _cachedOopsEval = null; // ★ V10 Phase 2: 저장 성공했으니 캐시 비움 (다음 Story 풀 때 fresh eval)
+      // ★ V11 패치(2026-05-13, 3차-6): 옛 글 비문 캐시도 비움 → 다음 도전 시 새 비문 (간격 반복 학습 효과 유지)
+      if (currentOopsRetryIsOldStory && story) clearCachedOopsBiumuns(story);
+
+      // ★ V10 Phase 2 수정: 낙관적 업데이트 - 서버 재호출 실패에 의존하지 않게
+      // 4-1. 일단 새 결과를 로컬 myOopsRetries에 즉시 추가 (캘린더 보라 배경 바로 보이게)
+      const todayStr = (() => { const d = new Date(); return `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`; })();
+      const sameAttemptCount = myOopsRetries.filter(r =>
+        String(r.lesson) === String(story.lesson) && r.storyTitle === story.title
+      ).length;
+      myOopsRetries.push({
+        timestamp: new Date().toISOString(), date: todayStr,
+        lesson: story.lesson || '', originalStoryRow: storyKey,
+        storyTitle: story.title || '', originalDate: toLocalDateStr(story.date || ''),
+        error1: inputs[0]?.biumun || '',  corrected1: inputs[0]?.corrected || '', reason1: inputs[0]?.reason || '',
+        error2: inputs[1]?.biumun || '',  corrected2: inputs[1]?.corrected || '', reason2: inputs[1]?.reason || '',
+        error3: inputs[2]?.biumun || '',  corrected3: inputs[2]?.corrected || '', reason3: inputs[2]?.reason || '',
+        zeetoFeedback: feedback, isMaster: isMaster, expandedHint: currentOopsRetryExpanded,
+        attemptNumber: sameAttemptCount + 1
+      });
+      // 4-2. 캘린더 즉시 다시 그림
+      if (typeof renderCalendar === 'function') renderCalendar();
+      // 4-3. 백그라운드로 서버 데이터 재동기화 (실패해도 화면엔 영향 없음)
+      loadMyOopsRetries().catch(() => {});
+    } catch(e) {
+      console.error('submitOopsRetry error:', e);
+      hideLoading();
+      submitBtn.disabled = false; submitBtn.style.opacity = '1'; submitBtn.textContent = '👽 Zeeto에게 평가받기';
+      alert('통신 오류 🛸 잠시 후 다시 시도해보셈!');
+    } finally {
+      // ★ V11 패치(2026-05-13): 어떤 경로로 종료되더라도 in-flight 플래그 해제
+      _oopsSubmitInFlight = false;
+    }
+  }
+
+  // ★ V10(2026-05-12): My Story 작성 내용 자동저장/복원 — 새로고침해도 내용 안 날아가게
+  const MYSTORY_DRAFT_KEY = 'even_mystory_draft';
+  let _msSaveTimer = null;
+  function autoSaveMyStoryDraft() {
+    if (!currentStudentId) return;
+    clearTimeout(_msSaveTimer);
+    _msSaveTimer = setTimeout(() => {
+      try {
+        const getVal = (id) => { const el = document.getElementById(id); return el ? el.value : ''; };
+        const getHtml = (id) => { const el = document.getElementById(id); return el ? el.innerHTML : ''; };
+        const activeStepEl = document.querySelector('.story-step.active');
+        const draft = {
+          studentId: currentStudentId,
+          savedAt: Date.now(),
+          activeStep: activeStepEl ? activeStepEl.id : 'story-step-1',
+          lesson: getVal('ms-lesson'), title: getVal('ms-title'),
+          draft: getVal('ms-draft'), revision: getVal('ms-revision'), reflection: getVal('ms-reflection'),
+          wordReq1: getVal('ms-word-req1'), wordReq2: getVal('ms-word-req2'), wordReq3: getVal('ms-word-req3'),
+          wordOpt1: getVal('ms-word-opt1'), wordOpt2: getVal('ms-word-opt2'),
+          grammar: getVal('ms-grammar'),
+          grammarDisplay: (document.getElementById('ms-grammar-display')||{}).textContent || '',
+          zeetoHint: getHtml('ms-zeeto-hint'), displayDraft: getHtml('ms-display-draft'),
+          zeetoFeedback: getHtml('ms-zeeto-feedback'), zeetoFinal: getHtml('ms-zeeto-final'),
+          zeetoTip: getHtml('ms-zeeto-tip'), oopsPoint: getHtml('ms-oops-point'),
+          oopsPointOriginal: (document.getElementById('ms-oops-point')||{}).dataset ? (document.getElementById('ms-oops-point').dataset.original || '') : '',
+          oopsPointCopy: getHtml('ms-oops-point-copy'), displayRevision: getHtml('ms-display-revision'),
+          error1: getVal('ms-error-1'), corrected1: getVal('ms-corrected-1'), reason1: getVal('ms-reason-1'),
+          error2: getVal('ms-error-2'), corrected2: getVal('ms-corrected-2'), reason2: getVal('ms-reason-2'),
+          error3: getVal('ms-error-3'), corrected3: getVal('ms-corrected-3'), reason3: getVal('ms-reason-3'),
+          // ★ V10 추가(M2 fix): 재호출/재시도에 필요한 in-memory 상태도 같이 저장
+          msCombinedWords: (typeof msCombinedWords !== 'undefined') ? msCombinedWords : '',
+          hintRetryCount: (typeof hintRetryCount !== 'undefined') ? hintRetryCount : 0,
+          finalRetryCount: (typeof finalRetryCount !== 'undefined') ? finalRetryCount : 0
+        };
+        // ★ V10 수정(M4 fix): 단어/레슨/제목/Step4 입력 중 하나라도 있으면 저장. 폼이 진짜 다 비어있을 때만 스킵.
+        const hasAnyInput = draft.draft || draft.revision || draft.reflection || draft.title || draft.lesson
+          || draft.wordReq1 || draft.wordReq2 || draft.wordReq3 || draft.wordOpt1 || draft.wordOpt2
+          || draft.corrected1 || draft.reason1 || draft.corrected2 || draft.reason2 || draft.corrected3 || draft.reason3;
+        if (!hasAnyInput) return;
+        sessionStorage.setItem(MYSTORY_DRAFT_KEY, JSON.stringify(draft));
+      } catch(e) { console.warn('autoSaveMyStoryDraft failed:', e); }
+    }, 400);
+  }
+  function restoreMyStoryDraft() {
+    try {
+      const raw = sessionStorage.getItem(MYSTORY_DRAFT_KEY);
+      if (!raw) return false;
+      const d = JSON.parse(raw);
+      if (d.studentId !== currentStudentId) { sessionStorage.removeItem(MYSTORY_DRAFT_KEY); return false; }
+      // 7일 이상 묵은 임시저장은 자동 폐기
+      if (Date.now() - (d.savedAt || 0) > 7*24*60*60*1000) { sessionStorage.removeItem(MYSTORY_DRAFT_KEY); return false; }
+      // 이미 폼에 내용이 있으면 덮어쓰지 않음
+      const cur = document.getElementById('ms-draft').value || document.getElementById('ms-revision').value;
+      if (cur) return false;
+      const setVal = (id, v) => { const el = document.getElementById(id); if (el && v != null) el.value = v; };
+      const setHtml = (id, v) => { const el = document.getElementById(id); if (el && v != null) el.innerHTML = v; };
+      setVal('ms-lesson', d.lesson); setVal('ms-title', d.title);
+      setVal('ms-draft', d.draft); setVal('ms-revision', d.revision); setVal('ms-reflection', d.reflection);
+      setVal('ms-word-req1', d.wordReq1); setVal('ms-word-req2', d.wordReq2); setVal('ms-word-req3', d.wordReq3);
+      setVal('ms-word-opt1', d.wordOpt1); setVal('ms-word-opt2', d.wordOpt2);
+      // ★ V10 수정(M5 fix): grammar를 저장값으로 곧장 덮어쓰지 말고, 최신 grammarList로 dropdown 재계산
+      // - 선생님이 그 사이에 문법 목록을 바꿨을 수도 있으니 항상 현재 grammarList 기준으로 표시
+      if (typeof updateGrammarDropdown === 'function') {
+        try { updateGrammarDropdown(); } catch(e) {}
+      }
+      // 위 호출로도 grammar가 비어있고(=목록 없음), 저장값엔 있다면 안전망으로 저장값 적용
+      const grammarEl = document.getElementById('ms-grammar');
+      if (grammarEl && !grammarEl.value && d.grammar) {
+        grammarEl.value = d.grammar;
+        const gd = document.getElementById('ms-grammar-display');
+        if (gd && d.grammarDisplay) gd.textContent = d.grammarDisplay;
+      }
+      // ★ V10 추가(M2 fix): in-memory 상태 복원
+      if (typeof d.msCombinedWords === 'string') msCombinedWords = d.msCombinedWords;
+      if (typeof d.hintRetryCount === 'number') hintRetryCount = d.hintRetryCount;
+      if (typeof d.finalRetryCount === 'number') finalRetryCount = d.finalRetryCount;
+      setHtml('ms-zeeto-hint', d.zeetoHint); setHtml('ms-display-draft', d.displayDraft);
+      setHtml('ms-zeeto-feedback', d.zeetoFeedback); setHtml('ms-zeeto-final', d.zeetoFinal);
+      setHtml('ms-zeeto-tip', d.zeetoTip); setHtml('ms-oops-point', d.oopsPoint);
+      const op = document.getElementById('ms-oops-point'); if (op && d.oopsPointOriginal) op.dataset.original = d.oopsPointOriginal;
+      setHtml('ms-oops-point-copy', d.oopsPointCopy); setHtml('ms-display-revision', d.displayRevision);
+      ['1','2','3'].forEach(i => {
+        setVal('ms-error-'+i, d['error'+i]);
+        setVal('ms-corrected-'+i, d['corrected'+i]);
+        setVal('ms-reason-'+i, d['reason'+i]);
+      });
+      if (d.activeStep) {
+        document.querySelectorAll('.story-step').forEach(s => s.classList.remove('active'));
+        const target = document.getElementById(d.activeStep);
+        if (target) target.classList.add('active');
+        // ★ V10 추가(M3 fix): Step 4로 복원될 때 박스 display 상태도 복구
+        // - 저장된 ms-error-N 값이 있으면 보여주고, 없으면 숨김
+        if (d.activeStep === 'story-step-4') {
+          for (let i = 1; i <= 3; i++) {
+            const errEl = document.getElementById('ms-error-' + i);
+            if (!errEl) continue;
+            const box = errEl.parentElement;
+            if (box) box.style.display = errEl.value && errEl.value.trim() ? 'block' : 'none';
+            // 피드백도 저장된 게 없으면 숨겨두기
+            const fb = document.getElementById('ms-feedback-' + i);
+            if (fb && !fb.innerHTML.trim()) fb.style.display = 'none';
+          }
+        }
+      }
+      return true;
+    } catch(e) { console.warn('restoreMyStoryDraft failed:', e); return false; }
+  }
+  function clearMyStoryDraft() { try { sessionStorage.removeItem(MYSTORY_DRAFT_KEY); } catch(e) {} }
+  function attachMyStoryAutosave() {
+    if (window._msAutosaveAttached) return;
+    window._msAutosaveAttached = true;
+    ['ms-lesson','ms-title','ms-draft','ms-revision','ms-reflection','ms-word-req1','ms-word-req2','ms-word-req3','ms-word-opt1','ms-word-opt2','ms-error-1','ms-corrected-1','ms-reason-1','ms-error-2','ms-corrected-2','ms-reason-2','ms-error-3','ms-corrected-3','ms-reason-3'].forEach(id => {
+      const el = document.getElementById(id);
+      if (el) { el.addEventListener('input', autoSaveMyStoryDraft); el.addEventListener('change', autoSaveMyStoryDraft); }
+    });
+    // ★ V10 추가(원래 Bug #4 fix): 정문/이유 수정하면 옛 ✔️ 피드백을 자동으로 비워서 헷갈리지 않게
+    [1,2,3].forEach(i => {
+      ['ms-corrected-'+i, 'ms-reason-'+i].forEach(id => {
+        const el = document.getElementById(id);
+        if (el) el.addEventListener('input', () => {
+          const fb = document.getElementById('ms-feedback-' + i);
+          if (fb && fb.style.display !== 'none' && fb.innerHTML.trim()) {
+            fb.innerHTML = ''; fb.style.display = 'none';
+          }
+        });
+      });
+    });
   }
 
   function submitMyStory() {
@@ -2093,6 +3349,9 @@ checkNewComments();
     }
 
     if(isLoading) return;
+    // ★ V10(2026-05-12): 더블클릭 방지 — 제출 버튼을 즉시 비활성화
+    const submitBtn = document.querySelector('#story-step-4 button.btn');
+    if (submitBtn) { submitBtn.disabled = true; submitBtn.style.opacity = '0.5'; }
     showLoading("우주 서버로 전송 중... 🚀");
 
     const rawFinalStory = document.getElementById('ms-zeeto-final').innerHTML.replace(/<span[^>]*>/g, '^').replace(/<\/span>/g, '^');
@@ -2125,7 +3384,15 @@ checkNewComments();
     fetch(SHEET_URL, { method: 'POST', body: JSON.stringify(payload) })
     .then(res => res.text())
     .then(text => {
-      if (text === "Unauthorized") { hideLoading(); alert("⚠️ 다른 기기에서 로그인해서 세션이 만료됐음! 다시 로그인하셈 👽"); logout(); return; }
+      // ★ V10(2026-05-12): 응답 검증 강화 — 정확히 "MyStory Saved"일 때만 성공 처리
+      if (text === "Unauthorized") { hideLoading(); if (submitBtn) { submitBtn.disabled = false; submitBtn.style.opacity = '1'; } alert("⚠️ 다른 기기에서 로그인해서 세션이 만료됐음! 다시 로그인하셈 👽"); logout(); return; }
+      if (text !== "MyStory Saved") {
+        hideLoading();
+        if (submitBtn) { submitBtn.disabled = false; submitBtn.style.opacity = '1'; }
+        console.error('Unexpected server response:', text);
+        alert("⚠️ 저장에 실패했음! 작성 내용은 그대로 남아있으니 잠시 후 다시 시도해보셈 🛸");
+        return;
+      }
       hideLoading(); alert("🎉 My Story가 저장되었습니다!");
       myStories.push({ date: new Date().toISOString(), lesson: payload.lesson, grammar: payload.grammar, words: payload.reqWords, title: payload.title, draft: payload.draft, hint: payload.hint, revision: payload.revision, feedback: payload.feedback, finalStory: payload.finalStory, tip: payload.tip, oops: payload.oops, reflection: payload.reflection, corrections: payload.corrections });
       // ★ sessionStorage 동기화 (새로고침 착시 방지)
@@ -2143,8 +3410,9 @@ checkNewComments();
       document.querySelectorAll('.story-step').forEach(step => step.classList.remove('active'));
       document.getElementById('story-step-1').classList.add('active'); changeTab('mypage-screen');
       resetMsRetryState(); // ★ V9: 새 My Story 시작 시 재시도 카운트 초기화
+      clearMyStoryDraft(); // ★ V10(2026-05-12): 임시저장 삭제 (제출 완료했으니)
     })
-    .catch(e => { console.error('Story submit error:', e); hideLoading(); alert('통신 오류가 발생했어요 😵 다시 시도해주세요!'); });
+    .catch(e => { console.error('Story submit error:', e); hideLoading(); if (submitBtn) { submitBtn.disabled = false; submitBtn.style.opacity = '1'; } alert('통신 오류가 발생했어요 😵 작성 내용은 그대로 남아있으니 다시 시도해주세요!'); });
   }
 
   function changeMonth(step) { currentDate.setMonth(currentDate.getMonth() + step); renderCalendar(); }
@@ -2161,8 +3429,11 @@ checkNewComments();
       let hasLog = myLearningLogs.some(l => toLocalDateStr(l.date) === cellDateStr);
       let hasStory = myStories.some(s => toLocalDateStr(s.date) === cellDateStr);
       let hasPenalty = myPenalties.some(p => { try { return toLocalDateStr(p.date) === cellDateStr; } catch(e) { return false; } });
+      // ★ V10 Phase 2(2026-05-12): Oops 다시 풀기 한 날 표시
+      const hasOopsRetry = getRetriesForDate(cellDateStr).length > 0;
+      const isToday = (year === new Date().getFullYear() && month === new Date().getMonth() && i === new Date().getDate());
 
-      let classNames = "cal-day"; if(year === new Date().getFullYear() && month === new Date().getMonth() && i === new Date().getDate()) classNames += " today";
+      let classNames = "cal-day"; if(isToday) classNames += " today";
 
       let stampHtml = "";
       if(hasPenalty) stampHtml += `<div class="stamp-penalty">🚨</div>`;
@@ -2171,8 +3442,24 @@ checkNewComments();
       const hasTeaching = myTeaching.some(t => { try { return toLocalDateStr(t.clearDate) === cellDateStr; } catch(e){ return false; } });
       if(hasTeaching) stampHtml += `<div class="stamp-teaching">👾</div>`;
 
-      const hasAnything = hasLog || hasStory || hasPenalty || hasTeaching;
-      calBody.innerHTML += `<div class="${classNames}" style="${hasAnything ? 'cursor:pointer; background:#fffafa; border:1px solid #eee;' : ''}" ${hasAnything?`onclick="showDailyRecords('${cellDateStr}')"`:''}>${i}${stampHtml}</div>`;
+      const hasAnything = hasLog || hasStory || hasPenalty || hasTeaching || hasOopsRetry;
+      // ★ V10 Phase 2: 배경/테두리 색 결정
+      // - Oops + 오늘: 연보라 배경 + 파란 테두리
+      // - Oops만: 연보라 배경
+      // - 오늘만: today 클래스의 기본 스타일
+      // - 그 외 활동만: 기본 활동 배경
+      let cellStyle = '';
+      if (hasAnything) {
+        cellStyle = 'cursor:pointer;';
+        if (hasOopsRetry && isToday) {
+          cellStyle += ' background:#EEEDFE; border:2px solid #378ADD;';
+        } else if (hasOopsRetry) {
+          cellStyle += ' background:#EEEDFE; border:1px solid #CECBF6;';
+        } else {
+          cellStyle += ' background:#fffafa; border:1px solid #eee;';
+        }
+      }
+      calBody.innerHTML += `<div class="${classNames}" style="${cellStyle}" ${hasAnything?`onclick="showDailyRecords('${cellDateStr}')"`:''}>${i}${stampHtml}</div>`;
     }
   }
 
@@ -2200,24 +3487,37 @@ checkNewComments();
     document.getElementById('detail-content-penalty').innerHTML = htmlPenalty;
     document.getElementById('detail-content-penalty').style.display = dayPenalties.length > 0 ? 'block' : 'none';
 
+    // ★ V10 Phase 2(2026-05-12): Oops 연습 탭 추가
+    const dayOopsRetries = getRetriesForDate(dateStr);
     const tabBar = document.getElementById('modal-tabs');
-    const btnLog = document.getElementById('tab-btn-log'); const btnStory = document.getElementById('tab-btn-story');
+    const btnLog = document.getElementById('tab-btn-log');
+    const btnStory = document.getElementById('tab-btn-story');
+    const btnOops = document.getElementById('tab-btn-oops');
 
-    if(dayLogs.length > 0 && dayStories.length > 0) { tabBar.style.display = 'flex'; btnLog.style.display = 'block'; btnStory.style.display = 'block'; }
-    else { tabBar.style.display = 'none'; }
+    // 탭 2개 이상 보일 때만 탭바 노출
+    const activeTypes = [];
+    if (dayLogs.length > 0) activeTypes.push('log');
+    if (dayStories.length > 0) activeTypes.push('story');
+    if (dayOopsRetries.length > 0) activeTypes.push('oops');
+    btnLog.style.display = dayLogs.length > 0 ? 'block' : 'none';
+    btnStory.style.display = dayStories.length > 0 ? 'block' : 'none';
+    btnOops.style.display = dayOopsRetries.length > 0 ? 'block' : 'none';
+    tabBar.style.display = activeTypes.length >= 2 ? 'flex' : 'none';
 
     let htmlLog = "";
     dayLogs.forEach((currentLogData, idx) => {
       // ★ open 속성을 아예 뺐습니다! 무조건 다 접힌 상태로 시작합니다.
       htmlLog += `<details style="margin-bottom: 10px;">`;
-      htmlLog += `<summary style="padding: 12px; background: #e8f0eb; border-radius: 10px; font-weight: 900; color: #4a5d4e; cursor: pointer; margin-bottom: 10px; outline: none; list-style-position: inside;">🤓 ${idx + 1}번째 Log (Lesson ${currentLogData.lesson || "?"})</summary>`;
+      htmlLog += `<summary style="padding: 12px; background: #e8f0eb; border-radius: 10px; font-weight: 900; color: #4a5d4e; cursor: pointer; margin-bottom: 10px; outline: none; list-style-position: inside;">🤓 ${idx + 1}번째 Log (Lesson ${escapeHtml(String(currentLogData.lesson || "?"))})</summary>`;
       
-      htmlLog += `<div class="log-detail-box"><div class="log-label">📌 Lesson ${currentLogData.lesson || "?"}</div><div class="log-text">${currentLogData.summary || "-"}</div></div>`;
-      htmlLog += `<div class="log-detail-box"><div class="log-label">💡 새로 알게 된 점</div><div class="log-text">${currentLogData.newThings || "-"}</div></div>`;
+      // ★ V10 XSS 패치(2026-05-12): summary/newThings/reflection 학생 자유 입력 → escapeHtml 필수
+      htmlLog += `<div class="log-detail-box"><div class="log-label">📌 Lesson ${escapeHtml(String(currentLogData.lesson || "?"))}</div><div class="log-text">${escapeHtml(currentLogData.summary || "-")}</div></div>`;
+      htmlLog += `<div class="log-detail-box"><div class="log-label">💡 새로 알게 된 점</div><div class="log-text">${escapeHtml(currentLogData.newThings || "-")}</div></div>`;
       htmlLog += `<div class="log-detail-box"><div class="log-label">📝 1st Practice</div><div class="log-text">${escapeHtml(currentLogData.p1 || "-")}</div><div class="log-label" style="color:#d9534f; margin-top:5px;">👽 Zeeto's Hint</div><div class="log-text">${safeSavedHtml(currentLogData.hint || "-")}</div></div>`;
       htmlLog += `<div class="log-detail-box"><div class="log-label">📝 2nd Practice</div><div class="log-text">${escapeHtml(currentLogData.p2 || "-")}</div><div class="log-label" style="color:#4a5d4e; margin-top:5px;">👽 Zeeto's Answer</div><div class="log-text">${safeSavedHtml(currentLogData.answer || "-")}</div></div>`;
-      htmlLog += `<div class="log-detail-box"><div class="log-label">🤔 Reflection</div><div class="log-text">${currentLogData.reflection || "-"}</div></div>`;
-      if(currentLogData.image && currentLogData.image.startsWith('http')) htmlLog += `<div class="log-detail-box"><img src="${currentLogData.image}" style="width:100%; border-radius:10px;"></div>`;
+      htmlLog += `<div class="log-detail-box"><div class="log-label">🤔 Reflection</div><div class="log-text">${escapeHtml(currentLogData.reflection || "-")}</div></div>`;
+      // ★ V10 XSS 패치(2026-05-12): 이미지 URL도 escape (예: " onerror=... 삽입 방어)
+      if(currentLogData.image && /^https?:\/\//.test(currentLogData.image)) htmlLog += `<div class="log-detail-box"><img src="${escapeHtml(currentLogData.image)}" style="width:100%; border-radius:10px;"></div>`;
       
       htmlLog += `</details>`;
     });
@@ -2227,9 +3527,10 @@ checkNewComments();
     dayStories.forEach((currentStoryData, idx) => {
       // ★ 여기서도 open 속성을 날려버렸습니다!
       htmlStory += `<details style="margin-bottom: 10px;">`;
-      htmlStory += `<summary style="padding: 12px; background: #e8f0eb; border-radius: 10px; font-weight: 900; color: #4a5d4e; cursor: pointer; margin-bottom: 10px; outline: none; list-style-position: inside;">📖 ${idx + 1}번째 Story: ${currentStoryData.title || "제목 없음"}</summary>`;
+      // ★ V10 XSS 패치(2026-05-12): title/grammar/words 학생 자유 입력 → escapeHtml 필수
+      htmlStory += `<summary style="padding: 12px; background: #e8f0eb; border-radius: 10px; font-weight: 900; color: #4a5d4e; cursor: pointer; margin-bottom: 10px; outline: none; list-style-position: inside;">📖 ${idx + 1}번째 Story: ${escapeHtml(currentStoryData.title || "제목 없음")}</summary>`;
 
-      htmlStory += `<div class="log-detail-box"><div class="log-label">📌 Lesson ${currentStoryData.lesson || "?"}</div><div class="log-text" style="font-weight:bold; color:#4a5d4e;">${currentStoryData.title || "?"}</div><div class="log-text" style="font-size:0.8rem; color:#666; margin-top:5px;">문법: ${currentStoryData.grammar} | 단어: ${currentStoryData.words}</div></div>`;
+      htmlStory += `<div class="log-detail-box"><div class="log-label">📌 Lesson ${escapeHtml(String(currentStoryData.lesson || "?"))}</div><div class="log-text" style="font-weight:bold; color:#4a5d4e;">${escapeHtml(currentStoryData.title || "?")}</div><div class="log-text" style="font-size:0.8rem; color:#666; margin-top:5px;">문법: ${escapeHtml(String(currentStoryData.grammar || ""))} | 단어: ${escapeHtml(String(currentStoryData.words || ""))}</div></div>`;
       htmlStory += `<div class="log-detail-box"><div class="log-label">📝 나의 초안</div><div class="log-text">${escapeHtml(currentStoryData.draft || "-")}</div><div class="log-label" style="color:#d9534f; margin-top:10px;">👽 Zeeto's Hint</div><div class="log-text">${safeSavedHtml(currentStoryData.hint || "-")}</div></div>`;
       htmlStory += `<div class="log-detail-box"><div class="log-label">✏️ 나의 수정본</div><div class="log-text">${escapeHtml(currentStoryData.revision || "-")}</div></div>`;
 
@@ -2271,46 +3572,179 @@ checkNewComments();
     });
     document.getElementById('detail-content-story').innerHTML = htmlStory;
 
+    // ★ V10 Phase 2(2026-05-12): Oops 연습 탭 콘텐츠 렌더
+    let htmlOops = "";
+    dayOopsRetries.forEach((r, idx) => {
+      const masterBadge = r.isMaster
+        ? '<span style="background:#EAF3DE; color:#27500A; padding:2px 8px; border-radius:10px; font-size:0.75rem; font-weight:500;">✅ 마스터</span>'
+        : '<span style="background:#FAEEDA; color:#633806; padding:2px 8px; border-radius:10px; font-size:0.75rem; font-weight:500;">💪 도전 #' + (r.attemptNumber || '?') + '</span>';
+      htmlOops += `<details style="margin-bottom: 10px;">`;
+      htmlOops += `<summary style="padding: 12px; background:#EEEDFE; border-radius:10px; font-weight:900; color:#3C3489; cursor:pointer; margin-bottom:10px; outline:none; list-style-position:inside; display:flex; justify-content:space-between; align-items:center;"><span>🔁 ${idx+1}번째 — Lesson ${r.lesson || '?'} · ${escapeHtml(r.storyTitle || '')}</span> ${masterBadge}</summary>`;
+      // 3개 비문 + 학생 답
+      for (let i = 1; i <= 3; i++) {
+        const biumun = r['error' + i];
+        if (!biumun) continue;
+        const corrected = r['corrected' + i] || '';
+        const reason = r['reason' + i] || '';
+        htmlOops += '<div style="background:#fffafa; border-left:3px solid #d9534f; border-radius:8px; padding:10px; margin-bottom:8px;">';
+        htmlOops += '<div style="color:#c62828; font-size:0.85rem;">🚨 ' + escapeHtml(biumun) + '</div>';
+        if (corrected) htmlOops += '<div style="color:#2e7d32; font-size:0.85rem; margin-top:4px;">✅ 내 답: ' + escapeHtml(corrected) + '</div>';
+        if (reason) htmlOops += '<div style="color:#1565c0; font-size:0.85rem; margin-top:4px;">💡 이유: ' + escapeHtml(reason) + '</div>';
+        htmlOops += '</div>';
+      }
+      if (r.zeetoFeedback) {
+        htmlOops += '<div style="background:#EEEDFE; border:1px solid #AFA9EC; border-radius:8px; padding:10px; margin-bottom:8px;">';
+        htmlOops += '<div style="font-weight:500; color:#3C3489; font-size:0.85rem; margin-bottom:4px;">👽 Zeeto 평가</div>';
+        // ★ V10 Phase 2 수정: 줄바꿈 보존을 위해 safeAiRender 사용 (제출 직후 표시와 일관성)
+        htmlOops += '<div style="font-size:0.85rem; color:#26215C; line-height:1.5;">' + safeAiRender(r.zeetoFeedback) + '</div>';
+        htmlOops += '</div>';
+      }
+      htmlOops += '</details>';
+    });
+    document.getElementById('detail-content-oops').innerHTML = htmlOops;
+
     document.getElementById('log-detail-modal').style.display = 'flex';
+    // 우선순위: Log → Story → Oops
     if(dayLogs.length > 0) switchModalTab('log');
     else if(dayStories.length > 0) switchModalTab('story');
+    else if(dayOopsRetries.length > 0) switchModalTab('oops');
     else {
-      // 패널티만 있는 날: 로그/스토리 탭 숨기고 패널티만 표시
+      // 패널티만 있는 날
       document.getElementById('detail-content-log').style.display = 'none';
       document.getElementById('detail-content-story').style.display = 'none';
+      document.getElementById('detail-content-oops').style.display = 'none';
     }
   }
 
   function switchModalTab(type) {
-    document.getElementById('tab-btn-log').classList.remove('active'); document.getElementById('tab-btn-story').classList.remove('active');
-    document.getElementById('detail-content-log').style.display = 'none'; document.getElementById('detail-content-story').style.display = 'none';
-    if(type === 'log') { document.getElementById('tab-btn-log').classList.add('active'); document.getElementById('detail-content-log').style.display = 'block'; } 
-    else { document.getElementById('tab-btn-story').classList.add('active'); document.getElementById('detail-content-story').style.display = 'block'; }
+    // 모든 탭 비활성화 + 모든 콘텐츠 숨김
+    ['log','story','oops'].forEach(t => {
+      const btn = document.getElementById('tab-btn-' + t);
+      const content = document.getElementById('detail-content-' + t);
+      if (btn) btn.classList.remove('active');
+      if (content) content.style.display = 'none';
+    });
+    // 선택된 탭만 활성화
+    const btn = document.getElementById('tab-btn-' + type);
+    const content = document.getElementById('detail-content-' + type);
+    if (btn) btn.classList.add('active');
+    if (content) content.style.display = 'block';
   }
 
   let instaDisplayCount = 10;
-  function openInsta() { currentFilterUser = null; instaDisplayCount = 10; document.getElementById('insta-back-btn').style.display = 'none'; if (allInstaPosts.length > 0) renderInstaPosts(); loadInstaPosts(); }
-  function filterUser(userName) { if (userName.includes("Zeeto")) return; currentFilterUser = userName; instaDisplayCount = 10; document.getElementById('insta-back-btn').style.display = 'block'; renderInstaPosts(); }
-  function clearFilter() { currentFilterUser = null; instaDisplayCount = 10; document.getElementById('insta-back-btn').style.display = 'none'; renderInstaPosts(); }
+  // ★ V10 패치(2026-05-13): 서버 페이지네이션 상태
+  let instaHasMore = false;     // 서버에 더 있는지
+  let instaServerOffset = 0;    // 서버에서 다음에 가져올 시작 위치
+  let isInstaLoading = false;   // 중복 로딩 방지
+  const INSTA_PAGE_SIZE = 10;
 
-  async function loadInstaPosts() {
-    const feed = document.getElementById('insta-feed'); if (allInstaPosts.length === 0) feed.innerHTML = '<div style="text-align:center; margin-top:50px; color:#999;">로딩 중... 🛸</div>';
-    try { const res = await fetch(SHEET_URL); allInstaPosts = await res.json(); renderInstaPosts(); } catch(e) { feed.innerHTML = '<div style="text-align:center; margin-top:50px; color:#999;">불러오기 실패 😵 다시 시도해주세요</div>'; }
+  function openInsta() {
+    currentFilterUser = null; instaDisplayCount = 10; instaServerOffset = 0; instaHasMore = false;
+    document.getElementById('insta-back-btn').style.display = 'none';
+    if (allInstaPosts.length > 0) renderInstaPosts();
+    loadInstaPosts(true); // 초기 로드 (offset=0)
+  }
+  // ★ V11 패치(2026-05-13, 3차): 필터 모드도 서버 페이지네이션으로 — 전체 캐시에만 의존하면 10개 초과시 잘림
+  // currentFilterUser가 set되면 loadInstaPosts가 자동으로 &filterUser=... 붙여 서버에 요청.
+  // 필터 캐시는 별도 변수(allInstaPostsFiltered)에 저장, 전체 피드 캐시(allInstaPosts)는 보존.
+  let allInstaPostsFiltered = [];
+  function filterUser(userName) {
+    if (userName.includes("Zeeto")) return;
+    currentFilterUser = userName;
+    instaDisplayCount = 10;
+    instaServerOffset = 0;
+    instaHasMore = false;
+    allInstaPostsFiltered = [];
+    document.getElementById('insta-back-btn').style.display = 'block';
+    renderInstaPosts(); // 즉시 로딩 표시
+    loadInstaPosts(true); // 서버에서 필터된 글 처음 10개 fetch
+  }
+  function clearFilter() {
+    currentFilterUser = null;
+    instaDisplayCount = 10;
+    instaServerOffset = allInstaPosts.length; // 전체 캐시 끝부터 이어서
+    instaHasMore = true; // 더 있을 수 있으니 시도
+    allInstaPostsFiltered = [];
+    document.getElementById('insta-back-btn').style.display = 'none';
+    renderInstaPosts();
+  }
+
+  // ★ V10 패치(2026-05-13): ENGsta 서버 페이지네이션 — 처음 10개만 가져오고 "더 보기" 시 추가 fetch
+  // initial=true면 새로 시작 (offset 0), false면 더 가져옴 (현재 instaServerOffset부터)
+  async function loadInstaPosts(initial) {
+    if (isInstaLoading) return;
+    isInstaLoading = true;
+    const feed = document.getElementById('insta-feed');
+    const isFilter = !!currentFilterUser;
+    if (initial) {
+      instaServerOffset = 0;
+      if (isFilter) {
+        feed.innerHTML = '<div style="text-align:center; margin-top:50px; color:#999;">필터 적용 중... 🛸</div>';
+      } else if (allInstaPosts.length === 0) {
+        feed.innerHTML = '<div style="text-align:center; margin-top:50px; color:#999;">로딩 중... 🛸</div>';
+      }
+    }
+    try {
+      // ★ V11 패치(2026-05-13, 3차): 필터 모드면 &filterUser=... 추가하여 서버에서 필터된 결과만 받음
+      let url = SHEET_URL + (SHEET_URL.indexOf('?') === -1 ? '?' : '&') + 'action=get_insta_feed&offset=' + instaServerOffset + '&limit=' + INSTA_PAGE_SIZE;
+      if (isFilter) url += '&filterUser=' + encodeURIComponent(currentFilterUser);
+      const res = await fetch(url);
+      const data = await res.json();
+      if (data && Array.isArray(data.posts)) {
+        if (isFilter) {
+          // ★ 필터 모드: allInstaPostsFiltered에 누적 (전체 캐시 allInstaPosts는 보존)
+          if (initial) {
+            allInstaPostsFiltered = data.posts;
+          } else {
+            const existingFids = new Set(allInstaPostsFiltered.map(p => p.id));
+            data.posts.forEach(p => { if (!existingFids.has(p.id)) allInstaPostsFiltered.push(p); });
+          }
+        } else {
+          // 전체 피드
+          if (initial) {
+            allInstaPosts = data.posts;
+          } else {
+            const existingIds = new Set(allInstaPosts.map(p => p.id));
+            data.posts.forEach(p => { if (!existingIds.has(p.id)) allInstaPosts.push(p); });
+          }
+        }
+        instaServerOffset += (data.posts.length || 0);
+        instaHasMore = !!data.hasMore;
+      } else if (Array.isArray(data)) {
+        // 구버전 응답 형식 폴백
+        if (!isFilter) {
+          allInstaPosts = data;
+        }
+        instaHasMore = false;
+        instaServerOffset = data.length;
+      }
+      renderInstaPosts();
+    } catch(e) {
+      console.error('loadInstaPosts error:', e);
+      if (initial) feed.innerHTML = '<div style="text-align:center; margin-top:50px; color:#999;">불러오기 실패 😵 다시 시도해주세요</div>';
+    } finally {
+      isInstaLoading = false;
+    }
   }
 
   function renderInstaPosts() {
     const feed = document.getElementById('insta-feed'); feed.innerHTML = "";
     if (currentFilterUser) feed.innerHTML = `<div onclick="clearFilter()" style="padding:12px; background:#d2e3d5; color:#4a5d4e; font-weight:bold; text-align:center; cursor:pointer; margin-bottom:15px; border-radius:10px; width:90%; margin:auto;">전체 피드로 돌아가기</div>`;
-    let displayPosts = currentFilterUser ? allInstaPosts.filter(p => p.name === currentFilterUser) : allInstaPosts;
+    // ★ V11 패치(2026-05-13, 3차): 필터 모드는 서버에서 필터된 별도 캐시 사용
+    let displayPosts = currentFilterUser ? allInstaPostsFiltered : allInstaPosts;
     if (displayPosts.length === 0) { feed.innerHTML += '<div style="text-align:center; margin-top:50px;">게시물이 없습니다.</div>'; return; }
 
     displayPosts.slice(0, instaDisplayCount).forEach(post => {
       
       let commentHtml = post.comments.map(c => {
-        let isReply = c.parentId ? true : false; 
-        let replyClass = isReply ? "engsta-comment-reply" : "comment"; 
-        let replyMargin = isReply ? "" : "margin-bottom: 5px;"; 
-        
+        let isReply = c.parentId ? true : false;
+        let replyClass = isReply ? "engsta-comment-reply" : "comment";
+        let replyMargin = isReply ? "" : "margin-bottom: 5px;";
+        // ★ V10 패치(2026-05-13): Zeeto 자동 댓글은 줄바꿈 보존 (한국어/영어 두 줄 분리 유지)
+        // safeAiRender: \n을 <br>로 변환 + HTML 이스케이프. 학생 댓글은 그대로 escapeHtml (XSS 방어).
+        const isZeeto = (c.name || '').indexOf('Zeeto') !== -1;
+        const textHtml = isZeeto ? safeAiRender(c.text || '') : escapeHtml(c.text || '');
+
         return `
           <div class="${replyClass}" style="${replyMargin}">
             <div style="display:flex; align-items:center;">
@@ -2318,7 +3752,7 @@ checkNewComments();
               <span style="font-size:0.7rem; color:#999; margin-left:5px;">${formatTime(c.date)}</span>
               <button class="engsta-reply-btn" onclick="prepareEngstaReply('${escapeHtml(post.id)}', '${escapeHtml(c.id)}', '${escapeHtml(c.name)}')">답글</button>
             </div>
-            <div style="margin-top:3px;">${escapeHtml(c.text)}</div>
+            <div style="margin-top:3px; white-space:pre-line;">${textHtml}</div>
           </div>
         `;
       }).join('');
@@ -2339,9 +3773,27 @@ checkNewComments();
       feed.appendChild(postDiv);
     });
     
+    // ★ V10 패치(2026-05-13): "더 보기" — 클라이언트 표시 카운트 증가 + 캐시 소진 시 서버에서 추가 fetch
+    // 필터 활성 상태에선 서버 fetch 안 함 (필터된 결과만 페이지네이션)
     if (displayPosts.length > instaDisplayCount) {
-      const moreBtn = document.createElement('div'); moreBtn.innerHTML = "➕더 보기"; moreBtn.style.cssText = "text-align:center; padding:15px; background:#e8f0eb; color:#4a5d4e; border-radius:15px; cursor:pointer; font-weight:bold; margin:10px;";
-      moreBtn.onclick = () => { instaDisplayCount += 10; renderInstaPosts(); }; feed.appendChild(moreBtn);
+      const moreBtn = document.createElement('div');
+      moreBtn.innerHTML = "➕더 보기";
+      moreBtn.style.cssText = "text-align:center; padding:15px; background:#e8f0eb; color:#4a5d4e; border-radius:15px; cursor:pointer; font-weight:bold; margin:10px;";
+      moreBtn.onclick = () => { instaDisplayCount += 10; renderInstaPosts(); };
+      feed.appendChild(moreBtn);
+    } else if (instaHasMore && !isInstaLoading) {
+      // ★ V11 패치(2026-05-13, 3차): 필터 모드에서도 "더 가져오기" 노출 (서버 페이지네이션 사용)
+      // 캐시 다 보여줬는데 서버에 더 있으면 자동으로 다음 페이지 가져오기 버튼
+      const fetchMoreBtn = document.createElement('div');
+      fetchMoreBtn.innerHTML = "🛸 더 가져오기";
+      fetchMoreBtn.style.cssText = "text-align:center; padding:15px; background:#EEEDFE; color:#3C3489; border-radius:15px; cursor:pointer; font-weight:bold; margin:10px;";
+      fetchMoreBtn.onclick = () => {
+        fetchMoreBtn.innerHTML = "⏳ 가져오는 중...";
+        // ★ V10 패치(2026-05-13): loadInstaPosts 내부에서 renderInstaPosts()를 이미 호출하지만
+        // 그 시점엔 instaDisplayCount가 아직 10이라 새 10개가 슬라이스 밖. 카운트 올린 뒤 한 번 더 렌더 필수.
+        loadInstaPosts(false).then(() => { instaDisplayCount += 10; renderInstaPosts(); });
+      };
+      feed.appendChild(fetchMoreBtn);
     }
   }
 
@@ -2355,12 +3807,39 @@ checkNewComments();
     // ★ sessionStorage 동기화 (새로고침 착시 방지)
     const savedLogin = sessionStorage.getItem('even_login');
     if (savedLogin) { const loginData = JSON.parse(savedLogin); loginData.myPostCount = myPostCount; sessionStorage.setItem('even_login', JSON.stringify(loginData)); }
-    renderInstaPosts(); closeModal(); 
+    renderInstaPosts(); closeModal();
+    // ★ V10 보안 패치(2026-05-12): 네트워크 실패 시 묵살하던 catch 제거 → 롤백 + 사용자 알림
+    const rollback = (reason) => {
+      // 낙관적 삽입 되돌리기 (배열의 맨 앞 - tempId 매칭)
+      const idx = allInstaPosts.findIndex(p => p.id === tempId);
+      if (idx !== -1) allInstaPosts.splice(idx, 1);
+      // 카운터 되돌리기
+      myPostCount = Math.max(0, myPostCount - 1);
+      updateDashboard();
+      const savedLogin2 = sessionStorage.getItem('even_login');
+      if (savedLogin2) { try { const ld = JSON.parse(savedLogin2); ld.myPostCount = myPostCount; sessionStorage.setItem('even_login', JSON.stringify(ld)); } catch(e) {} }
+      renderInstaPosts();
+      alert('⚠️ 글이 안 올라갔음 (' + reason + ') 🛸\n네트워크 확인하고 다시 시도해보셈!');
+    };
     try {
-      const res = await fetch(SHEET_URL, { method: 'POST', body: JSON.stringify({ type: "insta_write", userName: currentUserProfile, studentId: currentStudentId, token: currentToken, firstName: currentFirstName, content: content, image: image, exitCount: engstaExitCount }) });
+      // ★ V10 패치(2026-05-13): tempId를 서버로 보내서 서버 시트에도 같은 ID 저장 → 댓글이 새 글에 정확히 매칭됨
+      const res = await fetch(SHEET_URL, { method: 'POST', body: JSON.stringify({ type: "insta_write", tempId: tempId, userName: currentUserProfile, studentId: currentStudentId, token: currentToken, firstName: currentFirstName, content: content, image: image, exitCount: engstaExitCount }) });
       const text = await res.text();
-      if (text === "Unauthorized") { alert("⚠️ 다른 기기에서 로그인해서 세션이 만료됐음! 다시 로그인하셈 👽"); logout(); return; }
-    } catch(e) {}
+      if (text === "Unauthorized") {
+        rollback('세션 만료');
+        alert("⚠️ 다른 기기에서 로그인해서 세션이 만료됐음! 다시 로그인하셈 👽");
+        logout();
+        return;
+      }
+      if (text !== "Post Saved" && text.indexOf('Post Saved') === -1) {
+        console.error('Unexpected uploadPost response:', text);
+        rollback('서버 오류');
+        return;
+      }
+    } catch(e) {
+      console.error('uploadPost error:', e);
+      rollback('통신 오류');
+    }
   }
 
   // ★ ENGsta 대댓글: 누구에게 답글을 다는지 기억하는 메모장
@@ -2431,18 +3910,48 @@ checkNewComments();
     const savedLogin2 = sessionStorage.getItem('even_login');
     if (savedLogin2) { const ld = JSON.parse(savedLogin2); ld.myCommentCount = myCommentCount; sessionStorage.setItem('even_login', JSON.stringify(ld)); }
 
-    fetch(SHEET_URL, {
-      method: 'POST', mode: 'no-cors',
-      body: JSON.stringify({
-        type: "comment_write",
-        postId: postId,
-        userName: currentUserProfile,
-        studentId: currentStudentId, token: currentToken,
-        comment: comment,
-        commentId: newCommentId,
-        parentId: currentParentId
-      })
-    });
+    // ★ V10 보안 패치(2026-05-12): mode:'no-cors' 제거 → 응답 검증해서 실패 시 롤백
+    const rollbackComment = (reason) => {
+      const tp = allInstaPosts.find(p => p.id === postId);
+      if (tp && tp.comments) {
+        const ci = tp.comments.findIndex(c => c.id === newCommentId);
+        if (ci !== -1) tp.comments.splice(ci, 1);
+      }
+      myCommentCount = Math.max(0, myCommentCount - 1);
+      updateDashboard();
+      const sl3 = sessionStorage.getItem('even_login');
+      if (sl3) { try { const ld = JSON.parse(sl3); ld.myCommentCount = myCommentCount; sessionStorage.setItem('even_login', JSON.stringify(ld)); } catch(e){} }
+      renderInstaPosts();
+      alert('⚠️ 댓글이 안 올라갔음 (' + reason + ') 🛸\n다시 시도해보셈!');
+    };
+    try {
+      const res = await fetch(SHEET_URL, {
+        method: 'POST',
+        body: JSON.stringify({
+          type: "comment_write",
+          postId: postId,
+          userName: currentUserProfile,
+          studentId: currentStudentId, token: currentToken,
+          comment: comment,
+          commentId: newCommentId,
+          parentId: currentParentId
+        })
+      });
+      const txt = await res.text();
+      if (txt === "Unauthorized") {
+        rollbackComment('세션 만료');
+        alert("⚠️ 다른 기기에서 로그인해서 세션이 만료됐음! 다시 로그인하셈 👽");
+        logout();
+        return;
+      }
+      if (txt !== "Comment Saved" && txt.indexOf('Comment Saved') === -1) {
+        console.error('Unexpected addComment response:', txt);
+        rollbackComment('서버 오류');
+      }
+    } catch(e) {
+      console.error('addComment error:', e);
+      rollbackComment('통신 오류');
+    }
   }
 let unreadUrgentNotices = [];
 let allUnreadNotices = [];
@@ -2551,8 +4060,11 @@ async function openNoticeModal() {
     document.getElementById('insta-content').removeEventListener('paste', _blockPaste);
     document.getElementById('write-modal').style.display = 'none';
     document.getElementById('insta-content').value = "";
-    document.getElementById('insta-preview').style.display = 'none';
+    const preview = document.getElementById('insta-preview');
+    if (preview) { preview.style.display = 'none'; preview.src = ''; preview.style.opacity = '1'; }
     document.getElementById('insta-camera').value = "";
+    // ★ V11 패치(2026-05-13): 사진 압축 중 모달 닫으면 로딩 오버레이 잔존하던 문제 해결
+    if (typeof hideLoading === 'function') hideLoading();
   }
   
 
@@ -2829,37 +4341,170 @@ let allStudentsData = [];
 let currentGradeFilter = 'all';
 let currentStudentForModal = null;
 
+// ★ V10 패치(2026-05-13): 잠입 모드 재설계 — 학생 선택 후 그 학생 데이터로 잠입
+// 선생님이 🕵️ 누르면 학생 검색 모달 → 선택 → 그 학생의 myLogs/myStories/myPenalties/myTeaching/myOopsRetries 로드 후 학생 시점으로 화면 전환.
+// 종료 시 선생님 본인 데이터로 복원.
+
 function enterUndercoverMode() {
-  teacherOriginalState = {
-    firstName: currentFirstName,
-    studentId: currentStudentId,
-    loginId: currentLoginId,
-    profile: currentUserProfile
-  };
- isUndercover = true;
-  currentStudentId = String(teacherOriginalState.studentId || "");
-  currentFirstName = teacherOriginalState.firstName;
-  currentUserProfile = teacherOriginalState.profile; // 🍌 가입할 때 고른 이모지 그대로 유지!
-  
-  // 🚨 강제로 👩‍🏫 모양으로 바꾸던 코드는 철거 완료!
-  document.getElementById('my-profile-name').innerText = teacherOriginalState.firstName;
-  
-  document.getElementById('undercover-return-btn').style.display = 'block';
-  document.getElementById('teacher-screen').style.display = 'none';
-  document.getElementById('main-content').style.display = 'flex';
-  document.getElementById('nav-bar').style.display = 'flex';
-  
-  changeTab('chat-screen');
-  if(document.getElementById('greeting-msg')) { document.getElementById('greeting-msg').innerText = `안녕, ${currentFirstName}! 나는 외계인 Zeeto. 지구 언어 영어 마스터. 질문 있음?`; }
+  // 학생 선택 모달 띄우기
+  openUndercoverStudentPicker();
+}
+
+function openUndercoverStudentPicker() {
+  // 기존 모달 있으면 제거
+  const old = document.getElementById('undercover-picker-modal');
+  if (old) old.remove();
+  // dashboardData 또는 allStudentsData에서 학생 목록 가져오기
+  const allUsers = (typeof dashboardData !== 'undefined' && dashboardData && dashboardData.allUsers) ? dashboardData.allUsers : (typeof allStudentsData !== 'undefined' ? allStudentsData : []);
+  const students = (allUsers || []).filter(u => u.studentId && u.firstName);
+  if (students.length === 0) {
+    alert('🛸 학생 목록을 불러오지 못함. 잠시 후 다시 시도하셈!');
+    return;
+  }
+  // 학년별로 그룹핑
+  const byGrade = {};
+  students.forEach(s => {
+    const g = String(s.studentId).charAt(0);
+    if (!byGrade[g]) byGrade[g] = [];
+    byGrade[g].push(s);
+  });
+  let listHtml = '';
+  Object.keys(byGrade).sort().forEach(grade => {
+    listHtml += `<div style="font-weight:700; color:#4a5d4e; margin:12px 0 6px; font-size:0.9rem;">📚 ${grade}학년 (${byGrade[grade].length}명)</div>`;
+    byGrade[grade].forEach(s => {
+      listHtml += `<div onclick="enterUndercoverAsStudent('${escapeHtml(String(s.studentId))}', '${escapeHtml(s.firstName)}', '${escapeHtml(s.emoji || '👤')}')" style="background:white; border:1px solid #ddd; border-radius:10px; padding:10px 12px; margin-bottom:6px; cursor:pointer; display:flex; justify-content:space-between; align-items:center;">
+        <span><span style="font-size:1.1rem;">${escapeHtml(s.emoji || '👤')}</span> <b>${escapeHtml(s.lastName || '')}${escapeHtml(s.firstName)}</b> <span style="font-size:0.75rem; color:#888;">(${escapeHtml(String(s.studentId))})</span></span>
+        <span style="color:#534AB7; font-weight:500; font-size:0.85rem;">잠입 →</span>
+      </div>`;
+    });
+  });
+  const modal = document.createElement('div');
+  modal.id = 'undercover-picker-modal';
+  modal.style.cssText = 'position:absolute; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.5); z-index:3500; display:flex; align-items:center; justify-content:center;';
+  modal.innerHTML = `<div style="width:90%; max-width:420px; max-height:85%; background:white; border-radius:20px; padding:18px; box-sizing:border-box; display:flex; flex-direction:column;">
+    <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:10px;">
+      <b style="color:#4a5d4e; font-size:1.05rem;">🕵️ 어느 학생으로 잠입할까?</b>
+      <span style="cursor:pointer; font-size:1.3rem;" onclick="document.getElementById('undercover-picker-modal').remove()">✕</span>
+    </div>
+    <input type="text" id="undercover-search" placeholder="🔍 이름/학번 검색..." oninput="filterUndercoverList(this.value)" style="width:100%; box-sizing:border-box; padding:8px 10px; border:1px solid #ccc; border-radius:8px; margin-bottom:8px; font-size:0.9rem;">
+    <div id="undercover-student-list" style="flex:1; overflow-y:auto; padding-right:4px;">${listHtml}</div>
+  </div>`;
+  document.body.appendChild(modal);
+}
+
+function filterUndercoverList(query) {
+  const q = (query || '').toLowerCase().trim();
+  const items = document.querySelectorAll('#undercover-student-list > div[onclick]');
+  items.forEach(item => {
+    const txt = item.textContent.toLowerCase();
+    item.style.display = (!q || txt.indexOf(q) !== -1) ? 'flex' : 'none';
+  });
+}
+
+async function enterUndercoverAsStudent(studentId, firstName, emoji) {
+  // 모달 닫기
+  const m = document.getElementById('undercover-picker-modal');
+  if (m) m.remove();
+  showLoading('🕵️ 학생 데이터 가져오는 중...');
+  try {
+    // 학생 데이터 가져오기 (선생님 권한으로 student_detail 호출)
+    const res = await fetch(SHEET_URL, { method: 'POST', body: JSON.stringify({
+      type: "get_student_detail", id: currentLoginId, pw: teacherPw, studentId
+    }) });
+    const detail = await res.json();
+    hideLoading();
+    if (detail.error) { alert('⚠️ ' + detail.error); return; }
+
+    // 선생님 본인 상태 + 본인 데이터 전체 백업
+    teacherOriginalState = {
+      firstName: currentFirstName,
+      studentId: currentStudentId,
+      loginId: currentLoginId,
+      profile: currentUserProfile,
+      myLogs: myLearningLogs,
+      myStories: myStories,
+      myPenalties: myPenalties,
+      myTeaching: myTeaching,
+      myPostCount: myPostCount,
+      myCommentCount: myCommentCount,
+      myOopsRetries: myOopsRetries
+    };
+    isUndercover = true;
+
+    // 학생 정체로 갈아입기 (currentLoginId/teacherPw는 선생님 권한 유지)
+    currentStudentId = String(studentId);
+    currentFirstName = firstName;
+    currentUserProfile = emoji + ' ' + firstName;
+
+    // 학생 데이터로 in-memory 변수 덮어쓰기
+    myLearningLogs = detail.myLogs || [];
+    myStories = detail.myStories || [];
+    myPenalties = detail.myPenalties || [];
+    myTeaching = detail.myTeaching || [];
+    myOopsRetries = detail.myOopsRetries || [];
+    // ★ V11 패치(2026-05-13): get_student_detail가 myPostCount/myCommentCount 반환하므로 그걸 사용
+    myPostCount = (typeof detail.myPostCount === 'number') ? detail.myPostCount : (detail.myPosts || []).length;
+    myCommentCount = (typeof detail.myCommentCount === 'number') ? detail.myCommentCount : 0;
+
+    // ★ 중요: token은 학생 토큰이 없으므로 학생 본인이 글 쓰기/제출하는 액션은 잠입 중엔 막아야 안전.
+    // 일단 학생 데이터를 "읽기 전용"으로 보여주는 게 안전. 현재는 currentToken이 선생님 토큰이라
+    // 학생 본인 인증이 필요한 API 호출(My Story 제출 등)은 Unauthorized로 거부될 것 (안전 폴백).
+
+    // UI 갱신
+    document.getElementById('my-profile-emoji').innerText = emoji || '👤';
+    document.getElementById('my-profile-name').innerText = firstName;
+
+    document.getElementById('undercover-return-btn').style.display = 'block';
+    document.getElementById('teacher-screen').style.display = 'none';
+    document.getElementById('main-content').style.display = 'flex';
+    document.getElementById('nav-bar').style.display = 'flex';
+
+    // 잠입 안내 배너 (이미 있으면 갱신)
+    let banner = document.getElementById('undercover-banner');
+    if (!banner) {
+      banner = document.createElement('div');
+      banner.id = 'undercover-banner';
+      banner.style.cssText = 'background:#FAEEDA; color:#633806; padding:6px 12px; text-align:center; font-size:0.8rem; font-weight:500; border-bottom:1px solid #EF9F27;';
+      document.getElementById('main-content').insertBefore(banner, document.getElementById('main-content').firstChild);
+    }
+    banner.textContent = '🕵️ 잠입 중: ' + (emoji || '👤') + ' ' + firstName + ' (' + studentId + ') 의 시점';
+
+    changeTab('mypage-screen'); // My Page로 바로 가서 학생 캘린더 보기
+  } catch(e) {
+    hideLoading();
+    console.error('enterUndercoverAsStudent error:', e);
+    alert('🛸 통신 오류! 잠시 후 다시 시도하셈.');
+  }
 }
 
 function exitUndercoverMode() {
+  if (!teacherOriginalState || teacherOriginalState.studentId === undefined) {
+    // 비정상 상태 — 그냥 teacher-screen으로 강제 복귀
+    document.getElementById('undercover-return-btn').style.display = 'none';
+    document.getElementById('main-content').style.display = 'none';
+    document.getElementById('nav-bar').style.display = 'none';
+    document.getElementById('teacher-screen').style.display = 'flex';
+    isUndercover = false;
+    return;
+  }
   isUndercover = false;
+  // 선생님 본인 데이터 복원
   currentFirstName = teacherOriginalState.firstName;
   currentStudentId = String(teacherOriginalState.studentId || "");
   currentLoginId = teacherOriginalState.loginId;
   currentUserProfile = teacherOriginalState.profile;
-  
+  myLearningLogs = teacherOriginalState.myLogs || [];
+  myStories = teacherOriginalState.myStories || [];
+  myPenalties = teacherOriginalState.myPenalties || [];
+  myTeaching = teacherOriginalState.myTeaching || [];
+  myPostCount = teacherOriginalState.myPostCount || 0;
+  myCommentCount = teacherOriginalState.myCommentCount || 0;
+  myOopsRetries = teacherOriginalState.myOopsRetries || [];
+
+  // 잠입 배너 제거
+  const banner = document.getElementById('undercover-banner');
+  if (banner) banner.remove();
+
   document.getElementById('undercover-return-btn').style.display = 'none';
   document.getElementById('main-content').style.display = 'none';
   document.getElementById('nav-bar').style.display = 'none';
@@ -3236,9 +4881,11 @@ async function openStudentModal(studentId) {
 }
 
 function switchStudentModal(type) {
-  ['log','story','insta','penalty','weeto'].forEach(t => {
-    document.getElementById(`t-smodal-tab-${t}`).style.background = t === type ? '#4a5d4e' : '#eee';
-    document.getElementById(`t-smodal-tab-${t}`).style.color = t === type ? 'white' : '#999';
+  ['log','story','insta','penalty','weeto','oops'].forEach(t => {
+    const el = document.getElementById(`t-smodal-tab-${t}`);
+    if (!el) return;
+    el.style.background = t === type ? '#4a5d4e' : '#eee';
+    el.style.color = t === type ? 'white' : '#999';
   });
   const detail = window._studentDetail;
   if (!detail) return;
@@ -3392,6 +5039,61 @@ function switchStudentModal(type) {
     return;
   }
 
+  // ★ V10 Phase 2(2026-05-12): 선생님이 학생 Oops Retry 기록 보기
+  if (type === 'oops') {
+    const retries = (detail.myOopsRetries || []).slice().sort((a,b) => new Date(b.timestamp) - new Date(a.timestamp));
+    const totalAttempts = retries.length;
+    const masteredCount = retries.filter(r => r.isMaster).length;
+    // Story별로 그룹핑해서 "마스터한 글 수"도 계산
+    const masteredStorySet = new Set();
+    retries.forEach(r => { if (r.isMaster) masteredStorySet.add(String(r.originalStoryRow)); });
+    const expandedCount = retries.filter(r => r.expandedHint).length;
+
+    if (!retries.length) {
+      html = '<div style="text-align:center;color:#999;padding:20px;">이 학생은 아직 Oops 다시 풀기를 안 했어요.</div>';
+    } else {
+      html = `<div style="background:#EEEDFE; border-radius:12px; padding:12px; margin-bottom:12px; display:flex; gap:8px; flex-wrap:wrap;">
+        <div style="flex:1; min-width:80px; text-align:center;"><div style="font-size:0.7rem; color:#534AB7;">총 시도</div><div style="font-size:1.3rem; font-weight:900; color:#3C3489;">${totalAttempts}회</div></div>
+        <div style="flex:1; min-width:80px; text-align:center;"><div style="font-size:0.7rem; color:#1D9E75;">마스터</div><div style="font-size:1.3rem; font-weight:900; color:#0F6E56;">${masteredCount}회</div></div>
+        <div style="flex:1; min-width:80px; text-align:center;"><div style="font-size:0.7rem; color:#534AB7;">마스터한 글</div><div style="font-size:1.3rem; font-weight:900; color:#3C3489;">${masteredStorySet.size}편</div></div>
+        <div style="flex:1; min-width:80px; text-align:center;"><div style="font-size:0.7rem; color:#888;">힌트 펼침</div><div style="font-size:1.3rem; font-weight:900; color:#666;">${expandedCount}회</div></div>
+      </div>`;
+      retries.forEach(r => {
+        const d = new Date(r.timestamp || r.date);
+        const dateStr = `${d.getFullYear()}.${d.getMonth()+1}.${d.getDate()}`;
+        const masterBadge = r.isMaster
+          ? '<span style="background:#EAF3DE; color:#27500A; padding:3px 8px; border-radius:10px; font-size:0.7rem; font-weight:bold; margin-left:6px;">✅ 마스터</span>'
+          : '<span style="background:#FAEEDA; color:#633806; padding:3px 8px; border-radius:10px; font-size:0.7rem; font-weight:bold; margin-left:6px;">💪 도전 #' + (r.attemptNumber || '?') + '</span>';
+        const hintBadge = r.expandedHint
+          ? '<span style="background:#FCEBEB; color:#A32D2D; padding:2px 6px; border-radius:8px; font-size:0.65rem; font-weight:bold; margin-left:4px;" title="힌트 펼침">💬 힌트봄</span>'
+          : '';
+        html += `<details style="margin-bottom:8px;">
+          <summary style="padding:10px; background:#EEEDFE; border-radius:10px; font-weight:bold; color:#3C3489; cursor:pointer; list-style-position:inside;">
+            🔁 ${dateStr} — Lesson ${r.lesson || '?'} · ${escapeHtml(r.storyTitle || '제목없음')}${masterBadge}${hintBadge}
+          </summary>
+          <div style="padding:10px;">`;
+        for (let i = 1; i <= 3; i++) {
+          const biumun = r['error' + i];
+          if (!biumun) continue;
+          const corrected = r['corrected' + i] || '';
+          const reason = r['reason' + i] || '';
+          html += `<div style="background:#fffafa; border-left:3px solid #d9534f; border-radius:8px; padding:10px; margin-bottom:8px;">
+            <div style="color:#c62828; font-size:0.85rem;">🚨 ${escapeHtml(biumun)}</div>
+            ${corrected ? `<div style="color:#2e7d32; font-size:0.85rem; margin-top:4px;">✅ ${escapeHtml(corrected)}</div>` : ''}
+            ${reason ? `<div style="color:#1565c0; font-size:0.85rem; margin-top:4px;">💡 ${escapeHtml(reason)}</div>` : ''}
+          </div>`;
+        }
+        if (r.zeetoFeedback) {
+          html += `<div style="background:#EEEDFE; border:1px solid #AFA9EC; border-radius:8px; padding:10px;">
+            <div style="font-weight:bold; color:#3C3489; font-size:0.85rem; margin-bottom:4px;">👽 Zeeto 평가</div>
+            <div style="font-size:0.85rem; color:#26215C; line-height:1.5;">${safeAiRender(r.zeetoFeedback)}</div>
+          </div>`;
+        }
+        html += `</div></details>`;
+      });
+    }
+  }
+
   document.getElementById('t-smodal-content').innerHTML = html;
   if (type === 'penalty') updatePenaltyTargetUI();
 }
@@ -3534,7 +5236,9 @@ async function teacherDeletePost(postId) {
   if (!confirm("이 게시물을 삭제할까요?")) return;
   showLoading("삭제 중...");
   try {
-    const res = await fetch(SHEET_URL, { method:'POST', body: JSON.stringify({ type:"teacher_delete_post", teacherId: currentStudentId, teacherPw: teacherPw, postId: postId }) });
+    // ★ V11 패치(2026-05-13): teacherId가 currentStudentId(잠입 시 학생 ID 또는 빈 문자열)로 잘못 매핑돼 있어서
+    // 백엔드의 verifyTeacher() 가 무조건 거부 → 게시물 삭제 영영 불가능했음. currentLoginId로 교정.
+    const res = await fetch(SHEET_URL, { method:'POST', body: JSON.stringify({ type:"teacher_delete_post", teacherId: currentLoginId, teacherPw: teacherPw, postId: postId }) });
     const result = await res.json();
     hideLoading();
     if (result.success) {
@@ -3627,7 +5331,8 @@ async function deleteStudent(userId, name) {
   if (!confirm(`${name} 학생의 계정을 삭제할까요?\n(학습 기록은 유지됩니다)`)) return;
   showLoading("계정 삭제 중...");
   try {
-    const res = await fetch(SHEET_URL, { method:'POST', body: JSON.stringify({ type:"teacher_delete_user", teacherId: currentStudentId, teacherPw: teacherPw, targetId: userId }) });
+    // ★ V11 패치(2026-05-13): teacherId 매핑 오류 교정 (위 teacher_delete_post와 동일 이슈)
+    const res = await fetch(SHEET_URL, { method:'POST', body: JSON.stringify({ type:"teacher_delete_user", teacherId: currentLoginId, teacherPw: teacherPw, targetId: userId }) });
     const result = await res.json();
     hideLoading();
     if (result.success) {
@@ -3726,6 +5431,49 @@ function showWeeto() {
   document.getElementById('weeto-grammar-select').style.display = 'flex';
   document.getElementById('weeto-chat').style.display = 'none';
   loadGrammarList();
+  // ★ V11 패치(2026-05-13): 중도 이탈한 세션이 있으면 복원 확인
+  tryRestoreWeetoSession();
+}
+
+// ★ V11 신규(2026-05-13): Weeto 세션 복원 — 중도 이탈 후 다시 들어왔을 때 학생에게 이어할지 묻기
+function tryRestoreWeetoSession() {
+  const sessionKey = '_weetoActiveSession_' + (currentStudentId || 'guest');
+  let session;
+  try { session = JSON.parse(sessionStorage.getItem(sessionKey) || 'null'); } catch(e) { return; }
+  if (!session || !session.grammar || !Array.isArray(session.chatHistory) || session.chatHistory.length === 0) return;
+  // 너무 오래된 세션 (30분 초과)은 무시 (학생이 잊었을 가능성)
+  if (Date.now() - (session.savedAt || 0) > 30 * 60 * 1000) {
+    sessionStorage.removeItem(sessionKey);
+    return;
+  }
+  const grammarName = session.grammar.grammarName;
+  const ok = confirm('🛸 좀 전에 풀던 "' + grammarName + '" 대화가 있음. 이어서 할래?\n\n[확인] = 이어서 / [취소] = 새로 시작 (이전 대화는 삭제됨)');
+  if (!ok) {
+    sessionStorage.removeItem(sessionKey);
+    return;
+  }
+  // 세션 복원
+  currentWeeetoGrammar = session.grammar;
+  weetoChatHistory = session.chatHistory;
+  currentWeetoAttempt = session.attempt || 1;
+  document.getElementById('weeto-grammar-tag').textContent = grammarName;
+  document.getElementById('weeto-grammar-select').style.display = 'none';
+  document.getElementById('weeto-chat').style.display = 'flex';
+  // 대화 화면에 기존 대화 복원
+  const chatBox = document.getElementById('weeto-chat-box');
+  chatBox.innerHTML = '';
+  session.chatHistory.forEach(msg => {
+    appendWeetoMessage(msg.role === '학생' ? 'sent' : 'received', msg.text);
+  });
+  const input = document.getElementById('weeto-chat-input');
+  if (input) { input.disabled = false; input.placeholder = '이어서 답해주세요...'; input.focus(); }
+  // 세션은 GG/CLEAR 시 클리어되거나 다음 이탈 시 갱신됨
+}
+
+// ★ V11 신규(2026-05-13): Weeto 세션 클리어 (정식 종료 — CLEAR / GG / "나가기" 등)
+function clearWeetoSession() {
+  const sessionKey = '_weetoActiveSession_' + (currentStudentId || 'guest');
+  try { sessionStorage.removeItem(sessionKey); } catch(e) {}
 }
 
 function backToAliens() {
@@ -3735,12 +5483,18 @@ function backToAliens() {
 }
 
 function backToGrammarSelect() {
-  // ★ 학생이 실제로 메시지를 보낸 경우에만 attemptCounts 증가 (잘못 누르고 바로 나간 경우 제외)
+  // ★ V11 패치(2026-05-13): 뒤로가기 시도 changeTab과 동일하게 sessionStorage 세션 보존
   const studentSentMessage = weetoChatHistory.some(h => h.role === '학생');
   if (currentWeeetoGrammar && studentSentMessage) {
-    const key = currentWeeetoGrammar.lesson + "||" + currentWeeetoGrammar.grammarName;
-    window._weetoAttemptCounts = window._weetoAttemptCounts || {};
-    window._weetoAttemptCounts[key] = (window._weetoAttemptCounts[key] || 0) + 1;
+    try {
+      const sessionKey = '_weetoActiveSession_' + (currentStudentId || 'guest');
+      sessionStorage.setItem(sessionKey, JSON.stringify({
+        grammar: currentWeeetoGrammar,
+        chatHistory: weetoChatHistory,
+        attempt: currentWeetoAttempt,
+        savedAt: Date.now()
+      }));
+    } catch(e) { console.warn('Weeto session save failed:', e); }
   }
   // 대화 중 나가면 초기화
   weetoChatHistory = [];
@@ -3812,197 +5566,149 @@ function startTeaching(grammarName, lesson) {
   sendWeetoAuto('(첫 만남 - 자기소개하고 이 문법 배우고 싶다고 해줘)');
 }
 
+// ★ V10 복구(2026-05-12): V9부터 잘려있던 Weeto 함수들 — teach_chat/teach_complete 백엔드 API 시그니처 기준으로 재작성
 async function sendWeetoAuto(systemMsg) {
   const chatBox = document.getElementById('weeto-chat-box');
-  // Show typing indicator
+  // 타이핑 인디케이터 표시
   chatBox.innerHTML += '<div class="message received" id="weeto-typing"><div class="typing-indicator"><div class="dot" style="animation-delay:0s"></div><div class="dot" style="animation-delay:0.2s"></div><div class="dot" style="animation-delay:0.4s"></div></div></div>';
   chatBox.scrollTop = chatBox.scrollHeight;
 
-  const payload = {
-    type: 'teach_chat',
-    studentId: currentStudentId,
-    token: currentToken,
-    lesson: currentWeeetoGrammar.lesson,
-    grammarName: currentWeeetoGrammar.grammarName,
-    grammarDesc: currentWeeetoGrammar.grammarDesc,
-    exampleWrong: currentWeeetoGrammar.exampleWrong,
-    message: systemMsg,
-    history: weetoChatHistory.map(h => h.role + ': ' + h.text).join('\n'),
-    attempt: currentWeetoAttempt
-  };
+  if (!currentWeeetoGrammar) return;
+  // 백엔드는 history 문자열 + 마지막 message를 받음. weetoChatHistory에는 학생 발언이 이미 push되어 있어야 함.
+  const historyStr = weetoChatHistory.map(h => h.role + ": " + h.text).join("\n");
 
-  // ★ V9.1: 첫 인사 실패 시 자동 1회 재시도 + 에러 폴백은 히스토리 오염 안 되게
-  let res = null;
   try {
-    res = await fetch(SHEET_URL, { method: 'POST', body: JSON.stringify(payload) }).then(r => r.json());
-    // 서버가 에러 폴백을 반환한 경우(errorReason 존재) → 2초 대기 후 1회 재시도
-    if (res && res.errorReason) {
-      await new Promise(r => setTimeout(r, 2000));
-      try { res = await fetch(SHEET_URL, { method: 'POST', body: JSON.stringify(payload) }).then(r => r.json()); } catch(e2) { res = null; }
+    const res = await fetch(SHEET_URL, {
+      method: 'POST',
+      body: JSON.stringify({
+        type: 'teach_chat',
+        studentId: currentStudentId,
+        token: currentToken,
+        grammarName: currentWeeetoGrammar.grammarName,
+        grammarDesc: currentWeeetoGrammar.grammarDesc || '',
+        exampleWrong: currentWeeetoGrammar.exampleWrong || '',
+        lesson: currentWeeetoGrammar.lesson,
+        history: historyStr,
+        message: systemMsg,
+        attempt: currentWeetoAttempt || 1
+      })
+    });
+    const data = await res.json();
+
+    // 타이핑 인디케이터 제거
+    const typing = document.getElementById('weeto-typing');
+    if (typing) typing.remove();
+
+    if (data.error) {
+      if (data.error === 'Unauthorized') {
+        alert('⚠️ 세션이 만료됐음! 다시 로그인하셈 👽');
+        logout();
+        return;
+      }
+      // 첫 인사 실패면 재시도 버튼, 일반 대화 실패면 에러 메시지 + 입력 활성화
+      if (systemMsg && systemMsg.indexOf('(첫 만남') === 0) {
+        showWeetoGreetingRetry();
+      } else {
+        appendWeetoMessage('received', '🛸 으으.. Weeto 잠시 멈춤! 다시 말 걸어줘');
+        const input = document.getElementById('weeto-chat-input');
+        if (input) { input.disabled = false; input.placeholder = 'Weeto에게 답해주세요...'; input.focus(); }
+      }
+      return;
     }
+
+    const reply = data.reply || '음... 잘 못 들었어 🤔';
+    const isClear = !!data.isClear;
+    const isGG = !!data.isGG;
+
+    // Weeto 응답 화면 + 히스토리에 추가
+    appendWeetoMessage('received', reply);
+    weetoChatHistory.push({ role: 'Weeto', text: reply });
+
+    if (isClear) { handleTeachingClear(); return; }
+    if (isGG)    { handleTeachingGG();    return; }
+
+    // 일반 응답 → 입력창 활성화
+    const input = document.getElementById('weeto-chat-input');
+    if (input) { input.disabled = false; input.placeholder = 'Weeto에게 답해주세요...'; input.focus(); }
   } catch(e) {
-    res = null;
+    console.error('sendWeetoAuto error:', e);
+    const typing = document.getElementById('weeto-typing');
+    if (typing) typing.remove();
+    if (systemMsg && systemMsg.indexOf('(첫 만남') === 0) {
+      showWeetoGreetingRetry();
+    } else {
+      appendWeetoMessage('received', '🛸 통신 오류가 났음! 다시 말해줄래?');
+      const input = document.getElementById('weeto-chat-input');
+      if (input) { input.disabled = false; input.placeholder = 'Weeto에게 답해주세요...'; input.focus(); }
+    }
   }
-
-  const typing = document.getElementById('weeto-typing');
-  if (typing) typing.remove();
-  const autoInput = document.getElementById('weeto-chat-input');
-
-  // ★ 네트워크 실패 (res === null)
-  if (!res) {
-    chatBox.innerHTML += '<div class="message received" style="background:#fdecea;color:#c62828;border:1px solid #f5c6cb;">⚠️ 네트워크 오류가 발생했음. 인터넷 연결 확인 후 아래 버튼 눌러주셈.<br><button onclick="retryWeetoGreeting()" style="margin-top:8px;background:#4a5d4e;color:white;border:none;padding:6px 12px;border-radius:8px;cursor:pointer;font-size:0.85rem;">🔄 Weeto 다시 부르기</button></div>';
-    chatBox.scrollTop = chatBox.scrollHeight;
-    autoInput.disabled = true;
-    autoInput.placeholder = 'Weeto를 먼저 다시 부르세요...';
-    return;
-  }
-
-  // ★ 재시도 후에도 서버 에러 폴백 → 시스템 에러 스타일 + 히스토리 push 안 함
-  if (res.errorReason) {
-    chatBox.innerHTML += '<div class="message received" style="background:#fff3cd;color:#856404;border:1px solid #ffeaa7;">🛸 Weeto 신호가 약해서 연결을 못했음! 🛰️ 잠시 후 아래 버튼 눌러서 다시 불러보셈.<br><button onclick="retryWeetoGreeting()" style="margin-top:8px;background:#4a5d4e;color:white;border:none;padding:6px 12px;border-radius:8px;cursor:pointer;font-size:0.85rem;">🔄 Weeto 다시 부르기</button></div>';
-    chatBox.scrollTop = chatBox.scrollHeight;
-    // 에러 폴백은 히스토리에 저장하지 않음 (다음 호출 컨텍스트 오염 방지)
-    autoInput.disabled = true;
-    autoInput.placeholder = 'Weeto를 먼저 다시 부르세요...';
-    return;
-  }
-
-  if (res.reply) {
-    weetoChatHistory.push({ role: 'Weeto', text: res.reply });
-    chatBox.innerHTML += '<div class="message received">👾 ' + safeAiRender(res.reply) + '</div>';
-    chatBox.scrollTop = chatBox.scrollHeight;
-  }
-  // ★ Weeto 첫인사 완료 → 입력창 활성화
-  autoInput.disabled = false;
-  autoInput.placeholder = 'Weeto에게 문법을 설명해주세요...';
-  autoInput.focus();
 }
 
-// ★ V9.1: Weeto 첫 인사 재시도 버튼 핸들러
-function retryWeetoGreeting() {
+// Weeto 메시지 화면에 추가하는 헬퍼
+function appendWeetoMessage(type, text) {
   const chatBox = document.getElementById('weeto-chat-box');
-  // 마지막 에러 메시지 제거
-  const messages = chatBox.querySelectorAll('.message.received');
-  if (messages.length > 0) messages[messages.length - 1].remove();
+  if (!chatBox) return;
+  const msgDiv = document.createElement('div');
+  msgDiv.className = 'message ' + type;
+  if (type === 'sent') {
+    msgDiv.textContent = text; // 학생 메시지는 안전하게 textContent
+  } else {
+    msgDiv.innerHTML = safeAiRender(text); // Weeto 응답은 줄바꿈 보존
+  }
+  chatBox.appendChild(msgDiv);
+  chatBox.scrollTop = chatBox.scrollHeight;
+}
+
+// 첫 인사 실패 시 재시도 버튼
+function showWeetoGreetingRetry() {
+  const chatBox = document.getElementById('weeto-chat-box');
+  if (!chatBox) return;
+  const retryDiv = document.createElement('div');
+  retryDiv.className = 'message received';
+  retryDiv.style.cssText = 'background:#fffafa; border:1px solid #d9534f; color:#c62828;';
+  retryDiv.innerHTML = '🛸 Weeto가 첫인사 실패함... <button onclick="retryWeetoGreeting()" style="margin-left:8px; padding:4px 10px; border:none; background:#4a5d4e; color:white; border-radius:8px; cursor:pointer; font-size:0.85rem;">🔄 다시 부르기</button>';
+  chatBox.appendChild(retryDiv);
+  chatBox.scrollTop = chatBox.scrollHeight;
+}
+
+function retryWeetoGreeting() {
+  if (!currentWeeetoGrammar) return;
+  const chatBox = document.getElementById('weeto-chat-box');
+  if (chatBox) chatBox.innerHTML = '';
+  weetoChatHistory = [];
   sendWeetoAuto('(첫 만남 - 자기소개하고 이 문법 배우고 싶다고 해줘)');
 }
 
+// 학생이 보낸 메시지 처리 (Send 버튼 또는 Enter)
+let isWeetoSending = false;
 async function sendWeeto() {
+  if (isWeetoSending) return; // 더블 클릭 방지
+  if (!currentWeeetoGrammar) return;
   const input = document.getElementById('weeto-chat-input');
-  if (input.disabled) return; // 클리어/GG/로딩 중 추가 대화 차단
-  const msg = input.value.trim();
-  if (!msg) return;
+  if (!input) return;
+  const text = input.value.trim();
+  if (!text) return;
+
+  isWeetoSending = true;
   input.value = '';
-  // ★ 연타 방지: 응답 올 때까지 입력 잠금
   input.disabled = true;
   input.placeholder = 'Weeto가 생각 중...';
-  const chatBox = document.getElementById('weeto-chat-box');
-  // Show student message
-  chatBox.innerHTML += '<div class="message sent">' + escapeHtml(msg) + '</div>';
-  weetoChatHistory.push({ role: '학생', text: msg });
-  chatBox.scrollTop = chatBox.scrollHeight;
-  // Show typing indicator
-  chatBox.innerHTML += '<div class="message received" id="weeto-typing"><div class="typing-indicator"><div class="dot" style="animation-delay:0s"></div><div class="dot" style="animation-delay:0.2s"></div><div class="dot" style="animation-delay:0.4s"></div></div></div>';
-  chatBox.scrollTop = chatBox.scrollHeight;
 
-  const payload = {
-    type: 'teach_chat',
-    studentId: currentStudentId,
-    token: currentToken,
-    lesson: currentWeeetoGrammar.lesson,
-    grammarName: currentWeeetoGrammar.grammarName,
-    grammarDesc: currentWeeetoGrammar.grammarDesc,
-    exampleWrong: currentWeeetoGrammar.exampleWrong,
-    message: msg,
-    history: weetoChatHistory.map(h => h.role + ': ' + h.text).join('\n'),
-    attempt: currentWeetoAttempt
-  };
+  // 학생 메시지 화면 + 히스토리에 추가
+  appendWeetoMessage('sent', text);
+  weetoChatHistory.push({ role: '학생', text });
 
-  // ★ V9.1: 자동 1회 재시도 + 에러 폴백 시 히스토리 오염 방지
-  let res = null;
-  try {
-    res = await fetch(SHEET_URL, { method: 'POST', body: JSON.stringify(payload) }).then(r => r.json());
-    if (res && res.errorReason) {
-      await new Promise(r => setTimeout(r, 2000));
-      try { res = await fetch(SHEET_URL, { method: 'POST', body: JSON.stringify(payload) }).then(r => r.json()); } catch(e2) { res = null; }
-    }
-  } catch(e) {
-    res = null;
-  }
-
-  const typing = document.getElementById('weeto-typing');
-  if (typing) typing.remove();
-
-  // ★ 네트워크 실패 → 학생 메시지는 history에서 pop (다음 시도 시 중복 방지) + 입력 복구
-  if (!res) {
-    if (weetoChatHistory.length && weetoChatHistory[weetoChatHistory.length-1].role === '학생') {
-      weetoChatHistory.pop();
-    }
-    chatBox.innerHTML += '<div class="message received" style="background:#fdecea;color:#c62828;border:1px solid #f5c6cb;">⚠️ 네트워크 오류. 메시지를 다시 보내보셈.</div>';
-    chatBox.scrollTop = chatBox.scrollHeight;
-    input.disabled = false;
-    input.placeholder = '메시지를 입력하세요...';
-    input.focus();
-    return;
-  }
-
-  // ★ 재시도 후에도 서버 에러 폴백 → 학생 메시지 history에서 pop + 시스템 에러 표시 + 입력 복구
-  if (res.errorReason) {
-    if (weetoChatHistory.length && weetoChatHistory[weetoChatHistory.length-1].role === '학생') {
-      weetoChatHistory.pop();
-    }
-    chatBox.innerHTML += '<div class="message received" style="background:#fff3cd;color:#856404;border:1px solid #ffeaa7;">🛸 Weeto 신호가 약함! 🛰️ 10초만 기다렸다가 메시지 한 번 더 보내보셈.</div>';
-    chatBox.scrollTop = chatBox.scrollHeight;
-    // 에러 폴백은 weetoChatHistory에 push하지 않음 (다음 호출 컨텍스트 오염 방지)
-    input.disabled = false;
-    input.placeholder = '메시지를 입력하세요...';
-    input.focus();
-    return;
-  }
-
-  if (res.reply) {
-    weetoChatHistory.push({ role: 'Weeto', text: res.reply });
-    // Check for CLEAR or GG
-    if (res.isClear) {
-      // CLEAR일 때는 채팅에 표시하지 않고 오버레이에서만 보여줌
-      input.disabled = true;
-      input.placeholder = '클리어! 🎉';
-      const lastMsg = res.reply;
-      // ★ V8 (W-1 수정 2026-04-22): 1.5초 race 시간 동안 학생이 뒤로가기 눌러도 안전하게 — grammar/attempt 캡처
-      const capturedGrammar = currentWeeetoGrammar;
-      const capturedAttempt = currentWeetoAttempt;
-      setTimeout(() => handleTeachingClear(lastMsg, capturedGrammar, capturedAttempt), 1500);
-    } else if (res.isGG) {
-      // GG일 때도 채팅에 표시하지 않고 오버레이에서만 보여줌
-      input.disabled = true;
-      input.placeholder = '다음에 다시 도전!';
-      const lastMsg = res.reply;
-      // ★ V8 (W-1 수정 2026-04-22): 1.5초 race 시간 동안 학생이 뒤로가기 눌러도 안전하게 — grammar/attempt 캡처
-      const capturedGrammarGG = currentWeeetoGrammar;
-      const capturedAttemptGG = currentWeetoAttempt;
-      setTimeout(() => handleTeachingGG(lastMsg, capturedGrammarGG, capturedAttemptGG), 1500);
-    } else {
-      // 일반 대화: 채팅에 메시지 표시 + 입력 잠금 해제
-      chatBox.innerHTML += '<div class="message received">👾 ' + safeAiRender(res.reply) + '</div>';
-      chatBox.scrollTop = chatBox.scrollHeight;
-      input.disabled = false;
-      input.placeholder = '메시지를 입력하세요...';
-      input.focus();
-    }
-  } else {
-    // 응답이 비었을 때도 잠금 해제
-    input.disabled = false;
-    input.placeholder = '메시지를 입력하세요...';
-  }
+  await sendWeetoAuto(text);
+  isWeetoSending = false;
 }
 
-async function handleTeachingClear(lastMsg, capturedGrammar, capturedAttempt) {
-  // ★ V8 (W-1 수정 2026-04-22): 인자로 받은 grammar/attempt 우선 사용 (전역 변수가 null이어도 안전)
-  // 학생이 1.5초 race 동안 뒤로가기 눌러서 currentWeeetoGrammar=null이 되어도 정상 저장됨
-  const g = capturedGrammar || currentWeeetoGrammar;
-  const att = capturedAttempt || currentWeetoAttempt;
-  if (!g) { console.error('Teaching clear: no grammar context, abort'); return; }
-  // Record clear on server
+// CLEAR 판정 처리: teach_complete 호출 + 축하 오버레이
+async function handleTeachingClear() {
+  if (!currentWeeetoGrammar) return;
+  const grammarName = currentWeeetoGrammar.grammarName;
+  const lesson = currentWeeetoGrammar.lesson;
+  const alreadyClearedLocally = weetoClearedList.some(c => String(c.lesson) === String(lesson) && c.grammarName === grammarName);
+
   try {
     const res = await fetch(SHEET_URL, {
       method: 'POST',
@@ -4010,142 +5716,166 @@ async function handleTeachingClear(lastMsg, capturedGrammar, capturedAttempt) {
         type: 'teach_complete',
         studentId: currentStudentId,
         token: currentToken,
-        lesson: g.lesson,
-        grammarName: g.grammarName,
-        attempt: att
+        grammarName, lesson,
+        clearType: 'normal',
+        attempt: currentWeetoAttempt || 1
       })
-    }).then(r => r.json());
-
-    // Show clear overlay with Weeto's last message
-    const overlay = document.createElement('div');
-    overlay.className = 'clear-overlay';
-    overlay.innerHTML = '<div class="clear-emoji">🎉</div>' +
-      '<div class="clear-text">Teaching Clear!</div>' +
-      '<div class="clear-sub">' + escapeHtml(g.grammarName) + (res.alreadyCleared ? ' (이미 클리어 — 재도전 성공!)' : ' (+3점!)') + '</div>' +
-      (lastMsg ? '<div style="background:rgba(255,255,255,0.15);border-radius:12px;padding:12px 16px;margin:15px 20px 0;max-height:120px;overflow-y:auto;font-size:0.85rem;color:#eee;line-height:1.5;text-align:left;">👾 ' + safeAiRender(lastMsg) + '</div>' : '') +
-      '<button class="clear-btn" onclick="closeClearOverlay(this)">돌아가기</button>';
-    document.querySelector('.mobile-app').appendChild(overlay);
-
-    // Update local data
-    if (!res.alreadyCleared) {
-      myTeaching.push({
-        grade: String(currentStudentId).charAt(0),
-        lesson: g.lesson,
-        grammarName: g.grammarName,
-        clearDate: new Date().toISOString()
-      });
-      // ★ sessionStorage 동기화 (새로고침 방어)
-      const savedLogin = sessionStorage.getItem('even_login');
-      if (savedLogin) { const loginData = JSON.parse(savedLogin); loginData.myTeaching = myTeaching; sessionStorage.setItem('even_login', JSON.stringify(loginData)); }
+    });
+    const data = await res.json();
+    if (data.error) {
+      if (data.error === 'Unauthorized') {
+        alert('⚠️ 세션이 만료됐음! 다시 로그인하셈 👽');
+        logout();
+        return;
+      }
+      alert('⚠️ 클리어 기록 저장 실패: ' + data.error);
+      return;
     }
-    // ★ V8 (W-1 수정): 학생이 race로 뒤로가서 closeClearOverlay의 갱신 분기를 못 탔을 수도 있으니 여기서도 갱신
-    if (!weetoClearedList.some(c => String(c.lesson) === String(g.lesson) && c.grammarName === g.grammarName)) {
-      weetoClearedList.push({ lesson: g.lesson, grammarName: g.grammarName });
+
+    // 로컬 캐시 갱신
+    if (!alreadyClearedLocally && !data.alreadyCleared) {
+      weetoClearedList.push({ lesson, grammarName });
+      if (typeof myTeaching !== 'undefined') {
+        myTeaching.push({ studentId: currentStudentId, lesson, grammarName, clearDate: new Date().toISOString(), clearType: 'normal' });
+      }
+      try {
+        const savedLogin = sessionStorage.getItem('even_login');
+        if (savedLogin) { const ld = JSON.parse(savedLogin); ld.myTeaching = myTeaching; sessionStorage.setItem('even_login', JSON.stringify(ld)); }
+      } catch(e) {}
     }
+
+    showClearOverlay(grammarName, !!data.alreadyCleared);
   } catch(e) {
-    console.error('Teaching clear save error:', e);
-    // ★ 통신 실패해도 클리어 오버레이 표시 (학생이 갇히지 않게)
-    const overlay = document.createElement('div');
-    overlay.className = 'clear-overlay';
-    overlay.innerHTML = '<div class="clear-emoji">🎉</div>' +
-      '<div class="clear-text">Teaching Clear!</div>' +
-      '<div class="clear-sub">' + escapeHtml(g.grammarName) + ' (저장은 나중에 다시 시도해주세요)</div>' +
-      '<button class="clear-btn" onclick="closeClearOverlay(this)">돌아가기</button>';
-    document.querySelector('.mobile-app').appendChild(overlay);
+    console.error('handleTeachingClear error:', e);
+    alert('🛸 통신 오류! 클리어 기록을 못 보냄. 잠시 후 다시 시도하셈.');
   }
 }
 
-async function handleTeachingGG(lastMsg, capturedGrammar, capturedAttempt) {
-  // ★ V8 (W-1 수정 2026-04-22): 인자로 받은 grammar/attempt 우선 사용 (전역 변수가 null이어도 안전)
-  const g = capturedGrammar || currentWeeetoGrammar;
-  const att = capturedAttempt || currentWeetoAttempt;
-  if (!g) { console.error('Teaching GG: no grammar context, abort'); return; }
-  // GG: Teaching 시트에 gg로 기록 (점수/도장 없음)
+function showClearOverlay(grammarName, alreadyCleared) {
+  const existing = document.getElementById('weeto-clear-overlay');
+  if (existing) existing.remove();
+  const overlay = document.createElement('div');
+  overlay.id = 'weeto-clear-overlay';
+  overlay.style.cssText = 'position:absolute; top:0; left:0; width:100%; height:100%; background:rgba(74,93,78,0.85); display:flex; align-items:center; justify-content:center; z-index:2500; flex-direction:column; padding:30px; box-sizing:border-box;';
+  const scoreMsg = alreadyCleared
+    ? '<div style="font-size:0.9rem; color:#fff; margin-top:10px;">(이미 클리어한 문법이라 점수는 안 들어감, 그래도 잘했음!)</div>'
+    : '<div style="font-size:1.05rem; color:#FFD700; margin-top:10px; font-weight:bold;">+3점 획득!</div>';
+  overlay.innerHTML = '<div style="background:white; border-radius:20px; padding:28px 22px; text-align:center; max-width:320px; width:100%; box-shadow:0 8px 24px rgba(0,0,0,0.3);">' +
+    '<div style="font-size:3.5rem;">🎉</div>' +
+    '<div style="font-size:1.5rem; font-weight:bold; color:#4a5d4e; margin-top:8px;">CLEAR!</div>' +
+    '<div style="font-size:0.95rem; color:#555; margin-top:6px;">"' + escapeHtml(grammarName) + '" 완료!</div>' +
+    '<div style="font-size:0.85rem; color:#888; margin-top:6px;">Weeto: "고마워! Zeeto 부장님께 자랑할 거임 ✨"</div>' +
+    scoreMsg +
+    '<button onclick="closeClearOverlay()" style="margin-top:18px; padding:12px 30px; background:#4a5d4e; color:white; border:none; border-radius:15px; font-weight:bold; cursor:pointer; font-size:0.95rem;">확인</button>' +
+    '</div>';
+  document.getElementById('chat-screen').appendChild(overlay);
+}
+
+function closeClearOverlay() {
+  const ov = document.getElementById('weeto-clear-overlay');
+  if (ov) ov.remove();
+  // CLEAR 후 → 문법 리스트로 복귀
+  // ★ V11 패치(2026-05-13): 정식 종료 시 세션 클리어
+  clearWeetoSession();
+  weetoChatHistory = [];
+  currentWeeetoGrammar = null;
+  document.getElementById('weeto-chat').style.display = 'none';
+  document.getElementById('weeto-grammar-select').style.display = 'flex';
+  renderGrammarList(); // ✅ 표시 갱신
+  if (typeof updateDashboard === 'function') updateDashboard();
+}
+
+// GG 판정 처리: teach_complete 호출 + GG 오버레이
+async function handleTeachingGG() {
+  if (!currentWeeetoGrammar) return;
+  const grammarName = currentWeeetoGrammar.grammarName;
+  const lesson = currentWeeetoGrammar.lesson;
+
   try {
-    await fetch(SHEET_URL, {
+    const res = await fetch(SHEET_URL, {
       method: 'POST',
       body: JSON.stringify({
         type: 'teach_complete',
         studentId: currentStudentId,
         token: currentToken,
-        lesson: g.lesson,
-        grammarName: g.grammarName,
+        grammarName, lesson,
         clearType: 'gg',
-        attempt: att
+        attempt: currentWeetoAttempt || 1
       })
     });
-  } catch(e) { console.error('GG save error:', e); }
-
-  const overlay = document.createElement('div');
-  overlay.className = 'clear-overlay';
-  // ★ V9 개편(2026-04-24): GG 문구 톤 업 + "다시 도전!" 버튼 추가
-  overlay.innerHTML = '<div class="clear-emoji">👾</div>' +
-    '<div class="clear-text">앗, Weeto가 아직 못 배웠나봐 😭</div>' +
-    '<div class="clear-sub">다음엔 더 잘 가르쳐줘!</div>' +
-    (lastMsg ? '<div style="background:rgba(255,255,255,0.15);border-radius:12px;padding:12px 16px;margin:15px 20px 0;max-height:120px;overflow-y:auto;font-size:0.85rem;color:#eee;line-height:1.5;text-align:left;">👾 ' + safeAiRender(lastMsg) + '</div>' : '') +
-    '<div style="display:flex; gap:12px; margin-top:25px;">' +
-      '<button class="clear-btn" style="margin-top:0; background:#8a9e8e;" onclick="closeGGOverlay(this)">돌아가기</button>' +
-      '<button class="clear-btn" style="margin-top:0;" onclick="retryTeachingGG(this)">다시 도전!</button>' +
-    '</div>';
-  document.querySelector('.mobile-app').appendChild(overlay);
-}
-
-function closeGGOverlay(btn) {
-  const overlay = btn.closest('.clear-overlay');
-  if (overlay) overlay.remove();
-  // GG는 클리어 목록에 추가하지 않음 — "도전 →" 상태 유지
-  // attemptCounts 증가는 backToGrammarSelect()에서 통합 처리
-  backToGrammarSelect();
-  renderGrammarList();
-}
-
-// ★ V9 신규(2026-04-24): GG 화면에서 바로 재도전
-// GG는 이미 서버에 기록됨 → 로컬 attemptCounts도 1 증가시키고 같은 문법으로 startTeaching 재호출
-// startTeaching 내부에서 attempt 번호 재계산되어 프롬프트로 전달됨 → Weeto가 재도전임을 인지
-function retryTeachingGG(btn) {
-  const overlay = btn.closest('.clear-overlay');
-  if (overlay) overlay.remove();
-  if (!currentWeeetoGrammar) {
-    // 방어: grammar 컨텍스트가 없으면 문법 목록으로 복귀
-    backToGrammarSelect();
-    renderGrammarList();
-    return;
-  }
-  const key = currentWeeetoGrammar.lesson + "||" + currentWeeetoGrammar.grammarName;
-  window._weetoAttemptCounts = window._weetoAttemptCounts || {};
-  window._weetoAttemptCounts[key] = (window._weetoAttemptCounts[key] || 0) + 1;
-  // 같은 문법으로 재도전 시작 (startTeaching이 내부에서 weetoChatHistory 초기화 + 새 attempt 번호 계산)
-  const g = currentWeeetoGrammar;
-  startTeaching(g.grammarName, g.lesson);
-}
-
-function closeClearOverlay(btn) {
-  const overlay = btn.closest('.clear-overlay');
-  if (overlay) overlay.remove();
-  // Update local cleared list instead of re-fetching from server
-  if (currentWeeetoGrammar) {
-    const alreadyInList = weetoClearedList.some(c => String(c.lesson) === String(currentWeeetoGrammar.lesson) && c.grammarName === currentWeeetoGrammar.grammarName);
-    if (!alreadyInList) {
-      weetoClearedList.push({ lesson: currentWeeetoGrammar.lesson, grammarName: currentWeeetoGrammar.grammarName });
+    const data = await res.json();
+    if (data.error && data.error === 'Unauthorized') {
+      alert('⚠️ 세션이 만료됐음! 다시 로그인하셈 👽');
+      logout();
+      return;
     }
-    // attemptCounts 증가는 backToGrammarSelect()에서 통합 처리
+    // GG 기록 실패해도 학생에겐 오버레이 표시 (학습 흐름 우선)
+    if (data.error) console.warn('GG record save failed:', data.error);
+    showGGOverlay(grammarName);
+  } catch(e) {
+    console.error('handleTeachingGG error:', e);
+    showGGOverlay(grammarName);
   }
-  backToGrammarSelect();
-  renderGrammarList(); // Use local data, no server call needed
 }
 
-// Weeto Enter key binding
-document.addEventListener('DOMContentLoaded', function() {
-  const weetoInput = document.getElementById('weeto-chat-input');
-  if (weetoInput) {
-    weetoInput.addEventListener('keydown', function(e) {
-      if (e.key === 'Enter') sendWeeto();
+function showGGOverlay(grammarName) {
+  const existing = document.getElementById('weeto-gg-overlay');
+  if (existing) existing.remove();
+  const overlay = document.createElement('div');
+  overlay.id = 'weeto-gg-overlay';
+  overlay.style.cssText = 'position:absolute; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.7); display:flex; align-items:center; justify-content:center; z-index:2500; flex-direction:column; padding:30px; box-sizing:border-box;';
+  overlay.innerHTML = '<div style="background:white; border-radius:20px; padding:28px 22px; text-align:center; max-width:320px; width:100%; box-shadow:0 8px 24px rgba(0,0,0,0.3);">' +
+    '<div style="font-size:3.5rem;">😢</div>' +
+    '<div style="font-size:1.5rem; font-weight:bold; color:#c62828; margin-top:8px;">GG</div>' +
+    '<div style="font-size:0.95rem; color:#555; margin-top:6px;">"' + escapeHtml(grammarName) + '"</div>' +
+    '<div style="font-size:0.85rem; color:#888; margin-top:6px;">Weeto: "으으 나 아직 이해 못했나봐 😭<br>다음에 다시 알려줘!"</div>' +
+    '<div style="display:flex; gap:8px; margin-top:18px; justify-content:center;">' +
+    '<button onclick="retryTeachingGG()" style="padding:12px 18px; background:#4a5d4e; color:white; border:none; border-radius:15px; font-weight:bold; cursor:pointer; font-size:0.9rem;">🔄 재도전</button>' +
+    '<button onclick="closeGGOverlay()" style="padding:12px 18px; background:#ddd; color:#333; border:none; border-radius:15px; font-weight:bold; cursor:pointer; font-size:0.9rem;">나가기</button>' +
+    '</div></div>';
+  document.getElementById('chat-screen').appendChild(overlay);
+}
+
+function closeGGOverlay() {
+  const ov = document.getElementById('weeto-gg-overlay');
+  if (ov) ov.remove();
+  // ★ V11 패치(2026-05-13): GG는 정식 종료 (서버에 'gg' 행 기록됨) → 세션 클리어
+  clearWeetoSession();
+  weetoChatHistory = [];
+  currentWeeetoGrammar = null;
+  document.getElementById('weeto-chat').style.display = 'none';
+  document.getElementById('weeto-grammar-select').style.display = 'flex';
+  loadGrammarList(); // 시도 카운트 새로 가져오기
+}
+
+function retryTeachingGG() {
+  const ov = document.getElementById('weeto-gg-overlay');
+  if (ov) ov.remove();
+  if (!currentWeeetoGrammar) return;
+  // 재도전: 시도 횟수 증가, 히스토리 초기화, 새 첫인사
+  currentWeetoAttempt = (currentWeetoAttempt || 1) + 1;
+  weetoChatHistory = [];
+  document.getElementById('weeto-chat-box').innerHTML = '';
+  const input = document.getElementById('weeto-chat-input');
+  if (input) { input.value = ''; input.disabled = true; input.placeholder = 'Weeto가 다시 인사 중...'; }
+  sendWeetoAuto('(재도전 - 같은 문법을 다시 배우려고 옴)');
+}
+
+// Weeto 입력창 Enter 키로 전송
+// ★ V11 패치(2026-05-13): keypress → keydown + isComposing. 한글 조합 중 Enter 미완성 전송 방지.
+(function attachWeetoEnterKey() {
+  const wInput = document.getElementById('weeto-chat-input');
+  if (wInput && !wInput._enterAttached) {
+    wInput._enterAttached = true;
+    wInput.addEventListener('keydown', function(e) {
+      if (e.key === 'Enter' && !e.shiftKey && !e.isComposing && e.keyCode !== 229) {
+        e.preventDefault();
+        sendWeeto();
+      }
     });
   }
-});
-
+})();
 
 </script>
-
 </body>
 </html>
