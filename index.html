@@ -4521,7 +4521,7 @@ async function enterUndercoverAsStudent(studentId, firstName, emoji) {
     if (!banner) {
       banner = document.createElement('div');
       banner.id = 'undercover-banner';
-      banner.style.cssText = 'background:#FAEEDA; color:#633806; padding:6px 12px; text-align:center; font-size:0.8rem; font-weight:500; border-bottom:1px solid #EF9F27;';
+      banner.style.cssText = 'position:absolute; top:0; left:0; right:0; z-index:50; box-sizing:border-box; background:#FAEEDA; color:#633806; padding:6px 12px; text-align:center; font-size:0.8rem; font-weight:500; border-bottom:1px solid #EF9F27;'; // ★ V12 핫픽스(2026-06-15): flex-row 안에서 세로 띠로 늘어나던 버그 → absolute로 빼내 상단 가로 띠로
       document.getElementById('main-content').insertBefore(banner, document.getElementById('main-content').firstChild);
     }
     banner.textContent = '🕵️ 잠입 중: ' + (emoji || '👤') + ' ' + firstName + ' (' + studentId + ') 의 시점';
@@ -4562,7 +4562,7 @@ function enterAsMyself() {
     banner.id = 'undercover-banner';
     document.getElementById('main-content').insertBefore(banner, document.getElementById('main-content').firstChild);
   }
-  banner.style.cssText = 'background:#EAF3DE; color:#27500A; padding:6px 12px; text-align:center; font-size:0.8rem; font-weight:500; border-bottom:1px solid #97C459;';
+  banner.style.cssText = 'position:absolute; top:0; left:0; right:0; z-index:50; box-sizing:border-box; background:#EAF3DE; color:#27500A; padding:6px 12px; text-align:center; font-size:0.8rem; font-weight:500; border-bottom:1px solid #97C459;'; // ★ V12 핫픽스(2026-06-15): flex-row 안에서 세로 띠로 늘어나던 버그 → absolute로 빼내 상단 가로 띠로
   banner.textContent = '👩‍🏫 내 계정으로 보는 중 — ENGsta에만 글/댓글 가능 (다른 탭은 둘러보기 전용)';
   if (typeof updateDashboard === 'function') updateDashboard();
   changeTab('insta-screen');
