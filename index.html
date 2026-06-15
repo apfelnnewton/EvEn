@@ -3744,6 +3744,7 @@ checkNewComments();
         instaHasMore = false;
         instaServerOffset = data.length;
       }
+      isInstaLoading = false; // ★ V12(2026-06-09): render 전에 락 해제 — 초기 페이지네이션 로드에서 "🛸 더 가져오기" 버튼이 !isInstaLoading 조건에 막혀 안 뜨던 버그
       renderInstaPosts();
     } catch(e) {
       console.error('loadInstaPosts error:', e);
@@ -4410,10 +4411,7 @@ function openUndercoverStudentPicker() {
   // dashboardData 또는 allStudentsData에서 학생 목록 가져오기
   const allUsers = (typeof dashboardData !== 'undefined' && dashboardData && dashboardData.allUsers) ? dashboardData.allUsers : (typeof allStudentsData !== 'undefined' ? allStudentsData : []);
   const students = (allUsers || []).filter(u => u.studentId && u.firstName);
-  if (students.length === 0) {
-    alert('🛸 학생 목록을 불러오지 못함. 잠시 후 다시 시도하셈!');
-    return;
-  }
+  // ★ V12(2026-06-09): 학생 목록 비어도 모달 막지 않음 — "내 계정 유지"는 학생 목록 없이도 됨 (교사가 👨‍🎓 학생 탭 먼저 안 눌러도 ENGsta 진입 가능)
   // 학년별로 그룹핑
   const byGrade = {};
   students.forEach(s => {
@@ -4431,6 +4429,7 @@ function openUndercoverStudentPicker() {
       </div>`;
     });
   });
+  if (!listHtml) listHtml = '<div style="text-align:center; color:#888; font-size:0.82rem; padding:16px;">학생 목록을 보려면 먼저 👨‍🎓 학생 탭을 한 번 열어주셈.<br>(👩‍🏫 내 계정 유지는 지금 바로 가능 ✅)</div>';
   const modal = document.createElement('div');
   modal.id = 'undercover-picker-modal';
   modal.style.cssText = 'position:absolute; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.5); z-index:3500; display:flex; align-items:center; justify-content:center;';
