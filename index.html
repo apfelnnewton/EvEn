@@ -418,7 +418,7 @@
 
  <div id="splash-screen">
     <div class="logo-wrapper">
-      <img src="https://drive.google.com/thumbnail?id=14VVMjNCdalwjaobjrz69VeRitKrbLCd1&sz=w1000" class="splash-logo">
+      <img src="https://lh3.googleusercontent.com/d/14VVMjNCdalwjaobjrz69VeRitKrbLCd1=w1000" class="splash-logo">
     </div>
   </div>
 
@@ -481,7 +481,7 @@
 
   <div id="login-screen" class="screen active">
     <div class="center-content">
-      <img src="https://drive.google.com/thumbnail?id=1KBx7nKrxKfIAUMPJZfBfT9WrzzonaERG&sz=w1000" class="login-logo">
+      <img src="https://lh3.googleusercontent.com/d/1KBx7nKrxKfIAUMPJZfBfT9WrzzonaERG=w1000" class="login-logo">
       <p id="login-msg" style="color: #666; margin-bottom: 20px; font-size: 0.95rem;">아이디와 비밀번호를 입력하세요.</p>
       <input type="text" id="login-id" class="input-field" placeholder="아이디 (예: jimin_07)">
       <input type="password" id="login-pw" class="input-field" placeholder="비밀번호 (숫자 4자리)" pattern="\d*">
@@ -1243,6 +1243,16 @@
   function escapeHtml(str) {
     if(!str) return "";
     return String(str).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
+  }
+
+  // ★ V12 패치(2026-07-11): 구글이 drive.google.com/thumbnail 임베드를 막아서 모든 이미지가 깨짐.
+  // 시트에 저장된 옛 주소를 표시 시점에 lh3.googleusercontent.com 형식으로 변환 (시트 데이터는 안 건드림).
+  // drive.google.com/thumbnail?id=X&sz=w1000 → https://lh3.googleusercontent.com/d/X=w1000
+  function fixImgUrl(url) {
+    if (!url) return url;
+    const m = String(url).match(/drive\.google\.com\/(?:thumbnail\?id=|uc\?(?:export=view&)?id=)([A-Za-z0-9_-]+)/);
+    if (m) return "https://lh3.googleusercontent.com/d/" + m[1] + "=w1000";
+    return url;
   }
 
   // ★ V6 추가: AI 응답을 안전하게 화면에 표시하는 함수
@@ -3544,7 +3554,7 @@ checkNewComments();
       htmlLog += `<div class="log-detail-box"><div class="log-label">📝 2nd Practice</div><div class="log-text">${escapeHtml(currentLogData.p2 || "-")}</div><div class="log-label" style="color:#4a5d4e; margin-top:5px;">👽 Zeeto's Answer</div><div class="log-text">${safeSavedHtml(currentLogData.answer || "-")}</div></div>`;
       htmlLog += `<div class="log-detail-box"><div class="log-label">🤔 Reflection</div><div class="log-text">${escapeHtml(currentLogData.reflection || "-")}</div></div>`;
       // ★ V10 XSS 패치(2026-05-12): 이미지 URL도 escape (예: " onerror=... 삽입 방어)
-      if(currentLogData.image && /^https?:\/\//.test(currentLogData.image)) htmlLog += `<div class="log-detail-box"><img src="${escapeHtml(currentLogData.image)}" style="width:100%; border-radius:10px;"></div>`;
+      if(currentLogData.image && /^https?:\/\//.test(currentLogData.image)) htmlLog += `<div class="log-detail-box"><img src="${escapeHtml(fixImgUrl(currentLogData.image))}" style="width:100%; border-radius:10px;"></div>`;
       
       htmlLog += `</details>`;
     });
@@ -3784,7 +3794,7 @@ checkNewComments();
         `;
       }).join('');
 
-      let imgHtml = post.image ? `<img src="${escapeHtml(post.image)}" class="post-img">` : "";
+      let imgHtml = post.image ? `<img src="${escapeHtml(fixImgUrl(post.image))}" class="post-img">` : "";
       const postDiv = document.createElement('div'); postDiv.className = 'insta-post';
       postDiv.setAttribute('data-post-id', post.id);
 
@@ -5008,7 +5018,7 @@ function switchStudentModal(type) {
             <div class="log-text" style="color:#666;">${safeSavedHtml(l.answer||'-')}</div>
           </div>
           <div class="log-detail-box"><div class="log-label">🤔 Reflection</div><div class="log-text">${escapeHtml(l.reflection||'-')}</div></div>
-          ${l.image ? `<img src="${l.image}" style="width:100%;border-radius:10px;margin-top:8px;">` : ''}
+          ${l.image ? `<img src="${fixImgUrl(l.image)}" style="width:100%;border-radius:10px;margin-top:8px;">` : ''}
         </div>
       </details>`;
     });
@@ -5061,7 +5071,7 @@ function switchStudentModal(type) {
       const exitBadge = p.exitCount > 0 ? `<span style="background:#ffebee;color:#c62828;font-size:0.75rem;padding:2px 6px;border-radius:8px;margin-left:6px;">이탈 ${p.exitCount}회</span>` : '';
       html += `<div style="background:white;border-radius:12px;padding:12px;margin-bottom:10px;border:1px solid #eee;">
         <div style="font-size:0.8rem;color:#999;margin-bottom:6px;">${formatTime(p.date)}${exitBadge}</div>
-        ${p.image ? `<img src="${p.image}" style="width:100%;border-radius:10px;margin-bottom:8px;object-fit:cover;max-height:200px;">` : ''}
+        ${p.image ? `<img src="${fixImgUrl(p.image)}" style="width:100%;border-radius:10px;margin-bottom:8px;object-fit:cover;max-height:200px;">` : ''}
         <div style="font-size:0.9rem;color:#333;margin-bottom:8px;">${escapeHtml(p.content)}</div>
         <button onclick="teacherDeletePost('${p.id}')" style="background:none;border:1px solid #ffcccc;color:#d9534f;border-radius:8px;padding:5px 10px;font-size:0.8rem;cursor:pointer;">🗑️ 삭제</button>
       </div>`;
