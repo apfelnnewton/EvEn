@@ -1,12 +1,270 @@
 <!DOCTYPE html>
-<html lang="ko">
-<head>
+<html lang="ko"><head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>EvEn - Everyday English</title>
-<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;700&display=swap" rel="stylesheet">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;500;600;700;900&display=swap" rel="stylesheet">
 <style>
-  body { margin: 0; min-height: 100vh; display: flex; justify-content: center; align-items: center; background-color: #e8f0eb; font-family: 'Noto Sans KR', sans-serif; -webkit-font-smoothing: antialiased; }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+/* cyrillic */
+
+/* vietnamese */
+
+/* latin-ext */
+
+/* latin */
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+/* cyrillic */
+
+/* vietnamese */
+
+/* latin-ext */
+
+/* latin */
+
+</style>
+<style>
+  body { margin: 0; min-height: 100vh; display: flex; justify-content: center; align-items: center; background-color: #e8f0eb; font-family: 'Noto Sans KR', sans-serif; -webkit-font-smoothing: antialiased; word-break: keep-all; }
 
   /* ★ 반응형: 기기별 컨테이너 크기 */
   .mobile-app {
@@ -26,7 +284,7 @@
   }
 
   /* 아이패드/태블릿: 조금 더 넓게 */
-  @media (min-width: 600px) and (max-width: 1024px) {
+  @media (min-width: 600px) {
     .mobile-app {
       max-width: 600px;
       max-height: 960px;
@@ -74,8 +332,8 @@
 
   .center-content { flex: 1; display: flex; flex-direction: column; justify-content: center; align-items: center; padding: 20px; text-align: center; overflow-y: auto; }
   .title { font-size: 2.2rem; color: #4a5d4e; margin-bottom: 20px; font-weight: 700; }
-  .input-field { padding: 12px 15px; border: 1px solid #e0e0e0; border-radius: 20px; outline: none; width: 85%; font-size: 0.95rem; margin-bottom: 15px; background-color: #fff; display: block; margin-left: auto; margin-right: auto; font-family: 'Noto Sans KR', sans-serif; box-sizing: border-box; }
-  .btn { padding: 15px 30px; background-color: #4a5d4e; color: white; border: none; border-radius: 25px; font-size: 1.1rem; cursor: pointer; font-weight: 700; width: 85%; margin-bottom: 15px; font-family: 'Noto Sans KR', sans-serif; transition: background 0.3s; }
+  .input-field { padding: 12px 15px; border: 1px solid #e0e0e0; border-radius: 14px; outline: none; width: 85%; font-size: 0.95rem; margin-bottom: 15px; background-color: #fff; display: block; margin-left: auto; margin-right: auto; font-family: 'Noto Sans KR', sans-serif; box-sizing: border-box; }
+  .btn { padding: 15px 30px; background-color: #4a5d4e; color: white; border: none; border-radius: 16px; font-size: 1.1rem; cursor: pointer; font-weight: 700; width: 85%; margin-bottom: 15px; font-family: 'Noto Sans KR', sans-serif; transition: background 0.3s; }
   .btn:active { background-color: #384a3c; }
   
   .chat-header { 
@@ -91,7 +349,7 @@
   .back-btn { font-size: 1.2rem; cursor: pointer; margin-right: 15px; color: #4a5d4e; display: none; } 
   .logout-btn { font-size: 0.85rem; color: #999; text-decoration: underline; cursor: pointer; margin-left: auto; }
 
-  .chat-box { flex: 1; padding: 20px; overflow-y: auto; display: flex; flex-direction: column; gap: 12px; min-height: 0; }
+  .chat-box { flex: 1; padding: 20px; overflow-y: auto; overflow-x: hidden; display: flex; flex-direction: column; gap: 12px; min-height: 0; }
   .input-area { display: flex; padding: 10px 15px; background: white; border-top: 1px solid #e0e0e0; gap: 8px; flex-shrink: 0; }
   .chat-input { flex: 1; padding: 10px 15px; border: 1px solid #e0e0e0; border-radius: 20px; outline: none; font-size: 0.95rem; font-family: 'Noto Sans KR', sans-serif; min-width: 0; box-sizing: border-box; }
   .send-btn { padding: 10px 18px; background-color: #4a5d4e; color: white; border: none; border-radius: 20px; font-size: 0.9rem; cursor: pointer; font-family: 'Noto Sans KR', sans-serif; flex-shrink: 0; }
@@ -120,13 +378,14 @@
   .fab { position: absolute; bottom: 20px; right: 20px; width: 60px; height: 60px; background: #4a5d4e; border-radius: 50%; display: flex; align-items: center; justify-content: center; color: white; font-size: 2rem; box-shadow: 0 4px 10px rgba(0,0,0,0.2); cursor: pointer; z-index: 1000; }
   
   #write-modal { display: none; position: absolute; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); z-index: 2000; justify-content: center; align-items: center; }
-  .modal-content { width: 85%; background: white; border-radius: 25px; padding: 20px; box-sizing: border-box; }
+  .modal-content { width: 85%; background: white; border-radius: 20px; padding: 20px; box-sizing: border-box; }
   #insta-preview { width: 100%; height: 200px; object-fit: cover; border-radius: 15px; margin-bottom: 10px; display: none; }
 
-  .nav-bar { display: flex; background-color: white; border-top: 1px solid #e0e0e0; padding: 10px 0; justify-content: space-around; flex-shrink: 0; z-index: 100; display: none; } 
-  .nav-item { display: flex; flex-direction: column; align-items: center; color: #999; cursor: pointer; text-decoration: none; font-size: 0.7rem; flex: 1; text-align: center; font-family: 'Noto Sans KR', sans-serif; min-width: 0; overflow: hidden; white-space: nowrap; position: relative;}
-  .nav-item.active { color: #4a5d4e; font-weight: bold; }
-  .nav-icon { font-size: 1.5rem; margin-bottom: 3px; }
+  .nav-bar { display: flex; background-color: white; border-top: 1px solid #e0e0e0; padding: 8px 6px; justify-content: space-around; flex-shrink: 0; z-index: 100; display: none; } 
+  .nav-item { display: flex; flex-direction: column; align-items: center; color: #999; cursor: pointer; text-decoration: none; font-size: 0.7rem; flex: 1; text-align: center; font-family: 'Noto Sans KR', sans-serif; min-width: 0; overflow: hidden; white-space: nowrap; position: relative; padding: 6px 2px; margin: 0 2px; border-radius: 14px; transition: background 0.15s;}
+  .nav-item.active { color: #4a5d4e; font-weight: bold; background: #e8f0eb; }
+  .nav-icon { font-size: 1.5rem; margin-bottom: 3px; filter: grayscale(1); opacity: 0.55; }
+  .nav-item.active .nav-icon { filter: none; opacity: 1; }
   .nav-badge { position: absolute; top: -2px; right: 15%; background: #c62828; color: white; font-size: 0.6rem; font-weight: 900; min-width: 16px; height: 16px; line-height: 16px; border-radius: 8px; text-align: center; display: none; }
 
   #mypage-screen { background-color: #f9fbf9; }
@@ -136,8 +395,9 @@
   .dash-left-col { flex: 0.8; display: flex; flex-direction: column; gap: 8px; }
   .dash-profile { flex: 1; background: #fff; border-radius: 20px; display: flex; flex-direction: column; justify-content: center; align-items: center; padding: 14px 10px; box-shadow: 0 4px 10px rgba(0,0,0,0.04); border: 1px solid #eee; }
   /* ★ V12(2026-06-09): 프로필 아래 Oops 복습 진입 버튼 */
-  .dash-oops-btn { background: #EEEDFE; border: 1px solid #AFA9EC; border-radius: 16px; padding: 10px 8px; display: flex; justify-content: center; align-items: center; gap: 5px; cursor: pointer; color: #3C3489; font-weight: 600; font-size: 0.85rem; white-space: nowrap; transition: background 0.15s; }
-  .dash-oops-btn:active { background: #CECBF6; }
+  /* ★ 디자인 개선(2026-07-23): Oops 복습 = 대시보드 아래 슬림 전체폭 배너(3a), 그린 재도색 */
+  .dash-oops-btn { margin: 0 15px 12px; background: #e8f0eb; border: 1px solid #c6dccb; border-radius: 16px; padding: 11px 16px; display: flex; justify-content: space-between; align-items: center; gap: 8px; cursor: pointer; color: #4a5d4e; font-weight: 700; font-size: 0.9rem; white-space: nowrap; transition: background 0.15s; }
+  .dash-oops-btn:active { background: #d2e3d5; }
   .dash-profile-emoji { font-size: 3rem; margin-bottom: 4px; line-height: 1.2; }
   .dash-profile-name { font-size: 1.2rem; font-weight: 700; color: #333; margin: 0; }
   
@@ -149,18 +409,17 @@
 
   .calendar-section { background: #fff; padding: 20px; border-radius: 20px; margin: 0 15px; box-shadow: 0 4px 10px rgba(0,0,0,0.05); }
   .calendar-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px; font-weight: bold; color: #4a5d4e; font-size: 1.1rem; }
-  .calendar-grid { display: grid; grid-template-columns: repeat(7, 1fr); row-gap: 15px; column-gap: 5px; text-align: center; font-size: 0.9rem; }
+  .calendar-grid { display: grid; grid-template-columns: repeat(7, 1fr); row-gap: 8px; column-gap: 5px; text-align: center; font-size: 0.9rem; }
   .cal-day-header { font-weight: bold; color: #999; margin-bottom: 10px; font-size: 0.8rem; }
-  .cal-day { padding: 10px 0; border-radius: 10px; position: relative; }
+  .cal-day { padding: 5px 0 4px; border-radius: 10px; position: relative; }
   .cal-day.today { background-color: #e8f0eb; color: #4a5d4e; font-weight: bold; }  
   
-  .cal-day .stamp-log { position: absolute; top: -5px; right: -2px; font-size: 1.1rem; line-height: 1; }
-  .cal-day .stamp-story { position: absolute; bottom: -5px; right: -2px; font-size: 1.1rem; line-height: 1; }
-  .cal-day .stamp-penalty { position: absolute; top: -5px; left: -2px; font-size: 1.1rem; line-height: 1; }
-  .cal-day .stamp-teaching { position: absolute; bottom: -5px; left: -2px; font-size: 1.1rem; line-height: 1; }
+  /* ★ 디자인 개선(2026-07-23): 도장을 모서리 절대배치 → 날짜 아래 고정 슬롯(4c)으로. 겹침 구조적 방지 */
+  .cal-day .stamp-row { min-height: 12px; display: flex; flex-wrap: wrap; justify-content: center; align-items: center; gap: 1px; margin-top: 2px; }
+  .cal-day .stamp-log, .cal-day .stamp-story, .cal-day .stamp-penalty, .cal-day .stamp-teaching { font-size: 8px; line-height: 1.2; }
 
   #log-detail-modal { display: none; position: absolute; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); z-index: 2000; justify-content: center; align-items: center; }
-  .log-detail-content { width: 90%; height: 85%; background: white; border-radius: 25px; padding: 15px; box-sizing: border-box; display: flex; flex-direction: column; }
+  .log-detail-content { width: 90%; height: 85%; background: white; border-radius: 20px; padding: 15px; box-sizing: border-box; display: flex; flex-direction: column; }
   .modal-tab-bar { display: flex; background: #e8f0eb; padding: 5px; border-radius: 15px; margin-bottom: 15px; flex-shrink: 0; }
   .modal-tab { flex: 1; text-align: center; padding: 10px; font-weight: bold; font-size: 0.9rem; color: #999; cursor: pointer; border-radius: 10px; }
   .modal-tab.active { background: #fff; color: #4a5d4e; box-shadow: 0 2px 5px rgba(0,0,0,0.05); }
@@ -262,18 +521,20 @@
   }
 
   /* ★ 행성 개발 프로젝트 스타일 */
+  /* ★ 디자인 개선(2026-07-23): 다크 → 앱 공통 라이트 테마(1a) */
   #planet-screen {
-    background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);
+    background: #f9fbf9;
     overflow-y: auto;
   }
 
   .planet-screen-header {
     text-align: center;
-    padding: 20px 15px;
-    color: white;
-    font-size: 1.5rem;
+    padding: 16px 15px;
+    color: #4a5d4e;
+    background: #ffffff;
+    font-size: 1.2rem;
     font-weight: bold;
-    border-bottom: 2px solid rgba(255,255,255,0.1);
+    border-bottom: 1px solid #e0e0e0;
     flex-shrink: 0;
   }
 
@@ -288,7 +549,8 @@
     background: white;
     border-radius: 20px;
     padding: 20px;
-    box-shadow: 0 8px 20px rgba(0,0,0,0.2);
+    box-shadow: 0 4px 10px rgba(0,0,0,0.06);
+    border: 1px solid #eee;
     border-left: 4px solid #4a5d4e;
     animation: slideInUp 0.5s ease-out forwards;
   }
@@ -362,10 +624,10 @@
   }
 
   .planet-explanation {
-    background: #f9fbf9;
+    background: #ffffff;
     border-radius: 15px;
     padding: 15px;
-    margin-top: 20px;
+    margin: 0 20px 20px;
     font-size: 0.85rem;
     color: #555;
     line-height: 1.5;
@@ -392,6 +654,14 @@
   .lesson-title { font-weight: 700; color: #4a5d4e; font-size: 0.95rem; margin-bottom: 8px; padding-left: 5px; }
   .grammar-item { background: white; border: 1px solid #e0e0e0; border-radius: 15px; padding: 12px 15px; margin-bottom: 8px; cursor: pointer; display: flex; justify-content: space-between; align-items: center; transition: all 0.2s; }
   .grammar-item:hover { border-color: #4a5d4e; }
+  #t-panel-dashboard, #t-panel-students, #t-panel-stats, #t-panel-notice, #t-panel-approve { }
+  .grammar-item.req-pending { border: 1.5px solid #ffe082; background: #fffdf5; cursor: default; flex-wrap: wrap; }
+  .grammar-item:has(.gr-reject-note) { flex-wrap: wrap; }
+  .gr-pending-box, .gr-reject-note { flex-basis: 100%; width: 100%; box-sizing: border-box; }
+  .gr-pending-box { margin-top: 8px; background: #fff8e1; border-radius: 10px; padding: 9px 11px; }
+  .gr-pending-box .gp-msg { font-size: 0.8rem; color: #8a6d1a; font-weight: bold; }
+  .gr-pending-box .gp-cancel { display: inline-block; margin-top: 6px; font-size: 0.75rem; color: #4a5d4e; text-decoration: underline; cursor: pointer; font-weight: bold; }
+  .gr-reject-note { margin-top: 6px; font-size: 0.75rem; color: #c62828; background: #fff5f5; border-radius: 8px; padding: 6px 9px; }
   .grammar-item.cleared { background: #f0f7f2; border-color: #a8d5b6; }
   .grammar-item .grammar-name { font-weight: 600; color: #333; }
   .grammar-item .grammar-status { font-size: 0.8rem; }
@@ -410,15 +680,87 @@
   .clear-overlay .clear-sub { font-size: 0.9rem; margin-top: 8px; color: #ccc; }
   .clear-overlay .clear-btn { margin-top: 25px; padding: 12px 30px; background: #4a5d4e; border: none; border-radius: 25px; color: white; font-size: 1rem; cursor: pointer; font-family: 'Noto Sans KR', sans-serif; }
   @keyframes clearBounce { 0% { transform: scale(0); } 50% { transform: scale(1.3); } 100% { transform: scale(1); } }
+
+  /* ★ 디자인 개선(2026-07-23): 얇은 스크롤바 */
+  * { scrollbar-width: thin; scrollbar-color: #c9d6cc transparent; }
+  *::-webkit-scrollbar { width: 6px; height: 6px; }
+  *::-webkit-scrollbar-thumb { background: #c9d6cc; border-radius: 3px; }
+  *::-webkit-scrollbar-track { background: transparent; }
+
+/* ===== V12.2 반응형 개선: 폰/태블릿/노트북 ===== */
+
+/* 교사 모드: 넓은 화면에서 프레임 확장 */
+@media (min-width: 768px) {
+  body.teacher-mode .mobile-app {
+    max-width: min(1200px, 96vw);
+    width: 96vw;
+    height: 94vh;
+    max-height: 94vh;
+    border-radius: 24px;
+  }
+  body.teacher-mode .t-content { padding: 20px 28px !important; }
+  body.teacher-mode #teacher-screen [id^="t-tab-"] { font-size: 0.9rem !important; padding: 10px !important; }
+
+  /* 학생 목록 → 카드 그리드 */
+  body.teacher-mode #t-student-list {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+    gap: 10px;
+  }
+  body.teacher-mode #t-student-list > div { margin-bottom: 0 !important; }
+
+  /* 랭킹 → 2컬럼 그리드 */
+  body.teacher-mode #t-stats-ranking {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(360px, 1fr));
+    gap: 8px;
+  }
+  body.teacher-mode #t-stats-ranking > div { margin-bottom: 0 !important; }
+
+  /* 승인 대기 목록 → 그리드 */
+  body.teacher-mode #t-pending-list {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+    gap: 10px;
+  }
+  body.teacher-mode #t-pending-list > div { margin-bottom: 0 !important; }
+
+  /* 공지: 넓은 화면에서 폼 + 최근 내역 2단 배치 */
+  body.teacher-mode #t-panel-notice {
+    display: grid;
+    grid-template-columns: minmax(320px, 440px) 1fr;
+    gap: 20px;
+    align-items: start;
+  }
+  body.teacher-mode #t-panel-notice .t-notice-form { position: sticky; top: 0; margin-bottom: 0; }
+  /* 승인: 가입 승인 + CLEAR 요청 2단 배치 */
+  body.teacher-mode #t-panel-approve {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 20px;
+    align-items: start;
+  }
+  body.teacher-mode #t-panel-approve .t-approve-col > div:first-child { margin: 0 0 12px !important; }
+
+  /* 학생 상세 모달: 내용 폭 제한 */
+  body.teacher-mode #t-student-modal > div { max-width: 900px; }
+}
+
+/* 노트북(≥1025px) 학생 앱: 세로 여백 확보 */
+@media (min-width: 1025px) {
+  .mobile-app { max-height: min(960px, 94vh); }
+  body.teacher-mode .mobile-app { max-height: 94vh; }
+}
 </style>
 </head>
 <body>
+
 
 <div class="mobile-app">
 
  <div id="splash-screen">
     <div class="logo-wrapper">
-      <img src="https://lh3.googleusercontent.com/d/14VVMjNCdalwjaobjrz69VeRitKrbLCd1=w1000" class="splash-logo">
+      <img src="data:image/webp;base64,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" class="splash-logo">
     </div>
   </div>
 
@@ -481,7 +823,7 @@
 
   <div id="login-screen" class="screen active">
     <div class="center-content">
-      <img src="https://lh3.googleusercontent.com/d/1KBx7nKrxKfIAUMPJZfBfT9WrzzonaERG=w1000" class="login-logo">
+      <img src="data:image/webp;base64,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" class="login-logo">
       <p id="login-msg" style="color: #666; margin-bottom: 20px; font-size: 0.95rem;">아이디와 비밀번호를 입력하세요.</p>
       <input type="text" id="login-id" class="input-field" placeholder="아이디 (예: jimin_07)">
       <input type="password" id="login-pw" class="input-field" placeholder="비밀번호 (숫자 4자리)" pattern="\d*">
@@ -594,6 +936,9 @@
             <span class="weeto-grammar-tag" id="weeto-grammar-tag"></span>
           </div>
           <div class="chat-box" id="weeto-chat-box"></div>
+          <div id="weeto-clear-req-area" style="display:none; padding:0 20px 8px; flex-shrink:0;">
+            <button onclick="requestTeacherClear()" style="width:100%; border:1.5px dashed #4a5d4e; background:#e8f0eb; color:#4a5d4e; border-radius:12px; padding:10px; font-family:inherit; font-size:0.85rem; font-weight:bold; cursor:pointer;">🙋 선생님께 CLEAR 요청하기</button>
+          </div>
           <div class="input-area">
             <input type="text" class="chat-input" id="weeto-chat-input" placeholder="Weeto에게 문법을 설명해주세요...">
             <button class="send-btn" onclick="sendWeeto()">Send</button>
@@ -609,7 +954,7 @@
           <div id="log-header-title" style="font-weight:700; color:#4a5d4e;">Daily Learning Log</div>
         </div>
         <div class="header-right">
-          <button id="late-submit-btn" onclick="enterLateMode()" style="background:#ffebee; color:#c62828; border:1px solid #ffcdd2; padding:5px 10px; border-radius:15px; font-weight:700; font-size:0.8rem; cursor:pointer; font-family:'Noto Sans KR',sans-serif;">🚨 지각 제출</button>
+          <button id="late-submit-btn" onclick="enterLateMode()" style="background:#ffebee; color:#c62828; border:1px solid #ffcdd2; padding:5px 10px; border-radius:15px; font-weight:700; font-size:0.8rem; cursor:pointer; white-space:nowrap; font-family:'Noto Sans KR',sans-serif;">🚨 지각 제출</button>
         </div>
       </div>
       <div class="chat-box" style="padding: 15px;">
@@ -617,43 +962,47 @@
         <div id="late-mode-banner" style="display:none; background:#ffebee; border:1px solid #ffcdd2; border-radius:12px; padding:10px 14px; margin-bottom:10px; font-size:0.85rem; color:#c62828; font-weight:bold;">
           🚨 지각 제출 모드 — 날짜를 선택하세요 (패널티 -1점 자동 부과)
         </div>
-        <div style="display: flex; gap: 10px; margin-bottom: 10px;">
-          <select id="lesson-select" class="input-field" style="width: 45%; margin-bottom:0;">
+        <div style="display: flex; gap: 8px; margin-bottom: 14px;">
+          <select id="lesson-select" class="input-field" style="flex:1; min-width:0; width:auto; margin-bottom:0;">
             <option value="">Lesson 선택</option>
             <script>for(let i=1; i<=8; i++) document.write(`<option value="${i}">Lesson ${i}</option>`);</script>
           </select>
-          <input type="text" id="log-date" class="input-field" style="width: 45%; margin-bottom:0;" readonly>
-          <input type="date" id="log-date-late" class="input-field" style="width: 45%; margin-bottom:0; display:none;">
+          <input type="text" id="log-date" class="input-field" style="flex:1; min-width:0; width:auto; margin-bottom:0; background:#f2f2f2; text-align:center;" readonly="">
+          <input type="date" id="log-date-late" class="input-field" style="flex:1; min-width:0; width:auto; margin-bottom:0; display:none;">
         </div>
 
-        <div style="display: flex; justify-content: flex-end; margin-bottom: 5px;">
-          <label for="camera-input" style="cursor:pointer; font-size:1.4rem;" title="사진 찍기">📷</label>
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 6px;">
+          <label style="font-size:0.85rem; font-weight:700; color:#4a5d4e;">📝 오늘 배운 내용 <span style="color:#d9534f;">*</span></label>
+          <label for="camera-input" style="cursor:pointer; font-size:1.3rem;" title="사진 찍기">📷</label>
           <input type="file" id="camera-input" accept="image/*" capture="environment" style="display:none;" onchange="previewImage(this)">
         </div>
-        <textarea id="log-summary" class="input-field" style="width:100%; height: 120px; resize: none; margin-bottom: 10px;" placeholder="오늘 배운 내용을 적어보세요."></textarea>
+        <textarea id="log-summary" class="input-field" style="width:100%; height: 110px; flex-shrink:0; resize: none; margin-bottom: 14px;" placeholder="오늘 배운 내용을 적어보세요."></textarea>
 
         <img id="photo-preview" alt="미리보기">
 
-        <textarea id="log-new" class="input-field" style="width:100%; height: 50px; resize: none;" placeholder="New: 새로 알게 된 점"></textarea>
+        <label style="display:block; font-size:0.85rem; font-weight:700; color:#4a5d4e; margin-bottom:6px;">💡 New — 새로 알게 된 점</label>
+        <textarea id="log-new" class="input-field" style="width:100%; height: 56px; flex-shrink:0; resize: none; margin-bottom: 14px;" placeholder="새로 알게 된 점을 적어보세요."></textarea>
 
-        <div style="border: 1px solid #ddd; padding: 12px; border-radius: 15px; background: #fff; width: 100%; margin: 0 auto 15px; box-sizing: border-box;">
-          <p style="font-weight: 700; font-size: 0.85rem; color: #4a5d4e; margin: 0 0 5px 0;">1st Practice</p>
+        <label style="display:block; font-size:0.85rem; font-weight:700; color:#4a5d4e; margin-bottom:6px;">✍️ Practice</label>
+        <div style="border: 1px solid #e0e0e0; padding: 14px; border-radius: 14px; background: #fff; width: 100%; margin: 0 auto 14px; box-sizing: border-box; flex-shrink:0;">
+          <p style="font-weight: 700; font-size: 0.8rem; color: #999; margin: 0 0 5px 0;">1st Practice</p>
           <div style="display: flex; gap: 5px; margin-bottom: 8px;">
-            <input type="text" id="practice-1" style="flex:1; border:1px solid #eee; border-radius:10px; padding:8px; font-family:'Noto Sans KR';" placeholder="영문장 작성">
-            <button onclick="checkPractice(1)" style="border:none; background:none; font-size:1.2rem; cursor:pointer;">✔️</button>
+            <input type="text" id="practice-1" style="flex:1; min-width:0; border:1px solid #eee; border-radius:10px; padding:9px 12px; font-family:'Noto Sans KR';" placeholder="영문장 작성">
+            <button onclick="checkPractice(1)" style="border:none; background:#e8f0eb; color:#4a5d4e; border-radius:10px; padding:0 14px; font-weight:700; font-size:0.85rem; cursor:pointer; font-family:'Noto Sans KR',sans-serif; flex-shrink:0;">확인</button>
           </div>
           <div id="hint-area" style="font-size: 0.8rem; color: #d9534f; margin-bottom: 10px; display: none;">💡 Hint: <span id="hint-text"></span></div>
 
-          <p style="font-weight: 700; font-size: 0.85rem; color: #4a5d4e; margin: 0 0 5px 0;">2nd Practice</p>
+          <p style="font-weight: 700; font-size: 0.8rem; color: #999; margin: 0 0 5px 0;">2nd Practice</p>
           <div style="display: flex; gap: 5px;">
-            <input type="text" id="practice-2" style="flex:1; border:1px solid #eee; border-radius:10px; padding:8px; font-family:'Noto Sans KR';" placeholder="다시 시도">
-            <button onclick="checkPractice(2)" style="border:none; background:none; font-size:1.2rem; cursor:pointer;">✔️</button>
+            <input type="text" id="practice-2" style="flex:1; min-width:0; border:1px solid #eee; border-radius:10px; padding:9px 12px; font-family:'Noto Sans KR';" placeholder="다시 시도">
+            <button onclick="checkPractice(2)" style="border:none; background:#e8f0eb; color:#4a5d4e; border-radius:10px; padding:0 14px; font-weight:700; font-size:0.85rem; cursor:pointer; font-family:'Noto Sans KR',sans-serif; flex-shrink:0;">확인</button>
           </div>
           <div id="answer-area" style="font-size: 0.8rem; color: #4a5d4e; margin-top: 8px; display: none;"><span id="answer-text"></span></div>
         </div>
 
-        <textarea id="log-reflection" class="input-field" style="width:100%; height: 50px; resize: none;" placeholder="Reflection: 오늘 학습 성찰"></textarea>
-        <button class="btn" style="width:100%;" onclick="submitLog()">Submit</button>
+        <label style="display:block; font-size:0.85rem; font-weight:700; color:#4a5d4e; margin-bottom:6px;">🌙 Reflection — 오늘 학습 성찰</label>
+        <textarea id="log-reflection" class="input-field" style="width:100%; height: 56px; flex-shrink:0; resize: none; margin-bottom: 14px;" placeholder="오늘 공부하면서 느낀 점을 적어보세요."></textarea>
+        <button class="btn" style="width:100%; flex-shrink:0;" onclick="submitLog()">Submit</button>
       </div>
     </div>
 
@@ -700,7 +1049,7 @@
       </div>
 
       <div id="story-step-2" class="story-step">
-        <div class="step-title">Step 2. 힌트 & 수정 🛠️</div>
+        <div class="step-title">Step 2. 힌트 &amp; 수정 🛠️</div>
         <div class="readonly-box" id="ms-display-draft">나의 초안이 여기에 표시됩니다.</div>
         
         <div class="zeeto-box">
@@ -744,7 +1093,7 @@
       </div>
 
       <div id="story-step-4" class="story-step">
-        <div class="step-title">Step 4. 오류 활용 & 성찰 🌱</div>
+        <div class="step-title">Step 4. 오류 활용 &amp; 성찰 🌱</div>
         
         <div class="zeeto-box" style="border-color:#d9534f; background:#fffafa; margin-bottom: 15px;">
           <div class="zeeto-title">🚨 My Oops Point (다시 보기)</div>
@@ -755,7 +1104,7 @@
 
         <div id="error-container">
           <div class="error-new-box">
-            <textarea id="ms-error-1" class="input-field" style="width:100%; box-sizing:border-box; border-color:#d9534f; margin-bottom:4px; resize:none; line-height:1.4; background-color:#f4f4f4; color:#333;" rows="2" placeholder="Zeeto가 만든 틀린 문장이 여기에 나타납니다 👽" readonly></textarea>
+            <textarea id="ms-error-1" class="input-field" style="width:100%; box-sizing:border-box; border-color:#d9534f; margin-bottom:4px; resize:none; line-height:1.4; background-color:#f4f4f4; color:#333;" rows="2" placeholder="Zeeto가 만든 틀린 문장이 여기에 나타납니다 👽" readonly=""></textarea>
             <div style="display:flex; justify-content:flex-end; margin-bottom:8px;">
               <button onclick="regenBiumun(1)" id="ms-regen-1" style="background:none; border:1px solid #d9534f; color:#d9534f; padding:3px 8px; font-size:0.9rem; border-radius:10px; cursor:pointer; line-height:1;" title="이 비문 새로 만들기">🔁</button>
             </div>
@@ -768,7 +1117,7 @@
           </div>
 
           <div class="error-new-box">
-            <textarea id="ms-error-2" class="input-field" style="width:100%; box-sizing:border-box; border-color:#d9534f; margin-bottom:4px; resize:none; line-height:1.4; background-color:#f4f4f4; color:#333;" rows="2" placeholder="Zeeto가 만든 틀린 문장이 여기에 나타납니다 👽" readonly></textarea>
+            <textarea id="ms-error-2" class="input-field" style="width:100%; box-sizing:border-box; border-color:#d9534f; margin-bottom:4px; resize:none; line-height:1.4; background-color:#f4f4f4; color:#333;" rows="2" placeholder="Zeeto가 만든 틀린 문장이 여기에 나타납니다 👽" readonly=""></textarea>
             <div style="display:flex; justify-content:flex-end; margin-bottom:8px;">
               <button onclick="regenBiumun(2)" id="ms-regen-2" style="background:none; border:1px solid #d9534f; color:#d9534f; padding:3px 8px; font-size:0.9rem; border-radius:10px; cursor:pointer; line-height:1;" title="이 비문 새로 만들기">🔁</button>
             </div>
@@ -781,7 +1130,7 @@
           </div>
 
           <div class="error-new-box">
-            <textarea id="ms-error-3" class="input-field" style="width:100%; box-sizing:border-box; border-color:#d9534f; margin-bottom:4px; resize:none; line-height:1.4; background-color:#f4f4f4; color:#333;" rows="2" placeholder="Zeeto가 만든 틀린 문장이 여기에 나타납니다 👽" readonly></textarea>
+            <textarea id="ms-error-3" class="input-field" style="width:100%; box-sizing:border-box; border-color:#d9534f; margin-bottom:4px; resize:none; line-height:1.4; background-color:#f4f4f4; color:#333;" rows="2" placeholder="Zeeto가 만든 틀린 문장이 여기에 나타납니다 👽" readonly=""></textarea>
             <div style="display:flex; justify-content:flex-end; margin-bottom:8px;">
               <button onclick="regenBiumun(3)" id="ms-regen-3" style="background:none; border:1px solid #d9534f; color:#d9534f; padding:3px 8px; font-size:0.9rem; border-radius:10px; cursor:pointer; line-height:1;" title="이 비문 새로 만들기">🔁</button>
             </div>
@@ -845,10 +1194,6 @@
             <div class="dash-profile-emoji" id="my-profile-emoji">🍕</div>
             <div class="dash-profile-name" id="my-profile-name">지민</div>
           </div>
-          <!-- ★ V12(2026-06-09): Oops Point 다시 풀기 진입 — 기존 전체폭 가로 띠에서 프로필 아래로 이동 -->
-          <div id="oops-retry-entry" onclick="openOopsRetryModal()" class="dash-oops-btn">
-            <span>🔁 Oops 복습</span>
-          </div>
         </div>
 
         <div class="dash-stats">
@@ -858,6 +1203,11 @@
           <div class="dash-stat-box"><div class="dash-icon">💬</div><div class="dash-title">Comment</div><div class="dash-value" id="dash-comment-count">0</div></div>
         </div>
 
+      </div>
+
+      <!-- ★ 디자인 개선(2026-07-23): Oops 복습 슬림 배너 (3a) -->
+      <div id="oops-retry-entry" onclick="openOopsRetryModal()" class="dash-oops-btn">
+        <span>🔁 Oops 복습</span><span style="font-size:1rem; color:#7fa387;">›</span>
       </div>
 
       <div class="calendar-section">
@@ -944,12 +1294,14 @@
         <div class="modal-tab active" id="tab-btn-log" onclick="switchModalTab('log')">🤓 Daily Log</div>
         <div class="modal-tab" id="tab-btn-story" onclick="switchModalTab('story')">📖 My Story</div>
         <div class="modal-tab" id="tab-btn-oops" onclick="switchModalTab('oops')" style="display:none;">🔁 Oops 연습</div>
+        <div class="modal-tab" id="tab-btn-weeto" onclick="switchModalTab('weeto')" style="display:none;">👾 Weeto</div>
       </div>
 
       <div id="detail-content-penalty" style="padding-bottom:10px; display:none;"></div>
       <div id="detail-content-log" style="overflow-y:auto; padding-right:5px; padding-bottom:10px; display:none;"></div>
       <div id="detail-content-story" style="overflow-y:auto; padding-right:5px; padding-bottom:10px; display:none;"></div>
       <div id="detail-content-oops" style="overflow-y:auto; padding-right:5px; padding-bottom:10px; display:none;"></div>
+      <div id="detail-content-weeto" style="overflow-y:auto; padding-right:5px; padding-bottom:10px; display:none;"></div>
     </div>
 
   </div>
@@ -1007,10 +1359,10 @@
     <div id="t-tab-students" onclick="switchTeacherTab('students')" style="flex:1; text-align:center; padding:8px; border-radius:10px; font-size:0.8rem; font-weight:bold; cursor:pointer; color:#999;">👨‍🎓 학생</div>
     <div id="t-tab-stats" onclick="switchTeacherTab('stats')" style="flex:1; text-align:center; padding:8px; border-radius:10px; font-size:0.8rem; font-weight:bold; cursor:pointer; color:#999;">📊 통계</div>
     <div id="t-tab-notice" onclick="switchTeacherTab('notice')" style="flex:1; text-align:center; padding:8px; border-radius:10px; font-size:0.8rem; font-weight:bold; cursor:pointer; color:#999;">📢 공지</div>
-    <div id="t-tab-approve" onclick="switchTeacherTab('approve')" style="flex:1; text-align:center; padding:8px; border-radius:10px; font-size:0.8rem; font-weight:bold; cursor:pointer; color:#999;">✅ 승인</div>
+    <div id="t-tab-approve" onclick="switchTeacherTab('approve')" style="flex:1; text-align:center; padding:8px; border-radius:10px; font-size:0.8rem; font-weight:bold; cursor:pointer; color:#999;">✅ 승인 <span id="t-approve-badge" style="display:none; background:#d9534f; color:white; border-radius:9px; padding:0 6px; font-size:0.65rem; font-weight:900; vertical-align:middle;">0</span></div>
   </div>
 
-  <div style="flex:1; overflow-y:auto; padding:15px;">
+  <div class="t-content" style="flex:1; overflow-y:auto; padding:15px;">
 
     <div id="t-panel-dashboard">
   <div style="display:flex; gap:8px; margin-bottom:12px;">
@@ -1079,7 +1431,7 @@
 </div>
 
     <div id="t-panel-notice" style="display:none;">
-      <div style="background:white; border-radius:15px; padding:15px; margin-bottom:15px; border:1px solid #eee;">
+      <div class="t-notice-form" style="background:white; border-radius:15px; padding:15px; margin-bottom:15px; border:1px solid #eee;">
         <div style="font-weight:bold; color:#4a5d4e; margin-bottom:8px;">📢 학생들에게 공지 보내기</div>
         <select id="t-notice-target" class="input-field" style="width:100%; box-sizing:border-box; margin-bottom:10px;">
           <option value="전체">전체 학생</option>
@@ -1093,13 +1445,21 @@
         </label>
         <button onclick="sendNotice()" class="btn" style="width:100%; margin-bottom:0;">전송 📢</button>
       </div>
-      <div style="font-weight:bold; color:#4a5d4e; margin-bottom:8px;">📋 최근 공지 내역</div>
-      <div id="t-notice-history" style="color:#999; font-size:0.9rem;">불러오는 중...</div>
+      <div class="t-notice-history-wrap">
+        <div style="font-weight:bold; color:#4a5d4e; margin-bottom:8px;">📋 최근 공지 내역</div>
+        <div id="t-notice-history" style="color:#999; font-size:0.9rem;">불러오는 중...</div>
+      </div>
     </div>
 
     <div id="t-panel-approve" style="display:none;">
-      <div style="font-weight:bold; color:#4a5d4e; margin-bottom:12px;">✅ 가입 승인 대기 목록</div>
-      <div id="t-pending-list" style="color:#999; font-size:0.9rem;">불러오는 중...</div>
+      <div class="t-approve-col">
+        <div style="font-weight:bold; color:#4a5d4e; margin-bottom:12px;">✅ 가입 승인 대기 목록</div>
+        <div id="t-pending-list" style="color:#999; font-size:0.9rem;">불러오는 중...</div>
+      </div>
+      <div class="t-approve-col">
+        <div style="font-weight:bold; color:#4a5d4e; margin:20px 0 12px;">🙋 Weeto CLEAR 요청 대기</div>
+        <div id="t-clear-req-list" style="color:#999; font-size:0.9rem;">불러오는 중...</div>
+      </div>
     </div>
 
 
@@ -1123,6 +1483,33 @@
     </div>
     <div id="t-smodal-summary"></div>
     <div id="t-smodal-content" style="flex:1; overflow-y:auto;"></div>
+  </div>
+</div>
+
+<!-- ★ V14(2026-08-10): My Story 낭독 녹음 모달 (Step 5) -->
+<div id="ms-record-modal" style="display:none; position:absolute; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.55); z-index:3500; justify-content:center; align-items:center;">
+  <div style="width:92%; max-height:92%; background:#f9fbf9; border-radius:22px; padding:16px; box-sizing:border-box; display:flex; flex-direction:column; overflow-y:auto;">
+    <div style="background:#e8f0eb; border-radius:12px; padding:11px 13px; margin-bottom:12px; font-size:0.88rem; color:#4a5d4e; font-weight:bold; text-align:center;">🎙️ 마지막 단계! 네 이야기를 소리 내어 읽어줘</div>
+    <div style="background:white; border:1px solid #eee; border-radius:13px; padding:13px; margin-bottom:12px;">
+      <div id="msr-title" style="font-weight:900; color:#333; font-size:1rem; margin-bottom:7px;"></div>
+      <div id="msr-text" style="font-size:0.9rem; line-height:1.8; color:#444; max-height:180px; overflow-y:auto; white-space:pre-line;"></div>
+      <div style="font-size:0.72rem; color:#999; margin-top:8px;">💡 천천히, 또박또박! 다시 녹음할 수 있어요.</div>
+    </div>
+    <div style="background:white; border:1px solid #eee; border-radius:14px; padding:15px; text-align:center;">
+      <div id="msr-status" style="font-size:0.83rem; color:#888; font-weight:bold; margin-bottom:10px;">버튼을 눌러 녹음을 시작하세요</div>
+      <button id="msr-btn" onclick="msrToggle()" style="width:70px; height:70px; border-radius:50%; border:none; cursor:pointer; background:#d9534f; color:white; font-size:1.7rem; box-shadow:0 4px 14px rgba(217,83,79,0.4);">🎙️</button>
+      <div id="msr-timer" style="font-size:1.4rem; font-weight:900; color:#4a5d4e; margin:8px 0 2px;">0:00</div>
+      <div style="font-size:0.7rem; color:#aaa;">최대 3분</div>
+      <div id="msr-after" style="display:none; margin-top:12px;">
+        <audio controls id="msr-audio" style="width:100%; margin-bottom:9px;"></audio>
+        <div style="display:flex; gap:7px;">
+          <button onclick="msrReset()" style="flex:1; border:none; border-radius:11px; padding:11px; font-family:inherit; font-weight:bold; font-size:0.85rem; cursor:pointer; background:#eee; color:#555;">🔄 다시 녹음</button>
+          <button id="msr-upload-btn" onclick="msrUpload()" style="flex:1; border:none; border-radius:11px; padding:11px; font-family:inherit; font-weight:bold; font-size:0.85rem; cursor:pointer; background:#4a5d4e; color:white;">🚀 게시하기</button>
+        </div>
+      </div>
+      <div id="msr-err" style="display:none; margin-top:11px; background:#fff5f5; border:1px solid #ffcdd2; border-radius:10px; padding:9px; font-size:0.76rem; color:#c62828;"></div>
+      <div style="margin-top:11px;"><span onclick="msrSkip()" style="font-size:0.72rem; color:#aaa; text-decoration:underline; cursor:pointer;">녹음이 안 돼요 (건너뛰기)</span></div>
+    </div>
   </div>
 </div>
 
@@ -1674,7 +2061,7 @@ checkNewComments();
           document.getElementById('login-screen').classList.remove('active');
           document.getElementById('main-content').style.display = 'none';
           document.getElementById('nav-bar').style.display = 'none';
-          document.getElementById('teacher-screen').style.display = 'flex';
+          document.getElementById('teacher-screen').style.display = 'flex'; document.body.classList.add('teacher-mode');
           loadTeacherDashboard();
           return;
         }
@@ -3430,8 +3817,10 @@ checkNewComments();
         alert("⚠️ 저장에 실패했음! 작성 내용은 그대로 남아있으니 잠시 후 다시 시도해보셈 🛸");
         return;
       }
-      hideLoading(); alert("🎉 My Story가 저장되었습니다!");
-      myStories.push({ date: new Date().toISOString(), lesson: payload.lesson, grammar: payload.grammar, words: payload.reqWords, title: payload.title, draft: payload.draft, hint: payload.hint, revision: payload.revision, feedback: payload.feedback, finalStory: payload.finalStory, tip: payload.tip, oops: payload.oops, reflection: payload.reflection, corrections: payload.corrections });
+      hideLoading();
+      // ★ V14(2026-08-10): 제출 성공 → 낭독 녹음 단계(Step 5)로
+      window._msrPending = { lesson: payload.lesson, title: payload.title, finalStory: payload.finalStory };
+      myStories.push({ date: new Date().toISOString(), lesson: payload.lesson, grammar: payload.grammar, words: payload.reqWords, title: payload.title, draft: payload.draft, hint: payload.hint, revision: payload.revision, feedback: payload.feedback, finalStory: payload.finalStory, tip: payload.tip, oops: payload.oops, reflection: payload.reflection, corrections: payload.corrections , hasAudio: false });
       // ★ sessionStorage 동기화 (새로고침 착시 방지)
       const savedLogin = sessionStorage.getItem('even_login');
       if (savedLogin) { const loginData = JSON.parse(savedLogin); loginData.myStories = myStories; sessionStorage.setItem('even_login', JSON.stringify(loginData)); }
@@ -3448,6 +3837,9 @@ checkNewComments();
       document.getElementById('story-step-1').classList.add('active'); changeTab('mypage-screen');
       resetMsRetryState(); // ★ V9: 새 My Story 시작 시 재시도 카운트 초기화
       clearMyStoryDraft(); // ★ V10(2026-05-12): 임시저장 삭제 (제출 완료했으니)
+      // ★ V14: 낭독 녹음 모달 — 2학기(L5+)만. 1학기 과를 늦게 제출하는 경우엔 현행 유지
+      if (parseInt(payload.lesson, 10) >= AUDIO_FROM_LESSON) { openMsRecordModal(); }
+      else { window._msrPending = null; alert("🎉 My Story가 저장되었습니다!"); }
     })
     .catch(e => { console.error('Story submit error:', e); hideLoading(); if (submitBtn) { submitBtn.disabled = false; submitBtn.style.opacity = '1'; } alert('통신 오류가 발생했어요 😵 작성 내용은 그대로 남아있으니 다시 시도해주세요!'); });
   }
@@ -3496,7 +3888,7 @@ checkNewComments();
           cellStyle += ' background:#fffafa; border:1px solid #eee;';
         }
       }
-      calBody.innerHTML += `<div class="${classNames}" style="${cellStyle}" ${hasAnything?`onclick="showDailyRecords('${cellDateStr}')"`:''}>${i}${stampHtml}</div>`;
+      calBody.innerHTML += `<div class="${classNames}" style="${cellStyle}" ${hasAnything?`onclick="showDailyRecords('${cellDateStr}')"`:''}>${i}<div class="stamp-row">${stampHtml}</div></div>`;
     }
   }
 
@@ -3582,6 +3974,9 @@ checkNewComments();
         <div class="log-label" style="color:#c62828; margin-top:10px; margin-bottom:5px;">🚨 Oops Point</div>
         <div class="log-text" style="font-size:0.85rem; color:#c62828;">${safeSavedHtml(currentStoryData.oops || "-")}</div>
       </div>`;
+      // ★ V14: 낭독하기 / 다시 하기 (도장 상세에서 재녹음 진입) — 2학기(L5+)만. 1학기 1~4과는 현행 유지
+      if (parseInt(currentStoryData.lesson, 10) >= AUDIO_FROM_LESSON)
+      htmlStory += `<button onclick="msrOpenFromArchive('${escapeHtml(String(currentStoryData.lesson))}', decodeURIComponent('${encodeURIComponent(currentStoryData.title || '')}'))" style="width:100%; border:1.5px dashed #4a5d4e; background:#e8f0eb; color:#4a5d4e; border-radius:12px; padding:11px; font-family:inherit; font-size:0.85rem; font-weight:bold; cursor:pointer; margin-bottom:10px;">${currentStoryData.hasAudio ? '🔄 낭독 다시 하기' : '🎙️ 낭독하기 (아직 안 했어요!)'}</button>`;
       // ★ V6→V8: Oops Point 교정 내용 표시 (구형 answer / 신형 corrected+reason 호환)
       try {
         const corr = JSON.parse(currentStoryData.corrections || '[]');
@@ -3640,22 +4035,43 @@ checkNewComments();
     });
     document.getElementById('detail-content-oops').innerHTML = htmlOops;
 
+    // ★ V14(2026-08-10): Weeto 클리어 도장(👾) 상세 — 이전엔 👾만 있는 날 모달이 비어 보이던 구멍 수정
+    const dayTeaching = (myTeaching || []).filter(t => { try { return toLocalDateStr(t.clearDate) === dateStr; } catch(e) { return false; } });
+    const btnWeeto = document.getElementById('tab-btn-weeto');
+    if (btnWeeto) btnWeeto.style.display = dayTeaching.length > 0 ? 'block' : 'none';
+    let htmlWeeto = "";
+    dayTeaching.forEach((t, wIdx) => {
+      htmlWeeto += `<div class="log-detail-box" style="border:1px solid #d2e3d5; background:#f0f7f2;">
+        <div class="log-label" style="color:#4a5d4e;">👾 Weeto 가르치기 CLEAR!</div>
+        <div class="log-text" style="font-weight:bold;">Lesson ${escapeHtml(String(t.lesson || "?"))} · ${escapeHtml(String(t.grammarName || "?"))}</div>
+        <div class="log-text" style="font-size:0.8rem; color:#666; margin-top:4px;">Weeto: "고마워! Zeeto 부장님께 자랑할 거임 ✨" (+3점)</div>
+        <button onclick="loadMyTeachingChat(${wIdx}, '${escapeHtml(String(t.lesson || ""))}', decodeURIComponent('${encodeURIComponent(t.grammarName || '')}'), this)" style="width:100%; margin-top:9px; border:1px solid #d2e3d5; background:white; color:#4a5d4e; border-radius:9px; padding:8px; font-family:inherit; font-size:0.8rem; font-weight:bold; cursor:pointer;">💬 그날의 대화 보기</button>
+        <div id="weeto-day-chat-${wIdx}" style="display:none; margin-top:8px; background:white; border-radius:9px; padding:9px; max-height:220px; overflow-y:auto;"></div>
+      </div>`;
+    });
+    document.getElementById('detail-content-weeto').innerHTML = htmlWeeto;
+    // 탭바 노출 조건에 Weeto 포함 (기존 activeTypes 계산은 위에서 끝났으므로 보정)
+    const visibleTabs = [dayLogs.length, dayStories.length, dayOopsRetries.length, dayTeaching.length].filter(n => n > 0).length;
+    document.getElementById('modal-tabs').style.display = visibleTabs >= 2 ? 'flex' : 'none';
+
     document.getElementById('log-detail-modal').style.display = 'flex';
-    // 우선순위: Log → Story → Oops
+    // 우선순위: Log → Story → Oops → Weeto
     if(dayLogs.length > 0) switchModalTab('log');
     else if(dayStories.length > 0) switchModalTab('story');
     else if(dayOopsRetries.length > 0) switchModalTab('oops');
+    else if(dayTeaching.length > 0) switchModalTab('weeto');
     else {
       // 패널티만 있는 날
       document.getElementById('detail-content-log').style.display = 'none';
       document.getElementById('detail-content-story').style.display = 'none';
       document.getElementById('detail-content-oops').style.display = 'none';
+      document.getElementById('detail-content-weeto').style.display = 'none';
     }
   }
 
   function switchModalTab(type) {
     // 모든 탭 비활성화 + 모든 콘텐츠 숨김
-    ['log','story','oops'].forEach(t => {
+    ['log','story','oops','weeto'].forEach(t => {
       const btn = document.getElementById('tab-btn-' + t);
       const content = document.getElementById('detail-content-' + t);
       if (btn) btn.classList.remove('active');
@@ -4148,6 +4564,217 @@ async function openNoticeModal() {
   function openShowcase() { document.getElementById('showcase-modal').style.display = 'flex'; loadShowcasePosts(); }
   function closeShowcase() { document.getElementById('showcase-modal').style.display = 'none'; }
 
+  // ═══════ ★ V14(2026-08-10): My Story 낭독 녹음 (Step 5) ═══════
+  // Web Audio PCM 캡처 → 16kHz mono 16bit WAV 인코딩 (iOS 포함 전 기기 동일 포맷)
+  let msrCtx = null, msrStream = null, msrProc = null, msrChunks = [], msrSrcRate = 48000;
+  let msrRecording = false, msrTimerInt = null, msrSec = 0, msrBlob = null, msrUploading = false;
+  const MSR_MAX_SEC = 180;
+  const AUDIO_FROM_LESSON = 5; // ★ 낭독 기능 적용 시작 레슨 (1학기 1~4과 현행 유지)
+
+  function openMsRecordModal() {
+    if (!window._msrPending) return;
+    document.getElementById('msr-title').textContent = window._msrPending.title || '';
+    document.getElementById('msr-text').textContent = (window._msrPending.finalStory || '').replace(/<br\s*\/?>/gi, '\n');
+    msrFullReset();
+    document.getElementById('ms-record-modal').style.display = 'flex';
+  }
+  function msrFullReset() {
+    msrStopTracks(); msrChunks = []; msrBlob = null; msrSec = 0; msrRecording = false;
+    clearInterval(msrTimerInt);
+    document.getElementById('msr-timer').textContent = '0:00';
+    document.getElementById('msr-status').textContent = '버튼을 눌러 녹음을 시작하세요';
+    document.getElementById('msr-btn').textContent = '🎙️';
+    document.getElementById('msr-after').style.display = 'none';
+    document.getElementById('msr-err').style.display = 'none';
+  }
+  function msrStopTracks() {
+    try { if (msrProc) { msrProc.disconnect(); msrProc.onaudioprocess = null; } } catch(e) {}
+    try { if (msrStream) msrStream.getTracks().forEach(t => t.stop()); } catch(e) {}
+    try { if (msrCtx && msrCtx.state !== 'closed') msrCtx.close(); } catch(e) {}
+    msrProc = null; msrStream = null; msrCtx = null;
+  }
+  async function msrToggle() {
+    if (msrRecording) { msrStop(); return; }
+    const errEl = document.getElementById('msr-err');
+    errEl.style.display = 'none';
+    if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) {
+      errEl.textContent = '이 브라우저는 녹음을 지원하지 않아요 😢'; errEl.style.display = 'block'; return;
+    }
+    try {
+      msrStream = await navigator.mediaDevices.getUserMedia({ audio: true });
+      const AC = window.AudioContext || window.webkitAudioContext;
+      msrCtx = new AC();
+      if (msrCtx.state === 'suspended') await msrCtx.resume();
+      msrSrcRate = msrCtx.sampleRate;
+      const srcNode = msrCtx.createMediaStreamSource(msrStream);
+      msrProc = msrCtx.createScriptProcessor(4096, 1, 1);
+      msrChunks = [];
+      msrProc.onaudioprocess = (e) => { if (msrRecording) msrChunks.push(new Float32Array(e.inputBuffer.getChannelData(0))); };
+      srcNode.connect(msrProc); msrProc.connect(msrCtx.destination);
+      msrRecording = true; msrSec = 0;
+      document.getElementById('msr-btn').textContent = '⏹';
+      document.getElementById('msr-status').textContent = '🔴 녹음 중... 이야기를 읽어주세요';
+      document.getElementById('msr-after').style.display = 'none';
+      msrTimerInt = setInterval(() => {
+        msrSec++;
+        document.getElementById('msr-timer').textContent = Math.floor(msrSec/60) + ':' + String(msrSec%60).padStart(2,'0');
+        if (msrSec >= MSR_MAX_SEC) msrStop();
+      }, 1000);
+    } catch(e) {
+      errEl.textContent = '마이크 권한이 필요해요! 브라우저 설정에서 허용해 주세요. (' + e.name + ')';
+      errEl.style.display = 'block';
+    }
+  }
+  function msrStop() {
+    if (!msrRecording) return;
+    msrRecording = false;
+    clearInterval(msrTimerInt);
+    msrStopTracks();
+    document.getElementById('msr-btn').textContent = '🎙️';
+    if (msrSec < 3 || msrChunks.length === 0) {
+      document.getElementById('msr-status').textContent = '너무 짧아요! 다시 눌러서 녹음해 주세요';
+      msrChunks = []; return;
+    }
+    msrBlob = msrEncodeWav(msrChunks, msrSrcRate, 16000);
+    document.getElementById('msr-audio').src = URL.createObjectURL(msrBlob);
+    document.getElementById('msr-status').textContent = '녹음 완료! 들어보고 마음에 들면 게시하세요';
+    document.getElementById('msr-after').style.display = 'block';
+  }
+  function msrReset() { msrFullReset(); }
+  function msrEncodeWav(chunks, srcRate, dstRate) {
+    let total = 0; chunks.forEach(c => total += c.length);
+    const merged = new Float32Array(total);
+    let off = 0; chunks.forEach(c => { merged.set(c, off); off += c.length; });
+    // 리샘플 (선형 보간)
+    const ratio = srcRate / dstRate;
+    const outLen = Math.floor(merged.length / ratio);
+    const out = new Int16Array(outLen);
+    for (let i = 0; i < outLen; i++) {
+      const pos = i * ratio, i0 = Math.floor(pos), i1 = Math.min(i0 + 1, merged.length - 1);
+      const s = merged[i0] + (merged[i1] - merged[i0]) * (pos - i0);
+      out[i] = Math.max(-1, Math.min(1, s)) * 0x7FFF;
+    }
+    const buf = new ArrayBuffer(44 + outLen * 2);
+    const v = new DataView(buf);
+    const ws = (o, str) => { for (let i = 0; i < str.length; i++) v.setUint8(o + i, str.charCodeAt(i)); };
+    ws(0,'RIFF'); v.setUint32(4, 36 + outLen*2, true); ws(8,'WAVE'); ws(12,'fmt ');
+    v.setUint32(16,16,true); v.setUint16(20,1,true); v.setUint16(22,1,true);
+    v.setUint32(24,dstRate,true); v.setUint32(28,dstRate*2,true); v.setUint16(32,2,true); v.setUint16(34,16,true);
+    ws(36,'data'); v.setUint32(40,outLen*2,true);
+    new Int16Array(buf, 44).set(out);
+    return new Blob([buf], { type: 'audio/wav' });
+  }
+  async function msrUpload() {
+    if (msrUploading || !msrBlob || !window._msrPending) return;
+    msrUploading = true;
+    const btn = document.getElementById('msr-upload-btn');
+    btn.disabled = true; btn.textContent = '🛸 우주로 전송 중...';
+    try {
+      const b64 = await new Promise((resolve, reject) => {
+        const r = new FileReader();
+        r.onload = () => resolve(String(r.result).split(',')[1]);
+        r.onerror = reject;
+        r.readAsDataURL(msrBlob);
+      });
+      const res = await fetch(SHEET_URL, { method: 'POST', body: JSON.stringify({
+        type: 'story_upload_audio', studentId: currentStudentId, token: currentToken,
+        lesson: window._msrPending.lesson, title: window._msrPending.title, audioBase64: b64
+      }) }).then(r => r.json());
+      if (res.error) throw new Error(res.error);
+      // ★ V14: 로컬 상태에 hasAudio 반영 (도장 상세 버튼 라벨용)
+      for (let i = myStories.length - 1; i >= 0; i--) {
+        if (String(myStories[i].lesson) === String(window._msrPending.lesson) && String(myStories[i].title || '') === String(window._msrPending.title)) { myStories[i].hasAudio = true; break; }
+      }
+      try {
+        const sl = sessionStorage.getItem('even_login');
+        if (sl) { const ld = JSON.parse(sl); ld.myStories = myStories; sessionStorage.setItem('even_login', JSON.stringify(ld)); }
+      } catch(e2) {}
+      document.getElementById('ms-record-modal').style.display = 'none';
+      window._msrPending = null;
+      alert('🎉 낭독까지 완료! Showcase에 올라갔어요' + (res.tts ? ' 🎧' : ''));
+    } catch(e) {
+      const errEl = document.getElementById('msr-err');
+      errEl.textContent = '업로드 실패: ' + (e.message || '통신 오류') + ' — 다시 시도해 주세요! (스토리는 이미 저장돼 있어요)';
+      errEl.style.display = 'block';
+    }
+    btn.disabled = false; btn.textContent = '🚀 게시하기';
+    msrUploading = false;
+  }
+  // ★ V14: 학생 본인 Weeto 대화 다시 보기 (날짜 상세 👾 탭)
+  async function loadMyTeachingChat(idx, lesson, grammarName, btnEl) {
+    const box = document.getElementById('weeto-day-chat-' + idx);
+    if (!box) return;
+    if (box.style.display !== 'none') { box.style.display = 'none'; btnEl.textContent = '💬 그날의 대화 보기'; return; }
+    box.style.display = 'block';
+    btnEl.textContent = '접기 ▲';
+    box.innerHTML = '<div style="color:#999; font-size:0.78rem;">우주 기록 보관소에서 불러오는 중... 🛸</div>';
+    try {
+      const res = await fetch(SHEET_URL, { method: 'POST', body: JSON.stringify({ type: 'get_my_teaching_chat', studentId: currentStudentId, token: currentToken, lesson, grammarName }) }).then(r => r.json());
+      if (res.error) throw new Error(res.error);
+      const msgs = res.messages || [];
+      if (!msgs.length) { box.innerHTML = '<div style="color:#999; font-size:0.78rem;">대화 기록이 없어요.</div>'; return; }
+      let html = ''; let lastAttempt = null;
+      msgs.forEach(m => {
+        const at = m.attempt || 1;
+        if (at !== lastAttempt) {
+          if (lastAttempt !== null) html += '<div style="border-top:1px dashed #ddd; margin:8px 0;"></div>';
+          html += '<div style="font-size:0.68rem; color:#aaa; margin-bottom:5px;">🔁 ' + at + '번째 도전</div>';
+          lastAttempt = at;
+        }
+        const isW = m.sender === 'weeto';
+        html += '<div style="margin-bottom:6px; line-height:1.5; font-size:0.8rem; color:#444;"><b style="color:' + (isW ? '#4a5d4e' : '#333') + ';">' + (isW ? '👾 Weeto' : '🙋 나') + ':</b> ' + escapeHtml(m.message) + '</div>';
+      });
+      box.innerHTML = html;
+    } catch(e) {
+      box.innerHTML = '<div style="color:#d9534f; font-size:0.78rem;">불러오지 못했어요. 잠시 후 다시!</div>';
+    }
+  }
+
+  // ★ V14: 도장 상세에서 낭독(재녹음) 진입
+  function msrOpenFromArchive(lesson, title) {
+    let story = null;
+    for (let i = myStories.length - 1; i >= 0; i--) {
+      if (String(myStories[i].lesson) === String(lesson) && String(myStories[i].title || '') === String(title)) { story = myStories[i]; break; }
+    }
+    if (!story || !story.finalStory) { alert('스토리를 찾을 수 없어요 😢'); return; }
+    window._msrPending = { lesson: String(story.lesson), title: story.title || '', finalStory: story.finalStory };
+    const dm = document.getElementById('log-detail-modal');
+    if (dm) dm.style.display = 'none';
+    openMsRecordModal();
+  }
+
+  function msrSkip() {
+    if (!confirm('녹음 없이 넘어갈까요?\n(스토리는 이미 저장됐고, 오디오만 빠져요)')) return;
+    msrRecording = false;
+    clearInterval(msrTimerInt);
+    msrStopTracks();
+    msrChunks = []; msrBlob = null;
+    document.getElementById('ms-record-modal').style.display = 'none';
+    window._msrPending = null;
+  }
+
+  // ★ V14: Showcase 오디오 재생 (지연 로딩 — 재생 버튼 클릭 시 서버에서 base64 수신)
+  async function playShowcaseTts(fileId, btnEl) {
+    if (btnEl.dataset.loaded === '1') return;
+    btnEl.dataset.loaded = '1';
+    btnEl.textContent = '🛸 불러오는 중...';
+    try {
+      const res = await fetch(SHEET_URL + '?action=get_story_audio&fileId=' + encodeURIComponent(fileId)).then(r => r.json());
+      if (res.error || !res.base64) throw new Error(res.error || 'no data');
+      const bin = atob(res.base64);
+      const bytes = new Uint8Array(bin.length);
+      for (let i = 0; i < bin.length; i++) bytes[i] = bin.charCodeAt(i);
+      const url = URL.createObjectURL(new Blob([bytes], { type: res.mime || 'audio/wav' }));
+      const audio = document.createElement('audio');
+      audio.controls = true; audio.src = url; audio.style.cssText = 'width:100%; height:36px;';
+      btnEl.replaceWith(audio);
+      audio.play().catch(() => {});
+    } catch(e) {
+      btnEl.dataset.loaded = '0';
+      btnEl.textContent = '▶️ 이야기 듣기 (다시 시도)';
+    }
+  }
+
   async function loadShowcasePosts() {
     const feed = document.getElementById('showcase-feed');
     feed.innerHTML = '<div style="text-align:center; margin-top:50px; color:#999;">우주 서버에서 명작들을 불러오는 중... 🛸</div>';
@@ -4248,6 +4875,10 @@ async function openNoticeModal() {
 
         <div style="font-weight:bold; color:#333; font-size:1.1rem; margin-bottom:5px;">${escapeHtml(post.title)}</div>
         <div style="font-size:0.75rem; color:#666; margin-bottom:10px;">${escapeHtml(post.grammar)} | ${escapeHtml(post.words)}</div>
+        ${post.audioTts ? `<div style="background:#f4f8f5; border-radius:11px; padding:9px 11px; margin-bottom:10px;">
+          <div style="font-size:0.72rem; font-weight:bold; color:#4a5d4e; margin-bottom:5px;">🎧 이야기 듣기</div>
+          <button onclick="playShowcaseTts('${escapeHtml(post.audioTts)}', this)" style="width:100%; border:1px solid #d2e3d5; background:white; color:#4a5d4e; border-radius:9px; padding:8px; font-family:inherit; font-size:0.82rem; font-weight:bold; cursor:pointer;">▶️ 이야기 듣기</button>
+        </div>` : ''}
         <div style="font-size:0.95rem; color:#444; line-height:1.5; margin-bottom:15px; white-space:pre-wrap;">${cleanContent}</div>
 
         <div style="border-top: 1px dashed #ddd; padding-top:10px;">
@@ -4522,7 +5153,7 @@ async function enterUndercoverAsStudent(studentId, firstName, emoji) {
     document.getElementById('my-profile-name').innerText = firstName;
 
     document.getElementById('undercover-return-btn').style.display = 'block';
-    document.getElementById('teacher-screen').style.display = 'none';
+    document.getElementById('teacher-screen').style.display = 'none'; document.body.classList.remove('teacher-mode');
     document.getElementById('main-content').style.display = 'flex';
     document.getElementById('nav-bar').style.display = 'flex';
 
@@ -4563,7 +5194,7 @@ function enterAsMyself() {
   document.getElementById('my-profile-emoji').innerText = _myEmoji;
   document.getElementById('my-profile-name').innerText = (currentFirstName || '선생님');
   document.getElementById('undercover-return-btn').style.display = 'block';
-  document.getElementById('teacher-screen').style.display = 'none';
+  document.getElementById('teacher-screen').style.display = 'none'; document.body.classList.remove('teacher-mode');
   document.getElementById('main-content').style.display = 'flex';
   document.getElementById('nav-bar').style.display = 'flex';
   let banner = document.getElementById('undercover-banner');
@@ -4585,7 +5216,7 @@ function exitUndercoverMode() {
     document.getElementById('undercover-return-btn').style.display = 'none';
     document.getElementById('main-content').style.display = 'none';
     document.getElementById('nav-bar').style.display = 'none';
-    document.getElementById('teacher-screen').style.display = 'flex';
+    document.getElementById('teacher-screen').style.display = 'flex'; document.body.classList.add('teacher-mode');
     isUndercover = false;
     return;
   }
@@ -4610,7 +5241,7 @@ function exitUndercoverMode() {
   document.getElementById('undercover-return-btn').style.display = 'none';
   document.getElementById('main-content').style.display = 'none';
   document.getElementById('nav-bar').style.display = 'none';
-  document.getElementById('teacher-screen').style.display = 'flex';
+  document.getElementById('teacher-screen').style.display = 'flex'; document.body.classList.add('teacher-mode');
 }
 function switchTeacherTab(tab) {
   ['dashboard','students','stats','notice','approve'].forEach(t => {
@@ -4624,7 +5255,8 @@ function switchTeacherTab(tab) {
   });
   const panel = document.getElementById(`t-panel-${tab}`);
   const tabEl = document.getElementById(`t-tab-${tab}`);
-  if (panel) panel.style.display = 'block';
+  if (panel) panel.style.display = ''; // ★ V13: 인라인 display 제거 → CSS(그리드 등)가 결정
+  if (panel) panel.classList.add('t-panel-on');
   if (tabEl) {
     tabEl.style.background = 'white';
     tabEl.style.color = '#4a5d4e';
@@ -4632,7 +5264,77 @@ function switchTeacherTab(tab) {
   if (tab === 'students' && allStudentsData.length === 0) loadAllStudents();
   if (tab === 'stats') loadStats();
   if (tab === 'notice') loadNoticeHistory();
-  if (tab === 'approve') loadPendingUsers();
+  if (tab === 'approve') { loadPendingUsers(); loadClearRequests(); }
+}
+
+// ★ V13(2026-08-09): Weeto CLEAR 요청 대기 목록
+async function loadClearRequests() {
+  const container = document.getElementById('t-clear-req-list');
+  container.innerHTML = '<div style="text-align:center; color:#999;">불러오는 중...</div>';
+  try {
+    const list = await fetch(SHEET_URL, { method: 'POST', body: JSON.stringify({ type: "get_clear_requests", id: currentLoginId, pw: teacherPw }) }).then(r => r.json());
+    if (list.error) { container.innerHTML = '<div style="text-align:center;color:#d9534f;">' + escapeHtml(list.error) + '</div>'; return; }
+    const badge = document.getElementById('t-approve-badge');
+    if (badge) { if (list.length > 0) { badge.textContent = list.length; badge.style.display = 'inline-block'; } else { badge.style.display = 'none'; } }
+    if (!list.length) { container.innerHTML = '<div style="text-align:center; color:#999; padding:20px;">대기 중인 CLEAR 요청이 없어요.</div>'; return; }
+    let html = '';
+    list.forEach((q, i) => {
+      html += `<div style="background:white;border-radius:14px;padding:13px 14px;margin-bottom:10px;border:1px solid #eee;">
+        <div style="display:flex;justify-content:space-between;align-items:center;">
+          <div style="font-weight:bold;color:#333;">${q.emoji} ${escapeHtml(q.lastName || '')}${escapeHtml(q.firstName)} <span style="font-weight:normal;color:#999;font-size:0.78rem;">(${escapeHtml(q.studentId)})</span></div>
+          <div style="font-size:0.72rem;color:#999;">${escapeHtml(q.requestDate)}</div>
+        </div>
+        <div style="margin-top:6px;"><span style="background:#e8f0eb;color:#4a5d4e;font-size:0.74rem;font-weight:bold;border-radius:8px;padding:3px 9px;">L${escapeHtml(String(q.lesson))} · ${escapeHtml(q.grammarName)}</span> <span style="font-size:0.72rem;color:#888;">시도 ${q.attempt}</span></div>
+        <div style="display:flex;gap:6px;margin-top:10px;">
+          <button onclick="toggleClearReqChat(${i}, '${escapeHtml(q.studentId)}', '${escapeHtml(String(q.lesson))}', decodeURIComponent('${encodeURIComponent(q.grammarName)}'), ${q.attempt})" style="flex:1;background:#eee;color:#555;border:none;border-radius:9px;padding:8px;font-size:0.78rem;font-weight:bold;cursor:pointer;">💬 대화 보기</button>
+          <button onclick="processClearRequest(${q.rowIndex}, 'approve')" style="flex:1;background:#4a5d4e;color:white;border:none;border-radius:9px;padding:8px;font-size:0.78rem;font-weight:bold;cursor:pointer;">✅ 수락</button>
+          <button onclick="openClearReqReject(${i}, ${q.rowIndex})" style="flex:1;background:#ffebee;color:#c62828;border:none;border-radius:9px;padding:8px;font-size:0.78rem;font-weight:bold;cursor:pointer;">거부</button>
+        </div>
+        <div id="cr-chat-${i}" style="display:none;margin-top:9px;background:#f4f8f5;border-radius:10px;padding:10px;max-height:220px;overflow-y:auto;font-size:0.78rem;color:#999;">로딩 중...</div>
+        <div id="cr-reject-${i}" style="display:none;margin-top:9px;">
+          <textarea id="cr-reject-memo-${i}" placeholder="한 줄 코멘트 (선택) — 학생에게 표시돼요" style="width:100%;box-sizing:border-box;border:1px solid #ddd;border-radius:9px;padding:8px 10px;font-family:inherit;font-size:0.78rem;resize:none;height:52px;"></textarea>
+          <div style="display:flex;gap:6px;margin-top:6px;">
+            <button onclick="processClearRequest(${q.rowIndex}, 'reject', document.getElementById('cr-reject-memo-${i}').value)" style="flex:1;background:#c62828;color:white;border:none;border-radius:9px;padding:7px;font-size:0.75rem;font-weight:bold;cursor:pointer;">거부 확정</button>
+            <button onclick="document.getElementById('cr-reject-${i}').style.display='none'" style="flex:1;background:#eee;color:#555;border:none;border-radius:9px;padding:7px;font-size:0.75rem;font-weight:bold;cursor:pointer;">취소</button>
+          </div>
+        </div>
+      </div>`;
+    });
+    container.innerHTML = html;
+  } catch(e) { container.innerHTML = '<div style="text-align:center;color:#d9534f;">불러오기 실패</div>'; }
+}
+
+async function toggleClearReqChat(i, studentId, lesson, grammarName, attempt) {
+  const box = document.getElementById('cr-chat-' + i);
+  if (!box) return;
+  if (box.style.display !== 'none') { box.style.display = 'none'; return; }
+  box.style.display = 'block';
+  box.innerHTML = '로딩 중...';
+  try {
+    const res = await fetch(SHEET_URL, { method: 'POST', body: JSON.stringify({ type: "get_teaching_chat", id: currentLoginId, pw: teacherPw, studentId, lesson, grammarName, attempt }) }).then(r => r.json());
+    const msgs = res.messages || [];
+    if (!msgs.length) { box.innerHTML = '<div style="color:#999;">대화 기록이 없어요.</div>'; return; }
+    box.innerHTML = msgs.map(m => {
+      const who = m.sender === 'weeto' ? '👾 Weeto' : '🧑 학생';
+      const col = m.sender === 'weeto' ? '#4a5d4e' : '#333';
+      return '<div style="margin-bottom:6px;line-height:1.5;color:#444;"><b style="color:' + col + ';">' + who + ':</b> ' + escapeHtml(m.message) + '</div>';
+    }).join('');
+  } catch(e) { box.innerHTML = '<div style="color:#d9534f;">대화를 불러오지 못했어요.</div>'; }
+}
+
+function openClearReqReject(i, rowIndex) {
+  const el = document.getElementById('cr-reject-' + i);
+  if (el) el.style.display = 'block';
+}
+
+async function processClearRequest(rowIndex, decision, comment) {
+  const label = decision === 'approve' ? '수락' : '거부';
+  if (decision === 'approve' && !confirm('이 요청을 수락할까요?\n가르치기 진행일에 도장이 찍혀요.')) return;
+  try {
+    const res = await fetch(SHEET_URL, { method: 'POST', body: JSON.stringify({ type: "process_clear_request", id: currentLoginId, pw: teacherPw, rowIndex, decision, comment: comment || "" }) }).then(r => r.json());
+    if (res.error) { alert(res.error); return; }
+    loadClearRequests();
+  } catch(e) { alert(label + ' 처리에 실패했어요.'); }
 }
 
 // ★ 가입 승인 대기 목록
@@ -4677,6 +5379,18 @@ async function loadTeacherDashboard() {
   const today = toLocalDateStr(new Date());
   document.getElementById('dash-log-date').value = today;
   switchDashTab('log');
+  refreshClearReqBadge();
+}
+
+// ★ V13(2026-08-09): 승인 탭 배지 — 대기 중 CLEAR 요청 수
+async function refreshClearReqBadge() {
+  try {
+    const list = await fetch(SHEET_URL, { method: 'POST', body: JSON.stringify({ type: "get_clear_requests", id: currentLoginId, pw: teacherPw }) }).then(r => r.json());
+    const badge = document.getElementById('t-approve-badge');
+    if (!badge || !Array.isArray(list)) return;
+    if (list.length > 0) { badge.textContent = list.length; badge.style.display = 'inline-block'; }
+    else { badge.style.display = 'none'; }
+  } catch(e) {}
 }
 
 function switchDashTab(tab) {
@@ -5569,6 +6283,7 @@ function tryRestoreWeetoSession() {
   });
   const input = document.getElementById('weeto-chat-input');
   if (input) { input.disabled = false; input.placeholder = '이어서 답해주세요...'; input.focus(); }
+  updateClearReqBtn();
   // 세션은 GG/CLEAR 시 클리어되거나 다음 이탈 시 갱신됨
 }
 
@@ -5576,6 +6291,56 @@ function tryRestoreWeetoSession() {
 function clearWeetoSession() {
   const sessionKey = '_weetoActiveSession_' + (currentStudentId || 'guest');
   try { sessionStorage.removeItem(sessionKey); } catch(e) {}
+}
+
+// ★ V13(2026-08-09): 선생님께 CLEAR 요청 — 버튼 표시 갱신 (학생 발언 1회 이상일 때만)
+function updateClearReqBtn() {
+  const area = document.getElementById('weeto-clear-req-area');
+  if (!area) return;
+  const hasStudentMsg = weetoChatHistory.some(h => h.role === '학생');
+  area.style.display = hasStudentMsg ? 'block' : 'none';
+}
+
+// ★ V13: 선생님께 CLEAR 요청 보내기 — 요청 즉시 세션 종료, 해당 문법은 확인 중 상태로 잠김
+let isClearReqSending = false;
+async function requestTeacherClear() {
+  if (isClearReqSending || !currentWeeetoGrammar) return;
+  if (!confirm('선생님께 CLEAR 판정을 요청할까요?\n요청하면 이 대화는 여기서 끝나고, 선생님 확인 후 결과를 알려드려요!')) return;
+  isClearReqSending = true;
+  try {
+    const res = await fetch(SHEET_URL, {
+      method: 'POST',
+      body: JSON.stringify({
+        type: 'clear_request', studentId: currentStudentId, token: currentToken,
+        lesson: currentWeeetoGrammar.lesson, grammarName: currentWeeetoGrammar.grammarName,
+        attempt: currentWeetoAttempt
+      })
+    }).then(r => r.json());
+    if (res.error) { alert(res.error); isClearReqSending = false; return; }
+    alert('🙋 선생님께 CLEAR 요청을 보냈어요!\n선생님이 확인하면 도장이 찍혀요.');
+    clearWeetoSession();
+    weetoChatHistory = [];
+    currentWeeetoGrammar = null;
+    document.getElementById('weeto-chat').style.display = 'none';
+    document.getElementById('weeto-grammar-select').style.display = 'flex';
+    loadGrammarList();
+  } catch(e) {
+    alert('요청을 보내지 못했어요. 잠시 후 다시 시도해 주세요.');
+  }
+  isClearReqSending = false;
+}
+
+// ★ V13: CLEAR 요청 취소 (문법 목록에서)
+async function cancelClearRequest(grammarName, lesson) {
+  if (!confirm('요청을 취소하고 다시 도전할까요?')) return;
+  try {
+    const res = await fetch(SHEET_URL, {
+      method: 'POST',
+      body: JSON.stringify({ type: 'clear_request_cancel', studentId: currentStudentId, token: currentToken, lesson, grammarName })
+    }).then(r => r.json());
+    if (res.error) { alert(res.error); return; }
+    loadGrammarList();
+  } catch(e) { alert('취소하지 못했어요. 잠시 후 다시 시도해 주세요.'); }
 }
 
 function backToAliens() {
@@ -5617,6 +6382,7 @@ async function loadGrammarList() {
     weetoGrammarList = res.myGrammar || [];
     weetoClearedList = res.cleared || [];
     window._weetoAttemptCounts = res.attemptCounts || {};
+    window._weetoClearRequests = res.clearRequests || [];
     renderGrammarList();
   } catch(e) {
     listEl.innerHTML = '<h3>오류</h3><p style="text-align:center;color:red;">문법 데이터를 불러올 수 없어요.</p>';
@@ -5636,9 +6402,25 @@ function renderGrammarList() {
     html += '<div class="lesson-title">📚 Lesson ' + lesson + '</div>';
     lessons[lesson].forEach(g => {
       const isCleared = weetoClearedList.some(c => String(c.lesson) === String(g.lesson) && c.grammarName === g.grammarName);
+      // ★ V13(2026-08-09): 선생님 CLEAR 요청 상태 반영
+      const req = (window._weetoClearRequests || []).find(r => String(r.lesson) === String(g.lesson) && r.grammarName === g.grammarName);
+      const isPending = !isCleared && req && req.status === 'pending';
+      const isRejected = !isCleared && req && req.status === 'rejected';
+      if (isPending) {
+        html += '<div class="grammar-item req-pending" data-grammar="' + encodeURIComponent(g.grammarName) + '" data-lesson="' + g.lesson + '">';
+        html += '<span class="grammar-name">' + escapeHtml(g.grammarName) + '</span>';
+        html += '<span class="grammar-status" style="color:#8a6d1a;">확인 중 ⏳</span>';
+        html += '<div class="gr-pending-box"><div class="gp-msg">👩‍🏫 선생님이 확인 중이에요...</div>';
+        html += '<span class="gp-cancel" onclick="event.stopPropagation(); cancelClearRequest(decodeURIComponent(this.closest(\'.grammar-item\').dataset.grammar), this.closest(\'.grammar-item\').dataset.lesson)">요청 취소하고 다시 도전하기</span></div>';
+        html += '</div>';
+        return;
+      }
       html += '<div class="grammar-item ' + (isCleared ? 'cleared' : '') + '" data-grammar="' + encodeURIComponent(g.grammarName) + '" data-lesson="' + g.lesson + '" onclick="startTeaching(decodeURIComponent(this.dataset.grammar), this.dataset.lesson)">';
       html += '<span class="grammar-name">' + (isCleared ? '✅ ' : '') + escapeHtml(g.grammarName) + '</span>';
       html += '<span class="grammar-status ' + (isCleared ? 'done' : 'new') + '">' + (isCleared ? '클리어!' : '도전 →') + '</span>';
+      if (isRejected && req.comment) {
+        html += '<div class="gr-reject-note">👩‍🏫 ' + escapeHtml(req.comment) + '</div>';
+      }
       html += '</div>';
     });
     html += '</div>';
@@ -5664,6 +6446,7 @@ function startTeaching(grammarName, lesson) {
   document.getElementById('weeto-chat-input').value = '';
   document.getElementById('weeto-chat-input').disabled = true;
   document.getElementById('weeto-chat-input').placeholder = 'Weeto가 인사하는 중...';
+  updateClearReqBtn();
   // Send initial message from Weeto (입력창은 sendWeetoAuto 완료 후 활성화됨)
   sendWeetoAuto('(첫 만남 - 자기소개하고 이 문법 배우고 싶다고 해줘)');
 }
@@ -5799,6 +6582,7 @@ async function sendWeeto() {
   // 학생 메시지 화면 + 히스토리에 추가
   appendWeetoMessage('sent', text);
   weetoChatHistory.push({ role: '학생', text });
+  updateClearReqBtn();
 
   await sendWeetoAuto(text);
   isWeetoSending = false;
@@ -5979,5 +6763,6 @@ function retryTeachingGG() {
 })();
 
 </script>
-</body>
-</html>
+
+
+</body></html>
