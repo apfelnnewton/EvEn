@@ -736,7 +736,7 @@
   /* 승인: 가입 승인 + CLEAR 요청 2단 배치 */
   body.teacher-mode #t-panel-approve {
     display: grid;
-    grid-template-columns: 1fr 1fr;
+    grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
     gap: 20px;
     align-items: start;
   }
@@ -1460,6 +1460,10 @@
         <div style="font-weight:bold; color:#4a5d4e; margin:20px 0 12px;">🙋 Weeto CLEAR 요청 대기</div>
         <div id="t-clear-req-list" style="color:#999; font-size:0.9rem;">불러오는 중...</div>
       </div>
+      <div class="t-approve-col">
+        <div style="font-weight:bold; color:#4a5d4e; margin:20px 0 12px;">🖼️ 힌트 이미지 승인 대기</div>
+        <div id="t-image-list" style="color:#999; font-size:0.9rem;">불러오는 중...</div>
+      </div>
     </div>
 
 
@@ -1502,6 +1506,11 @@
       <div style="font-size:0.7rem; color:#aaa;">최대 3분</div>
       <div id="msr-after" style="display:none; margin-top:12px;">
         <audio controls id="msr-audio" style="width:100%; margin-bottom:9px;"></audio>
+        <button id="msr-fb-btn" onclick="msrGetFeedback()" style="width:100%; border:1.5px dashed #4a5d4e; background:#e8f0eb; color:#4a5d4e; border-radius:11px; padding:10px; font-family:inherit; font-weight:bold; font-size:0.85rem; cursor:pointer; margin-bottom:8px;">👽 Zeeto 피드백 받기 (선택)</button>
+        <div id="msr-fb-result" style="display:none; text-align:left; margin-bottom:9px;"></div>
+        <div id="msr-tts-area" style="display:none; margin-bottom:9px;">
+          <button id="msr-tts-btn" onclick="msrPlayTts()" style="width:100%; border:1px solid #d2e3d5; background:#f0f7f2; color:#4a5d4e; border-radius:11px; padding:10px; font-family:inherit; font-weight:bold; font-size:0.85rem; cursor:pointer;">🔊 Deeto 낭독 듣기</button>
+        </div>
         <div style="display:flex; gap:7px;">
           <button onclick="msrReset()" style="flex:1; border:none; border-radius:11px; padding:11px; font-family:inherit; font-weight:bold; font-size:0.85rem; cursor:pointer; background:#eee; color:#555;">🔄 다시 녹음</button>
           <button id="msr-upload-btn" onclick="msrUpload()" style="flex:1; border:none; border-radius:11px; padding:11px; font-family:inherit; font-weight:bold; font-size:0.85rem; cursor:pointer; background:#4a5d4e; color:white;">🚀 게시하기</button>
@@ -4586,6 +4595,12 @@ async function openNoticeModal() {
     document.getElementById('msr-btn').textContent = '🎙️';
     document.getElementById('msr-after').style.display = 'none';
     document.getElementById('msr-err').style.display = 'none';
+    const fbR = document.getElementById('msr-fb-result');
+    if (fbR) { fbR.style.display = 'none'; fbR.innerHTML = ''; }
+    const fbB = document.getElementById('msr-fb-btn');
+    if (fbB) { fbB.disabled = false; fbB.textContent = '👽 Zeeto 피드백 받기 (선택)'; fbB.style.display = 'block'; }
+    const ttsA = document.getElementById('msr-tts-area');
+    if (ttsA) { ttsA.style.display = 'none'; ttsA.innerHTML = '<button id="msr-tts-btn" onclick="msrPlayTts()" style="width:100%; border:1px solid #d2e3d5; background:#f0f7f2; color:#4a5d4e; border-radius:11px; padding:10px; font-family:inherit; font-weight:bold; font-size:0.85rem; cursor:pointer;">🔊 Deeto 낭독 듣기</button>'; }
   }
   function msrStopTracks() {
     try { if (msrProc) { msrProc.disconnect(); msrProc.onaudioprocess = null; } } catch(e) {}
@@ -4664,6 +4679,105 @@ async function openNoticeModal() {
     new Int16Array(buf, 44).set(out);
     return new Blob([buf], { type: 'audio/wav' });
   }
+  // ★ V15(2026-08-10): Zeeto 낭독 피드백 (3단계 A-레이어, 스토리당 3회)
+  let msrFbBusy = false;
+  async function msrGetFeedback() {
+    if (msrFbBusy || !msrBlob || !window._msrPending) return;
+    msrFbBusy = true;
+    const btn = document.getElementById('msr-fb-btn');
+    const panel = document.getElementById('msr-fb-result');
+    btn.disabled = true; btn.textContent = '👽 Zeeto가 듣는 중... 🛸';
+    try {
+      const b64 = await new Promise((resolve, reject) => {
+        const r = new FileReader();
+        r.onload = () => resolve(String(r.result).split(',')[1]);
+        r.onerror = reject; r.readAsDataURL(msrBlob);
+      });
+      const res = await fetch(SHEET_URL, { method: 'POST', body: JSON.stringify({
+        type: 'story_read_feedback', studentId: currentStudentId, token: currentToken,
+        lesson: window._msrPending.lesson, title: window._msrPending.title, audioBase64: b64
+      }) }).then(r => r.json());
+      if (res.error) {
+        panel.style.display = 'block';
+        panel.innerHTML = '<div style="background:' + (res.soft ? '#fff8e1' : '#fff5f5') + '; border-radius:10px; padding:10px; font-size:0.8rem; color:' + (res.soft ? '#8a6d1a' : '#c62828') + ';">' + escapeHtml(res.error) + '</div>';
+        btn.disabled = false; btn.textContent = res.exhausted ? '피드백 3회 사용 완료' : '👽 다시 시도하기';
+        if (res.exhausted) btn.disabled = true;
+        document.getElementById('msr-tts-area').style.display = 'block'; // 소진·실패여도 모범 낭독은 들을 수 있게
+        msrFbBusy = false; return;
+      }
+      panel.style.display = 'block';
+      panel.innerHTML = msrRenderFeedback(res);
+      btn.style.display = 'none';
+      document.getElementById('msr-tts-area').style.display = 'block'; // ★ 피드백 후 모범 낭독 듣기 공개
+    } catch(e) {
+      panel.style.display = 'block';
+      panel.innerHTML = '<div style="background:#fff8e1; border-radius:10px; padding:10px; font-size:0.8rem; color:#8a6d1a;">우주 통신 불량임 🛸 일단 게시해도 괜찮아요!</div>';
+      btn.disabled = false; btn.textContent = '👽 다시 시도하기';
+    }
+    msrFbBusy = false;
+  }
+
+  function msrRenderFeedback(fb) {
+    const story = (window._msrPending.finalStory || '').replace(/<br\s*\/?>/gi, ' ').replace(/<[^>]+>/g, ' ');
+    const missed = (fb.missedWords || []).map(w => String(w).toLowerCase());
+    const misreadMap = {};
+    (fb.misreadWords || []).forEach(m => { if (m && m.expected) misreadMap[String(m.expected).toLowerCase()] = String(m.heard || ''); });
+    const usedMissed = {}, usedMisread = {};
+    const tokens = story.split(/(\s+)/).map(t => {
+      const w = t.replace(/[^A-Za-z']/g, '').toLowerCase();
+      if (!w) return escapeHtml(t);
+      if (misreadMap[w] !== undefined && !usedMisread[w]) {
+        usedMisread[w] = 1;
+        const heardNote = misreadMap[w] ? ' →"' + escapeHtml(misreadMap[w]) + '"로 들렸음' : ' →발음 연습!';
+        return '<span style="background:#ffebee; color:#c62828; border-radius:4px; padding:0 3px;">' + escapeHtml(t) + '</span><span style="font-size:0.68rem; color:#c62828; font-weight:bold;">' + heardNote + '</span>';
+      }
+      if (missed.includes(w) && !usedMissed[w]) {
+        usedMissed[w] = 1;
+        return '<span style="background:#fff3cd; border-radius:4px; padding:0 3px;">' + escapeHtml(t) + '</span>';
+      }
+      return escapeHtml(t);
+    });
+    const missCnt = (fb.missedWords || []).length, misCnt = (fb.misreadWords || []).length;
+    const summary = (missCnt === 0 && misCnt === 0)
+      ? '<span style="background:#e8f0eb; color:#4a5d4e; border-radius:8px; padding:3px 9px; font-size:0.72rem; font-weight:bold;">✨ 완벽하게 다 읽었음!</span>'
+      : '<span style="background:#fff3cd; color:#8a6d1a; border-radius:8px; padding:3px 9px; font-size:0.72rem; font-weight:bold;">건너뜀 ' + missCnt + '</span> <span style="background:#ffebee; color:#c62828; border-radius:8px; padding:3px 9px; font-size:0.72rem; font-weight:bold;">다르게 들림 ' + misCnt + '</span>';
+    return '<div style="background:white; border:1px solid #eee; border-radius:11px; padding:11px;">' +
+      '<div style="margin-bottom:7px;">' + summary + ' <span style="font-size:0.68rem; color:#aaa;">피드백 ' + (fb.remaining >= 0 ? fb.remaining : 0) + '회 남음</span></div>' +
+      '<div style="font-size:0.85rem; line-height:1.9; color:#444; max-height:150px; overflow-y:auto;">' + tokens.join('') + '</div>' +
+      '</div>' +
+      '<div style="background:#e8f0eb; border-radius:11px; padding:10px 12px; margin-top:7px;">' +
+      '<div style="font-weight:bold; color:#4a5d4e; font-size:0.78rem; margin-bottom:4px;">👽 Zeeto</div>' +
+      '<div style="font-size:0.82rem; color:#3d4f41; line-height:1.6;">' + escapeHtml(fb.praise || '') + '<br>' + escapeHtml(fb.tip || '') + '</div>' +
+      '</div>';
+  }
+
+  // ★ V15: 모범 낭독(TTS) 미리 듣기 — 서버가 없으면 생성해서 캐시
+  let msrTtsBusy = false;
+  async function msrPlayTts() {
+    if (msrTtsBusy || !window._msrPending) return;
+    msrTtsBusy = true;
+    const btn = document.getElementById('msr-tts-btn');
+    if (btn) { btn.disabled = true; btn.textContent = '🛸 Deeto 부르는 중...'; }
+    try {
+      const res = await fetch(SHEET_URL, { method: 'POST', body: JSON.stringify({
+        type: 'story_get_tts', studentId: currentStudentId, token: currentToken,
+        lesson: window._msrPending.lesson, title: window._msrPending.title
+      }) }).then(r => r.json());
+      if (res.error || !res.fileId) throw new Error(res.error || 'no file');
+      const au = await fetch(SHEET_URL + '?action=get_story_audio&fileId=' + encodeURIComponent(res.fileId)).then(r => r.json());
+      if (au.error || !au.base64) throw new Error(au.error || 'no audio');
+      const bin = atob(au.base64);
+      const bytes = new Uint8Array(bin.length);
+      for (let i = 0; i < bin.length; i++) bytes[i] = bin.charCodeAt(i);
+      const url = URL.createObjectURL(new Blob([bytes], { type: au.mime || 'audio/wav' }));
+      const area = document.getElementById('msr-tts-area');
+      area.innerHTML = '<div style="background:#f0f7f2; border:1px solid #d2e3d5; border-radius:11px; padding:9px 11px;"><div style="font-size:0.72rem; font-weight:bold; color:#4a5d4e; margin-bottom:5px;">🎙️ Deeto의 낭독</div><audio controls autoplay style="width:100%; height:36px;" src="' + url + '"></audio><div style="font-size:0.7rem; color:#889; margin-top:5px;">Deeto처럼 따라 읽어보고 🔄 다시 녹음에 도전해보셈!</div></div>';
+    } catch(e) {
+      if (btn) { btn.disabled = false; btn.textContent = '🔊 Deeto 낭독 듣기 (다시 시도)'; }
+    }
+    msrTtsBusy = false;
+  }
+
   async function msrUpload() {
     if (msrUploading || !msrBlob || !window._msrPending) return;
     msrUploading = true;
@@ -4779,7 +4893,11 @@ async function openNoticeModal() {
     const feed = document.getElementById('showcase-feed');
     feed.innerHTML = '<div style="text-align:center; margin-top:50px; color:#999;">우주 서버에서 명작들을 불러오는 중... 🛸</div>';
     try {
-      const res = await fetch(SHEET_URL + "?action=get_showcase&t=" + new Date().getTime());
+      // ★ V15-2단계: 뷰어 인증 포함 조회 (게이팅 판정은 서버가)
+      const res = await fetch(SHEET_URL, { method: 'POST', body: JSON.stringify({
+        type: "get_showcase2", studentId: currentStudentId, token: currentToken,
+        teacherId: ((isTeacherSelf || isUndercover) ? currentLoginId : ""), teacherPw: ((isTeacherSelf || isUndercover) ? teacherPw : "")
+      }) });
       allShowcasePosts = await res.json();
       renderShowcase();
     } catch(e) {
@@ -4832,6 +4950,9 @@ async function openNoticeModal() {
         
         let pBg = pIsMe ? "background:#d2e3d5;" : "background:#f4f4f4;";
         let pBadge = pIsAuthor ? `<span style="font-size:0.7rem; color:#4a5d4e; font-weight:bold; border:1px solid #4a5d4e; padding:1px 4px; border-radius:4px; margin-left:3px;">글쓴이</span>` : "";
+        // ★ V15-2단계: 1st(추측)/2nd(noticing) 단계 칩
+        if (p.stage === 'guess') pBadge += ` <span style="font-size:0.68rem; background:#fff3cd; color:#8a6d1a; font-weight:bold; padding:1px 5px; border-radius:5px;">1st 추측</span>`;
+        else if (p.stage === 'response') pBadge += ` <span style="font-size:0.68rem; background:#e8f0eb; color:#4a5d4e; font-weight:bold; padding:1px 5px; border-radius:5px;">2nd</span>`;
 
         // 1. 원댓글 그리기
         commentHtml += `
@@ -4866,6 +4987,42 @@ async function openNoticeModal() {
       postDiv.style.cssText = `background: ${bgStyle}; margin-bottom: 15px; border-radius: 15px; border: ${borderStyle}; padding: 15px; box-shadow: 0 4px 10px rgba(0,0,0,0.03);`;
       const cleanContent = formatForShowcase(post.content);
 
+      // ★ V15-2단계: 게이팅 상태별 본문/오디오 구성
+      const gatedView = !!post.gated;
+      // ★ V15-4단계: 힌트 이미지 (승인된 것만 imageId 도착, 없으면 L5+에 우주 플레이스홀더)
+      let imgHtml = '';
+      if (post.imageId) {
+        const imgElId = 'scimg-' + escapeHtml(post.id);
+        imgHtml = `<div style="margin-bottom:10px;"><img id="${imgElId}" alt="이야기 힌트 그림" style="width:100%; border-radius:12px; display:none;"><div id="${imgElId}-ld" style="background:#f4f8f5; border-radius:12px; padding:22px; text-align:center; font-size:0.78rem; color:#889;">🛸 힌트 그림 불러오는 중...</div></div>`;
+        if (!window._scImgQueue) window._scImgQueue = [];
+        window._scImgQueue.push({ fileId: post.imageId, elId: imgElId });
+      } else if (post.gateApplies) {
+        imgHtml = `<div style="margin-bottom:10px; background:linear-gradient(135deg,#e8f0eb,#d2e3d5); border-radius:12px; padding:26px 10px; text-align:center;"><div style="font-size:2rem;">🛸📖✨</div><div style="font-size:0.72rem; color:#7a8d7e; margin-top:4px;">힌트 그림 준비 중</div></div>`;
+      }
+      let bodyHtml = imgHtml;
+      if (gatedView) {
+        bodyHtml += `
+        ${post.audioTts ? `<div style="background:#f4f8f5; border-radius:11px; padding:9px 11px; margin-bottom:10px;">
+          <div style="font-size:0.72rem; font-weight:bold; color:#4a5d4e; margin-bottom:5px;">🎧 이야기 듣기</div>
+          <button onclick="playShowcaseTts('${escapeHtml(post.audioTts)}', this)" style="width:100%; border:1px solid #d2e3d5; background:white; color:#4a5d4e; border-radius:9px; padding:8px; font-family:inherit; font-size:0.82rem; font-weight:bold; cursor:pointer;">▶️ 이야기 듣기</button>
+        </div>` : `<div style="background:#f4f8f5; border-radius:11px; padding:9px 11px; margin-bottom:10px; font-size:0.78rem; color:#888;">🔇 이 스토리는 오디오가 없어요 — 제목으로 추측해봐요!</div>`}
+        <div style="background:#fff8e1; border:1.5px dashed #ffe082; border-radius:12px; padding:13px; margin-bottom:15px; text-align:center;">
+          <div style="font-size:1.4rem; margin-bottom:4px;">🔒🛸</div>
+          <div style="font-size:0.85rem; font-weight:bold; color:#8a6d1a;">어떤 이야기일까?</div>
+          <div style="font-size:0.76rem; color:#a08420; margin-top:3px;">제목과 소리만 듣고 <b>1st 추측 댓글</b>을 남기면<br>본문과 작가의 진짜 목소리가 열려요!</div>
+        </div>`;
+      } else {
+        bodyHtml += `
+        ${post.audioTts ? `<div style="background:#f4f8f5; border-radius:11px; padding:9px 11px; margin-bottom:10px;">
+          <div style="font-size:0.72rem; font-weight:bold; color:#4a5d4e; margin-bottom:5px;">🎧 이야기 듣기</div>
+          <button onclick="playShowcaseTts('${escapeHtml(post.audioTts)}', this)" style="width:100%; border:1px solid #d2e3d5; background:white; color:#4a5d4e; border-radius:9px; padding:8px; font-family:inherit; font-size:0.82rem; font-weight:bold; cursor:pointer;">▶️ 이야기 듣기</button>
+        </div>` : ''}
+        <div style="font-size:0.95rem; color:#444; line-height:1.5; margin-bottom:${post.audioReal ? '10px' : '15px'}; white-space:pre-wrap;">${cleanContent}</div>
+        ${post.audioReal ? `<div style="background:#f0f7f2; border:1px solid #d2e3d5; border-radius:11px; padding:9px 11px; margin-bottom:15px;">
+          <div style="font-size:0.72rem; font-weight:bold; color:#4a5d4e; margin-bottom:5px;">🎤 작가의 진짜 목소리</div>
+          <button onclick="playShowcaseTts('${escapeHtml(post.audioReal)}', this)" style="width:100%; border:1px solid #d2e3d5; background:white; color:#4a5d4e; border-radius:9px; padding:8px; font-family:inherit; font-size:0.82rem; font-weight:bold; cursor:pointer;">▶️ 진짜 목소리 듣기</button>
+        </div>` : ''}`;
+      }
       postDiv.innerHTML = `
         <div style="display:flex; justify-content:space-between; margin-bottom:8px;">
           <span style="font-size:0.75rem; background:#4a5d4e; color:white; padding:3px 8px; border-radius:10px; font-weight:bold;">Lesson ${escapeHtml(String(post.lesson))}</span>
@@ -4875,18 +5032,15 @@ async function openNoticeModal() {
 
         <div style="font-weight:bold; color:#333; font-size:1.1rem; margin-bottom:5px;">${escapeHtml(post.title)}</div>
         <div style="font-size:0.75rem; color:#666; margin-bottom:10px;">${escapeHtml(post.grammar)} | ${escapeHtml(post.words)}</div>
-        ${post.audioTts ? `<div style="background:#f4f8f5; border-radius:11px; padding:9px 11px; margin-bottom:10px;">
-          <div style="font-size:0.72rem; font-weight:bold; color:#4a5d4e; margin-bottom:5px;">🎧 이야기 듣기</div>
-          <button onclick="playShowcaseTts('${escapeHtml(post.audioTts)}', this)" style="width:100%; border:1px solid #d2e3d5; background:white; color:#4a5d4e; border-radius:9px; padding:8px; font-family:inherit; font-size:0.82rem; font-weight:bold; cursor:pointer;">▶️ 이야기 듣기</button>
-        </div>` : ''}
-        <div style="font-size:0.95rem; color:#444; line-height:1.5; margin-bottom:15px; white-space:pre-wrap;">${cleanContent}</div>
+        ${bodyHtml}
 
         <div style="border-top: 1px dashed #ddd; padding-top:10px;">
           <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:10px;">
             <span style="font-size:0.85rem; color:#4a5d4e; font-weight:bold;">Comments</span>
-            ${!isMyPost ? `<span style="cursor:pointer; font-size:1.1rem; user-select:none;" onclick="toggleShowcaseLike('${escapeHtml(post.id)}')">${heartIcon} <span style="font-size:0.9rem; color:#333;">${post.likes.length}</span></span>` : `<span style="font-size:0.85rem; color:#999;">❤️ ${post.likes.length}</span>`}
+            ${(!isMyPost && !gatedView) ? `<span style="cursor:pointer; font-size:1.1rem; user-select:none;" onclick="toggleShowcaseLike('${escapeHtml(post.id)}')">${heartIcon} <span style="font-size:0.9rem; color:#333;">${post.likes.length}</span></span>` : `<span style="font-size:0.85rem; color:#999;">❤️ ${post.likes.length}</span>`}
           </div>
 
+          ${(post.gateApplies && !isMyPost && !post.myResponse && (post.commentCount || 0) > post.comments.length) ? `<div style="background:#fff8e1; border:1px dashed #ffe082; border-radius:10px; padding:9px 11px; margin-bottom:8px; font-size:0.78rem; color:#8a6d1a; text-align:center;">🔒 친구들의 댓글 <b>${(post.commentCount || 0) - post.comments.length}개</b>가 기다리고 있어요 — <b>2nd 댓글</b>까지 쓰면 열려요!</div>` : ''}
           <div style="margin-bottom:10px; display:flex; flex-direction:column; align-items:stretch; max-height:160px; overflow-y:auto; padding-right:5px;">${commentHtml}</div>
 
           ${!isMyPost ? `
@@ -4896,7 +5050,7 @@ async function openNoticeModal() {
             </div>
 
             <div style="display:flex; gap:5px;">
-              <input type="text" id="comment-input-${escapeHtml(post.id)}" class="input-field" style="flex:1; margin-bottom:0; padding:8px; border-radius:10px; border:none;" placeholder="익명으로 댓글 남기기...">
+              <input type="text" id="comment-input-${escapeHtml(post.id)}" class="input-field" style="flex:1; margin-bottom:0; padding:8px; border-radius:10px; border:none;" placeholder="${gatedView ? '1st 추측: 어떤 이야기일 것 같아요?' : (post.gateApplies && post.myGuess && !post.myResponse ? '2nd: 추측과 비교 + 낭독 칭찬!' : '익명으로 댓글 남기기...')}">
               <button onclick="addShowcaseComment('${escapeHtml(post.id)}')" style="background:none; border:none; color:#4a5d4e; font-weight:bold; cursor:pointer;">등록</button>
             </div>
           </div>
@@ -4905,6 +5059,33 @@ async function openNoticeModal() {
       `;
       feed.appendChild(postDiv);
     });
+    loadQueuedShowcaseImages(); // ★ V15-4단계
+  }
+
+  // ★ V15-4단계: 힌트 이미지 지연 로딩 (+캐시 — 재렌더 시 재다운로드 방지)
+  if (!window._scImgCache) window._scImgCache = {};
+  async function loadQueuedShowcaseImages() {
+    const q = window._scImgQueue || [];
+    window._scImgQueue = [];
+    for (const item of q) {
+      const img = document.getElementById(item.elId);
+      const ld = document.getElementById(item.elId + '-ld');
+      if (!img) continue;
+      try {
+        let url = window._scImgCache[item.fileId];
+        if (!url) {
+          const res = await fetch(SHEET_URL + '?action=get_story_audio&fileId=' + encodeURIComponent(item.fileId)).then(r => r.json());
+          if (res.error || !res.base64) throw new Error('img load fail');
+          const bin = atob(res.base64);
+          const bytes = new Uint8Array(bin.length);
+          for (let i = 0; i < bin.length; i++) bytes[i] = bin.charCodeAt(i);
+          url = URL.createObjectURL(new Blob([bytes], { type: res.mime || 'image/png' }));
+          window._scImgCache[item.fileId] = url;
+        }
+        img.src = url; img.style.display = 'block';
+        if (ld) ld.remove();
+      } catch(e) { if (ld) ld.textContent = '🛸 그림을 불러오지 못했어요'; }
+    }
   }
 
   // ★ 답글 버튼 눌렀을 때 발동하는 함수
@@ -4980,16 +5161,25 @@ async function openNoticeModal() {
     const safeStudentId = String(currentStudentId);
     
     let parentId = replyStates[postId] || "";
-    
+
+    // ★ V15-2단계: 댓글 단계 자동 결정 — 게이팅 중이면 1st(guess), 공개 후 첫 반응이면 2nd(response), 그 외 일반
+    let stage = "";
+    if (!parentId && post.gateApplies) {
+      if (post.gated) stage = "guess";
+      else if (post.myGuess && !post.myResponse && String(post.studentId) !== safeStudentId) stage = "response";
+    }
+
     // 1. 앱이 주도적으로 영수증 번호를 먼저 만듦!
     const tempCommentId = "C" + new Date().getTime();
 
     // 2. 서버 기다리지 말고 화면에 0.1초 만에 띄워버리기!
-    post.comments.push({ studentId: safeStudentId, text: comment, date: new Date().toISOString(), commentId: tempCommentId, parentId: parentId });
+    post.comments.push({ studentId: safeStudentId, text: comment, date: new Date().toISOString(), commentId: tempCommentId, parentId: parentId, stage: stage });
     
     input.value = ""; 
     cancelReply(postId); // 다 썼으면 답글 모드 해제
     renderShowcase();
+
+    // (2nd의 myResponse 갱신은 서버 성공 후 리로드가 담당 — 낙관적 설정 시 실패 케이스에서 상태 불일치)
 
     // ★ 3. 잭팟 확인 및 치트키 발동 로직!
     let myAnimal = getHashAnimal(postId, safeStudentId); // 내 운명 확인
@@ -5009,10 +5199,23 @@ async function openNoticeModal() {
           type: "showcase_comment", postId: postId, postTitle: post.title,
           authorInfo: `${post.studentId}(${post.userName})`, reactorId: safeStudentId, reactorName: currentFirstName, token: currentToken, teacherId: (isTeacherSelf ? currentLoginId : ""), teacherPw: (isTeacherSelf ? teacherPw : ""), comment: comment,
           commentId: tempCommentId,
-          parentId: parentId
+          parentId: parentId,
+          stage: stage
         })
       });
       const txt = await res.text();
+      if (txt.indexOf("Showcase Comment Saved") !== -1 && stage === "guess") {
+        // ★ 추측 댓글 성공 → 서버에서 공개된 본문+진짜 목소리 다시 받기
+        alert('🔓 추측 완료! 본문과 작가의 진짜 목소리가 열렸어요.\n추측과 비교한 생각·느낌, 그리고 작가의 낭독에서 좋았던 점 하나를 2nd로 남겨봐요!');
+        loadShowcasePosts();
+        return;
+      }
+      if (txt.indexOf("Showcase Comment Saved") !== -1 && stage === "response") {
+        // ★ 개정: 2nd까지 완료 → 친구들의 댓글 전체 공개
+        alert('🎉 2nd 완료! 이제 친구들의 추측과 반응이 모두 열렸어요!');
+        loadShowcasePosts();
+        return;
+      }
       if (txt.indexOf("Showcase Comment Saved") === -1) {
         const ci = post.comments.findIndex(c => c.commentId === tempCommentId);
         if (ci !== -1) post.comments.splice(ci, 1);
@@ -5264,7 +5467,7 @@ function switchTeacherTab(tab) {
   if (tab === 'students' && allStudentsData.length === 0) loadAllStudents();
   if (tab === 'stats') loadStats();
   if (tab === 'notice') loadNoticeHistory();
-  if (tab === 'approve') { loadPendingUsers(); loadClearRequests(); }
+  if (tab === 'approve') { loadPendingUsers(); loadClearRequests(); loadPendingImages(); }
 }
 
 // ★ V13(2026-08-09): Weeto CLEAR 요청 대기 목록
@@ -5335,6 +5538,59 @@ async function processClearRequest(rowIndex, decision, comment) {
     if (res.error) { alert(res.error); return; }
     loadClearRequests();
   } catch(e) { alert(label + ' 처리에 실패했어요.'); }
+}
+
+// ★ V15-4단계: 힌트 이미지 승인 대기 목록
+async function loadPendingImages() {
+  const container = document.getElementById('t-image-list');
+  if (!container) return;
+  container.innerHTML = '<div style="text-align:center; color:#999;">불러오는 중...</div>';
+  try {
+    const list = await fetch(SHEET_URL, { method: 'POST', body: JSON.stringify({ type: "get_pending_images", id: currentLoginId, pw: teacherPw }) }).then(r => r.json());
+    if (list.error) { container.innerHTML = '<div style="text-align:center;color:#d9534f;">' + escapeHtml(list.error) + '</div>'; return; }
+    if (!list.length) { container.innerHTML = '<div style="text-align:center; color:#999; padding:20px;">승인 대기 중인 이미지가 없어요.</div>'; return; }
+    let html = '';
+    list.forEach((q, i) => {
+      html += `<div style="background:white;border-radius:14px;padding:13px 14px;margin-bottom:10px;border:1px solid #eee;">
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px;">
+          <div style="font-weight:bold;color:#333;">${escapeHtml(q.userName)} <span style="font-weight:normal;color:#999;font-size:0.78rem;">L${escapeHtml(q.lesson)} · ${escapeHtml(q.title)}</span></div>
+        </div>
+        <img id="timg-${i}" style="width:100%; border-radius:10px; display:none; margin-bottom:9px;">
+        <div id="timg-${i}-ld" style="background:#f4f8f5;border-radius:10px;padding:20px;text-align:center;font-size:0.78rem;color:#889;margin-bottom:9px;">🛸 이미지 로딩...</div>
+        <div style="display:flex;gap:6px;">
+          <button onclick="processImage(${q.rowIndex}, 'approve')" style="flex:1;background:#4a5d4e;color:white;border:none;border-radius:9px;padding:8px;font-size:0.78rem;font-weight:bold;cursor:pointer;">✅ 승인</button>
+          <button onclick="processImage(${q.rowIndex}, 'regen')" style="flex:1;background:#eee;color:#555;border:none;border-radius:9px;padding:8px;font-size:0.78rem;font-weight:bold;cursor:pointer;">🎨 다시 생성</button>
+          <button onclick="processImage(${q.rowIndex}, 'reject')" style="flex:1;background:#ffebee;color:#c62828;border:none;border-radius:9px;padding:8px;font-size:0.78rem;font-weight:bold;cursor:pointer;">거부</button>
+        </div>
+      </div>`;
+    });
+    container.innerHTML = html;
+    // 썸네일 로드 (프록시 재사용)
+    list.forEach(async (q, i) => {
+      try {
+        const res = await fetch(SHEET_URL + '?action=get_story_audio&fileId=' + encodeURIComponent(q.imageId)).then(r => r.json());
+        if (res.error || !res.base64) throw new Error('x');
+        const bin = atob(res.base64); const bytes = new Uint8Array(bin.length);
+        for (let k = 0; k < bin.length; k++) bytes[k] = bin.charCodeAt(k);
+        const el = document.getElementById('timg-' + i);
+        const ld = document.getElementById('timg-' + i + '-ld');
+        if (el) { el.src = URL.createObjectURL(new Blob([bytes], { type: res.mime || 'image/png' })); el.style.display = 'block'; }
+        if (ld) ld.remove();
+      } catch(e) {
+        const ld = document.getElementById('timg-' + i + '-ld');
+        if (ld) ld.textContent = '이미지 로드 실패';
+      }
+    });
+  } catch(e) { container.innerHTML = '<div style="text-align:center;color:#d9534f;">불러오기 실패</div>'; }
+}
+
+async function processImage(rowIndex, decision) {
+  if (decision === 'reject' && !confirm('이미지를 거부할까요?\nShowcase에는 우주 플레이스홀더가 표시돼요.')) return;
+  try {
+    const res = await fetch(SHEET_URL, { method: 'POST', body: JSON.stringify({ type: "process_image", id: currentLoginId, pw: teacherPw, rowIndex, decision }) }).then(r => r.json());
+    if (res.error) { alert(res.error); return; }
+    loadPendingImages();
+  } catch(e) { alert('처리 실패'); }
 }
 
 // ★ 가입 승인 대기 목록
