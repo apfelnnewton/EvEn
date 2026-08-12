@@ -1076,6 +1076,10 @@
 
         <div class="zeeto-box" style="border-color:#2e7d32;">
           <div class="zeeto-title">✨ 완벽 최종본</div>
+          <div style="font-size:0.72rem; color:#777; margin:-2px 0 7px; line-height:1.6;">
+            <span style="color:#d9534f; font-weight:bold;">빨강</span> = 아래 🚨 <b>Oops Point에서 설명하는 내 실수</b><br>
+            <span style="color:#999; text-decoration:underline; text-decoration-color:#c9c9c9; text-underline-offset:3px;">회색</span> = 그 밖에 Zeeto가 <b>고친 부분</b> (💡 Tip에서 중요한 것만 설명)
+          </div>
           <div id="ms-zeeto-final" style="font-size:0.9rem; line-height:1.4; white-space: pre-wrap;">(최종본 표시 영역)</div>
         </div>
 
@@ -1669,12 +1673,14 @@
     let safe = String(html);
     safe = safe.replace(/<br\s*\/?>/gi, '\n');   // <br> 태그 → \n으로 통합
     safe = safe.replace(/&lt;br\s*\/?&gt;/gi, '\n'); // 이스케이프된 &lt;br&gt;도 → \n으로 통합
-    // ^텍스트^ 마크(빨간 글씨)는 보존
+    // ^텍스트^ 마크(빨간 글씨)는 보존 / ★V17: 회색 밑줄(표현 다듬기) span도 보존
     safe = safe.replace(/<span style="color:#d9534f; font-weight:bold;">/gi, '\x00RS\x00');
+    safe = safe.replace(/<span style="color:#999; text-decoration:underline;[^>]*>/gi, '\x00PS\x00');
     safe = safe.replace(/<\/span>/gi, '\x00RE\x00');
     safe = safe.replace(/<\/?[a-zA-Z][^>]*>/g, '');  // 실제 HTML 태그만 제거
     safe = safe.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
     safe = safe.replace(/\x00RS\x00/g, '<span style="color:#d9534f; font-weight:bold;">');
+    safe = safe.replace(/\x00PS\x00/g, '<span style="color:#999; text-decoration:underline; text-decoration-color:#c9c9c9; text-underline-offset:3px;">');
     safe = safe.replace(/\x00RE\x00/g, '</span>');
     safe = safe.replace(/\n/g, '<br>');
     return safe;
@@ -1975,13 +1981,166 @@ checkNewComments();
 
   function formatTime(dateStr) { if (!dateStr) return ""; const d = new Date(dateStr); if (isNaN(d.getTime())) return dateStr; return `${d.getFullYear()}. ${String(d.getMonth() + 1).padStart(2, '0')}. ${String(d.getDate()).padStart(2, '0')}. ${String(d.getHours()).padStart(2, '0')}:${String(d.getMinutes()).padStart(2, '0')}`; }
 
+  // ★V17: 최종본 색 상수 (한 곳에서 관리)
+  var MS_ERR_SPAN = '<span style="color:#d9534f; font-weight:bold;">';
+  var MS_POL_SPAN = '<span style="color:#999; text-decoration:underline; text-decoration-color:#c9c9c9; text-underline-offset:3px;">';
   function formatForPersonal(text) {
     if(!text) return "";
     return text.replace(/\^([^^]+)\^/g, '<span style="color:#d9534f; font-weight:bold;">$1</span>');
   }
   function formatForShowcase(text) {
     if(!text) return "";
-    return text.replace(/\^/g, '');
+    // ★V17: 표현 다듬기 마크(~~)도 제거. Showcase는 익명 추측 활동이라 교정 흔적 노출 금지
+    return text.replace(/~~/g, '').replace(/\^/g, '');
+  }
+
+  // ═══════════════════════════════════════════════════════════════════
+  // ★ V16(2026-08-11): 완벽 최종본 빨간 글씨 = '학생 수정본과 실제로 달라진 단어'
+  //
+  // [왜 바꿨나]
+  //  기존엔 Zeeto(Gemini)가 스스로 "내가 고친 단어"라고 판단해 ^꺾쇠^를 찍었고,
+  //  프론트는 그걸 그대로 빨갛게 칠하기만 했음. 판정 로직이 코드에 아예 없어서
+  //  - 같은 글을 '다시 부르기' 하면 빨간 단어가 매번 달라지고
+  //  - 학생이 맞게 쓴 단어가 빨개지거나, 정작 고친 관사/전치사는 빠지는
+  //  편차가 구조적으로 존재했음. 학생도 교사도 기준을 알 수 없었음.
+  //
+  // [지금 기준] 학생 수정본(revision)과 최종본(finalStory)을 단어 단위로 LCS diff.
+  //  최종본에만 있는 단어 = 바뀐 단어 = 빨강. 그 외 = 검정. AI 판단 개입 없음.
+  //  대소문자는 구분함(i -> I 도 실제 교정이므로). 문장부호는 비교에서 제외(콤마 노이즈 방지).
+  //
+  // [폴백] 수정본이 없거나(구버전 데이터) diff가 비정상이면 기존 ^마크 방식으로 표시.
+  //  → AI 실패가 학생 화면을 막지 않는다는 대원칙 유지.
+  // ═══════════════════════════════════════════════════════════════════
+
+  // 저장된 HTML/AI 원문 -> 순수 텍스트 (태그·엔티티·^마크 제거)
+  function toPlainStory(s) {
+    if (!s) return "";
+    var t = String(s);
+    t = t.replace(/<br\s*\/?>/gi, '\n');
+    t = t.replace(/&lt;br\s*\/?&gt;/gi, '\n');
+    t = t.replace(/<\/?[a-zA-Z][^>]*>/g, '');
+    try {
+      var ta = document.createElement('textarea');
+      ta.innerHTML = t;
+      t = ta.value;
+    } catch(e) {}
+    t = t.replace(/~~/g, '').replace(/\^/g, '');
+    return t;
+  }
+
+  // 단어 토큰과 나머지(공백·문장부호)를 순서대로 보존해서 쪼갬
+  function tokenizeStory(text) {
+    var out = [], re = /[A-Za-z0-9]+(?:['’][A-Za-z]+)*/g, last = 0, m;
+    while ((m = re.exec(text)) !== null) {
+      if (m.index > last) out.push({ w: false, t: text.slice(last, m.index) });
+      out.push({ w: true, t: m[0] });
+      last = m.index + m[0].length;
+    }
+    if (last < text.length) out.push({ w: false, t: text.slice(last) });
+    return out;
+  }
+
+  // LCS — b(최종본) 단어 중 a(수정본)와 공통인 인덱스 집합. 비정상이면 null
+  function lcsMatchedIdx(a, b) {
+    var n = a.length, m = b.length;
+    if (!n || !m) return null;
+    if (n * m > 400000) return null;            // 안전장치(초장문): 폴백
+    var dp = [], i, j;
+    for (i = 0; i <= n; i++) dp.push(new Uint16Array(m + 1));
+    for (i = 1; i <= n; i++)
+      for (j = 1; j <= m; j++)
+        dp[i][j] = (a[i-1] === b[j-1]) ? dp[i-1][j-1] + 1
+                 : (dp[i-1][j] >= dp[i][j-1] ? dp[i-1][j] : dp[i][j-1]);
+    var matched = {}, cnt = 0;
+    i = n; j = m;
+    while (i > 0 && j > 0) {
+      if (a[i-1] === b[j-1]) { matched[j-1] = 1; cnt++; i--; j--; }
+      else if (dp[i-1][j] >= dp[i][j-1]) i--;
+      else j--;
+    }
+    if (cnt === 0) return null;                  // 겹치는 단어가 0개 = 비교 불가 -> 폴백
+    return matched;
+  }
+
+  // ═══════════════════════════════════════════════════════════════════
+  // ★ V17(2026-08-11): 최종본 2단 색
+  //   빨강 볼드 = Oops Point에서 다루는 내 문법 오류   (AI 마크 ^...^)
+  //   회색+밑줄 = 문법 오류는 아니고 표현만 다듬은 것  (AI 마크 ~~...~~)
+  //
+  // [역할 분리] 어디를 칠할지 = diff(결정론적) / 무슨 색으로 칠할지 = AI 마크(분류)
+  //   교집합으로 처리하므로, AI가 안 바뀐 단어에 마크해도 무시되고
+  //   마크를 빠뜨리면 회색이 아니라 빨강으로 떨어짐 → AI가 없는 오류를 만들어낼 수 없음.
+  //
+  // [구분자] 단일 ~는 쓰지 않음. 학생 글에 'Rando~', 'easy~' 같은 장식 물결이 실재해서
+  //   파서가 원문을 먹어버림(실데이터 확인). 짝이 완성된 마크만 소비하고
+  //   짝 없는 기호는 본문 글자로 그대로 살림.
+  // ═══════════════════════════════════════════════════════════════════
+
+  // 마크 붙은 원문 -> { plain, cls[문자index] }  (cls: 'err' | 'pol' | null)
+  function parseMarks(s) {
+    var plain = "", cls = [], re = /\^([^^\n]+)\^|~~([^~\n]+)~~/g, last = 0, m, i;
+    function push(txt, c) { for (i = 0; i < txt.length; i++) { plain += txt[i]; cls.push(c); } }
+    while ((m = re.exec(s)) !== null) {
+      push(s.slice(last, m.index), null);
+      var isErr = m[1] !== undefined;
+      push(isErr ? m[1] : m[2], isErr ? 'err' : 'pol');
+      last = m.index + m[0].length;
+    }
+    push(s.slice(last), null);
+    // 짝 없는 ^만 제거(본문에 쓸 일 없음). 짝 없는 ~는 학생 표현이므로 보존
+    var out = "", oc = [];
+    for (i = 0; i < plain.length; i++) { if (plain[i] === '^') continue; out += plain[i]; oc.push(cls[i]); }
+    return { plain: out, cls: oc };
+  }
+
+  // 최종본 렌더링 (diff = 위치, 마크 = 색등급). 실패 시 폴백
+  function renderFinalDiff(finalRaw, revisionRaw) {
+    var fallback = function() { return formatForPersonal(safeSavedHtml(finalRaw)); };
+    try {
+      var pm = parseMarks(String(finalRaw == null ? "" : finalRaw));
+      var finalText = toPlainStory(pm.plain);
+      if (!finalText) return "-";
+      var revText = toPlainStory(revisionRaw);
+      if (!revText || !revText.trim()) return fallback();
+
+      // toPlainStory가 태그·엔티티를 건드리면 cls 인덱스가 어긋남 -> 길이 같을 때만 등급 사용
+      var cls = (finalText.length === pm.plain.length) ? pm.cls : null;
+
+      var fTok = tokenizeStory(finalText);
+      var fWords = [], k;
+      for (k = 0; k < fTok.length; k++) if (fTok[k].w) fWords.push(fTok[k].t);
+      var rTok = tokenizeStory(revText), rWords = [];
+      for (k = 0; k < rTok.length; k++) if (rTok[k].w) rWords.push(rTok[k].t);
+
+      var matched = lcsMatchedIdx(rWords, fWords);
+      if (!matched) return fallback();
+
+      var html = "", wi = 0, pos = 0;
+      for (k = 0; k < fTok.length; k++) {
+        var tok = fTok[k], esc = escapeHtml(tok.t).replace(/\n/g, '<br>');
+        if (!tok.w) { html += esc; pos += tok.t.length; continue; }
+        if (matched[wi]) { html += esc; }
+        else {
+          // 바뀐 단어. 마크가 'pol'일 때만 회색, 그 외(마크 없음·깨짐 포함)는 빨강 = 안전한 폴백
+          var c = cls ? cls[pos] : null;
+          html += (c === 'pol' ? MS_POL_SPAN : MS_ERR_SPAN) + esc + '</span>';
+        }
+        pos += tok.t.length; wi++;
+      }
+      return html;
+    } catch(e) { return fallback(); }
+  }
+
+  // 증량 배율 — 교사 화면 배지용. diff 계산과 같은 토크나이저 사용
+  function finalExpansion(finalRaw, revisionRaw) {
+    try {
+      var f = toPlainStory(parseMarks(String(finalRaw || "")).plain), r = toPlainStory(revisionRaw);
+      var fw = 0, rw = 0, t, k;
+      t = tokenizeStory(f); for (k = 0; k < t.length; k++) if (t[k].w) fw++;
+      t = tokenizeStory(r); for (k = 0; k < t.length; k++) if (t[k].w) rw++;
+      if (rw < 5 || fw < 5) return null;
+      return { ratio: fw / rw, fw: fw, rw: rw };
+    } catch(e) { return null; }
   }
 
   async function registerUser() {
@@ -2624,7 +2783,10 @@ checkNewComments();
 
       document.getElementById('ms-zeeto-feedback').innerHTML = safeAiRender(feedbackPart);
       // ★ V10(2026-05-12): finalPart || rawText 폴백 제거 — 파싱 실패하면 위에서 이미 return함
-      document.getElementById('ms-zeeto-final').innerHTML = formatForPersonal(safeAiRender(finalPart));
+      // ★ V16: AI의 ^마크 대신 학생 수정본과의 diff로 표시 / ★V17: 2단 색
+      var msFinalEl = document.getElementById('ms-zeeto-final');
+      msFinalEl.dataset.rawFinal = finalPart;   // ★V17: 마크 원문 보관(저장 시 무손실)
+      msFinalEl.innerHTML = renderFinalDiff(finalPart, revision);
       document.getElementById('ms-zeeto-tip').innerHTML = formatForPersonal(safeAiRender(tipPart));
       document.getElementById('ms-oops-point').dataset.original = oopsPart;
       const oopsDisplay = oopsPart.replace(/👽 Zeeto의 (비문 예시|퀴즈):[\s\S]*?🎯/g, '').trim();
@@ -2750,7 +2912,7 @@ checkNewComments();
         // ★ V10(2026-05-12): 새 비문이 옛 비문과 다르면 학생의 옛 정문/이유/피드백을 같이 초기화
         // - 학생이 어떤 경로로 Step 4에 다시 들어와도 stale 답이 새 문제 옆에 남지 않음
         const prevQuizValue = errorInput.value;
-        const incomingQuiz = (rawQuiz && !isBadQuizFormat(rawQuiz)) ? rawQuiz.replace(/\^/g, '') : '';
+        const incomingQuiz = (rawQuiz && !isBadQuizFormat(rawQuiz)) ? rawQuiz.replace(/~~/g, '').replace(/\^/g, '') : '';
         const quizChanged = incomingQuiz && incomingQuiz.trim() !== prevQuizValue.trim();
 
         if (rawQuiz && !isBadQuizFormat(rawQuiz)) {
@@ -2900,7 +3062,7 @@ checkNewComments();
       // 케이스 B: 검증 결과 "정문이었음" OR forceRegen 모드 — 새 비문 교체
       let newBiumun = newBiumunMatch ? newBiumunMatch[1].trim() : '';
       // 정제: 꺾쇠/마크다운 제거 + 영어 평서문 골라내기
-      const lines = newBiumun.replace(/\^/g, '').replace(/[*#`"']/g, '').split('\n').map(s=>s.trim()).filter(s=>s.length>0);
+      const lines = newBiumun.replace(/~~/g, '').replace(/\^/g, '').replace(/[*#`"']/g, '').split('\n').map(s=>s.trim()).filter(s=>s.length>0);
       let cleaned = lines.find(s => /^[A-Z]/.test(s) && !/[가-힣]/.test(s) && s.length >= 5) || lines[0] || newBiumun;
       if (!cleaned) {
         alert('Zeeto 응답 형식이 이상함 🛸 다시 시도해보셈!');
@@ -3278,7 +3440,7 @@ checkNewComments();
 
       // 케이스 B: 정문이었음 OR forceRegen 모드 — 새 비문 교체
       let newBiumun = newBiumunMatch ? newBiumunMatch[1].trim() : '';
-      const lines = newBiumun.replace(/\^/g, '').replace(/[*#`"']/g, '').split('\n').map(s=>s.trim()).filter(s=>s.length>0);
+      const lines = newBiumun.replace(/~~/g, '').replace(/\^/g, '').replace(/[*#`"']/g, '').split('\n').map(s=>s.trim()).filter(s=>s.length>0);
       let cleaned = lines.find(s => /^[A-Z]/.test(s) && !/[가-힣]/.test(s) && s.length >= 5) || lines[0] || newBiumun;
       if (!cleaned) { alert('Zeeto 응답 형식이 이상함 🛸'); return; }
       if (cleaned.length > 200) { alert('Zeeto가 너무 길게 만들었음 😵'); return; }
@@ -3659,6 +3821,7 @@ checkNewComments();
           grammarDisplay: (document.getElementById('ms-grammar-display')||{}).textContent || '',
           zeetoHint: getHtml('ms-zeeto-hint'), displayDraft: getHtml('ms-display-draft'),
           zeetoFeedback: getHtml('ms-zeeto-feedback'), zeetoFinal: getHtml('ms-zeeto-final'),
+          zeetoFinalRaw: (document.getElementById('ms-zeeto-final')||{}).dataset ? (document.getElementById('ms-zeeto-final').dataset.rawFinal || '') : '',
           zeetoTip: getHtml('ms-zeeto-tip'), oopsPoint: getHtml('ms-oops-point'),
           oopsPointOriginal: (document.getElementById('ms-oops-point')||{}).dataset ? (document.getElementById('ms-oops-point').dataset.original || '') : '',
           oopsPointCopy: getHtml('ms-oops-point-copy'), displayRevision: getHtml('ms-display-revision'),
@@ -3714,6 +3877,7 @@ checkNewComments();
       if (typeof d.finalRetryCount === 'number') finalRetryCount = d.finalRetryCount;
       setHtml('ms-zeeto-hint', d.zeetoHint); setHtml('ms-display-draft', d.displayDraft);
       setHtml('ms-zeeto-feedback', d.zeetoFeedback); setHtml('ms-zeeto-final', d.zeetoFinal);
+      const mfe = document.getElementById('ms-zeeto-final'); if (mfe && d.zeetoFinalRaw) mfe.dataset.rawFinal = d.zeetoFinalRaw;
       setHtml('ms-zeeto-tip', d.zeetoTip); setHtml('ms-oops-point', d.oopsPoint);
       const op = document.getElementById('ms-oops-point'); if (op && d.oopsPointOriginal) op.dataset.original = d.oopsPointOriginal;
       setHtml('ms-oops-point-copy', d.oopsPointCopy); setHtml('ms-display-revision', d.displayRevision);
@@ -3787,7 +3951,12 @@ checkNewComments();
     if (submitBtn) { submitBtn.disabled = true; submitBtn.style.opacity = '0.5'; }
     showLoading("우주 서버로 전송 중... 🚀");
 
-    const rawFinalStory = document.getElementById('ms-zeeto-final').innerHTML.replace(/<span[^>]*>/g, '^').replace(/<\/span>/g, '^');
+    // ★V17: AI가 준 마크 원문을 그대로 저장(무손실). 없으면 span을 마크로 역변환해 폴백
+    const msFinalEl2 = document.getElementById('ms-zeeto-final');
+    const rawFinalStory = msFinalEl2.dataset.rawFinal || msFinalEl2.innerHTML
+      .replace(/<span style="color:#999;[^>]*>/g, '~~').replace(/<span[^>]*>/g, '^')
+      .replace(/<\/span>/g, function(){ return '\x01'; })
+      .replace(/~~([^\x01]*)\x01/g, '~~$1~~').replace(/\x01/g, '^');
 
     // ★ V6→V8: Oops Point 교정 데이터 수집 (정문+이유 분리)
     const corrections = [];
@@ -3972,11 +4141,13 @@ checkNewComments();
       htmlStory += `<div class="log-detail-box"><div class="log-label">📝 나의 초안</div><div class="log-text">${escapeHtml(currentStoryData.draft || "-")}</div><div class="log-label" style="color:#d9534f; margin-top:10px;">👽 Zeeto's Hint</div><div class="log-text">${safeSavedHtml(currentStoryData.hint || "-")}</div></div>`;
       htmlStory += `<div class="log-detail-box"><div class="log-label">✏️ 나의 수정본</div><div class="log-text">${escapeHtml(currentStoryData.revision || "-")}</div></div>`;
 
-      const redFinalStory = formatForPersonal(safeSavedHtml(currentStoryData.finalStory));
+      // ★ V16(2026-08-11): 저장된 글도 표시 시점에 diff 재계산 (구버전 글은 ^마크로 폴백)
+      const redFinalStory = renderFinalDiff(currentStoryData.finalStory, currentStoryData.revision);
       htmlStory += `<div class="log-detail-box" style="border: 1px solid #4a5d4e; background:#f0f7f2;">
         <div class="log-label" style="color:#ff9800; margin-bottom:5px;">👽 Zeeto's Feedback</div>
         <div class="log-text" style="font-size:0.85rem; color:#666;">${safeSavedHtml(currentStoryData.feedback || "-")}</div>
         <div class="log-label" style="color:#4a5d4e; margin-top:10px; margin-bottom:5px;">✨ 완벽 최종본</div>
+        <div style="font-size:0.68rem; color:#888; margin-bottom:4px; line-height:1.5;"><span style="color:#d9534f; font-weight:bold;">빨강</span> = Oops Point에서 다룬 실수 · <span style="color:#999; text-decoration:underline; text-decoration-color:#c9c9c9; text-underline-offset:3px;">회색</span> = 그 밖에 고친 부분</div>
         <div class="log-text" style="font-size:0.95rem;">${redFinalStory || "-"}</div>
         <div class="log-label" style="color:#2196f3; margin-top:10px; margin-bottom:5px;">💡 Zeeto's Tip</div>
         <div class="log-text" style="font-size:0.85rem; color:#0d47a1;">${formatForPersonal(safeSavedHtml(currentStoryData.tip || "-"))}</div>
@@ -6021,7 +6192,11 @@ function switchStudentModal(type) {
           </div>
           <div class="log-detail-box" style="border:1px solid #4a5d4e; background:#f0f7f2;">
             <div class="log-label" style="color:#4a5d4e;">✨ 최종본</div>
-            <div class="log-text">${formatForPersonal(safeSavedHtml(s.finalStory||'-'))}</div>
+            ${(() => { const ex = finalExpansion(s.finalStory||'', s.revision||'');
+                return (ex && ex.ratio > 1.25)
+                  ? `<div style="font-size:0.72rem; color:#8a6d1a; background:#fffdf3; border:1px solid #f0e4bd; border-radius:8px; padding:5px 9px; margin:3px 0 7px;">⚠️ Zeeto가 많이 고침 (${ex.rw}단어 → ${ex.fw}단어, ${ex.ratio.toFixed(2)}배)</div>`
+                  : ''; })()}
+            <div class="log-text">${renderFinalDiff(s.finalStory||'', s.revision||'')}</div>
             <div class="log-label" style="color:#2196f3; margin-top:8px;">💡 Zeeto's Tip</div>
             <div class="log-text" style="color:#0d47a1;">${formatForPersonal(safeSavedHtml(s.tip||'-'))}</div>
             <div class="log-label" style="color:#c62828; margin-top:8px;">🚨 Oops Point</div>
