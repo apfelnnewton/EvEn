@@ -1510,7 +1510,8 @@
       <div style="font-size:0.7rem; color:#aaa;">최대 3분</div>
       <div id="msr-after" style="display:none; margin-top:12px;">
         <audio controls id="msr-audio" style="width:100%; margin-bottom:9px;"></audio>
-        <button id="msr-fb-btn" onclick="msrGetFeedback()" style="width:100%; border:1.5px dashed #4a5d4e; background:#e8f0eb; color:#4a5d4e; border-radius:11px; padding:10px; font-family:inherit; font-weight:bold; font-size:0.85rem; cursor:pointer; margin-bottom:8px;">👽 Zeeto 피드백 받기 (선택)</button>
+        <button id="msr-fb-btn" onclick="msrGetFeedback()" style="width:100%; border:1.5px dashed #4a5d4e; background:#e8f0eb; color:#4a5d4e; border-radius:11px; padding:10px; font-family:inherit; font-weight:bold; font-size:0.85rem; cursor:pointer; margin-bottom:3px;">👽 Zeeto &amp; 🎙️Deeto 만나기</button>
+        <div id="msr-fb-hint" style="font-size:0.68rem; color:#8a978f; text-align:center; margin-bottom:8px; line-height:1.5;">내 낭독을 Zeeto가 듣고, Deeto의 낭독도 들려줌 (3번까지)</div>
         <div id="msr-fb-result" style="display:none; text-align:left; margin-bottom:9px;"></div>
         <div id="msr-tts-area" style="display:none; margin-bottom:9px;">
           <button id="msr-tts-btn" onclick="msrPlayTts()" style="width:100%; border:1px solid #d2e3d5; background:#f0f7f2; color:#4a5d4e; border-radius:11px; padding:10px; font-family:inherit; font-weight:bold; font-size:0.85rem; cursor:pointer;">🔊 Deeto 낭독 듣기</button>
@@ -2954,6 +2955,13 @@ checkNewComments();
     const reasonText = document.getElementById(`ms-reason-${boxNum}`).value.trim();
 
     if(!errText || !correctedText || !reasonText) return alert("정문과 이유 둘 다 적어야 함! 👽");
+    // ★V18(2026-08-11): 안 고치고 그대로 제출하면 AI에 보내지 않음.
+    // 예전엔 그대로 통과시켜 "완벽하게 맞았음!" 칭찬이 나갔음(비문이 사실 정문이었던 경우 포함).
+    // 진짜 이의가 있으면 이미 있는 🔁 검증 경로로 보냄.
+    const _norm = (t) => String(t).toLowerCase().replace(/[^a-z0-9']+/g, ' ').trim();
+    if (_norm(correctedText) === _norm(errText)) {
+      return alert("아직 안 고쳤음! 🤔\n\n이 문장이 진짜 맞는 문장이라고 생각하면\n🔁 버튼을 눌러서 Zeeto한테 확인받아보셈 👽");
+    }
     if(isLoading) return; // ★ V10(2026-05-12): 병렬 클릭 방지
 
     showLoading(`Zeeto 채점 중... 👽`);
@@ -4748,13 +4756,22 @@ async function openNoticeModal() {
   // Web Audio PCM 캡처 → 16kHz mono 16bit WAV 인코딩 (iOS 포함 전 기기 동일 포맷)
   let msrCtx = null, msrStream = null, msrProc = null, msrChunks = [], msrSrcRate = 48000;
   let msrRecording = false, msrTimerInt = null, msrSec = 0, msrBlob = null, msrUploading = false;
+  // ★ V19(2026-08-11): Deeto 낭독은 한 번 열리면 그 스토리 안에서 계속 열어둠.
+  // 재녹음마다 닫히면 다시 들으려고 피드백 횟수(3회)를 소모하게 되어 따라 읽기 연습이 손해가 됨.
+  let msrTtsUnlocked = false;
+  function msrUnlockTts() {
+    msrTtsUnlocked = true;
+    document.getElementById('msr-tts-area').style.display = 'block';
+  }
   const MSR_MAX_SEC = 180;
   const AUDIO_FROM_LESSON = 5; // ★ 낭독 기능 적용 시작 레슨 (1학기 1~4과 현행 유지)
 
   function openMsRecordModal() {
     if (!window._msrPending) return;
+    msrTtsUnlocked = false;   // ★V19: 새 스토리는 잠금 상태로 시작(이전 글의 Deeto 오디오가 남지 않도록)
     document.getElementById('msr-title').textContent = window._msrPending.title || '';
-    document.getElementById('msr-text').textContent = (window._msrPending.finalStory || '').replace(/<br\s*\/?>/gi, '\n');
+    // ★V18(2026-08-11): 교정 마크(^ ~~)를 지우고 보여줌. 학생이 소리 내어 읽는 원고이므로 기호가 보이면 안 됨
+    document.getElementById('msr-text').textContent = toPlainStory(window._msrPending.finalStory || '');
     msrFullReset();
     document.getElementById('ms-record-modal').style.display = 'flex';
   }
@@ -4769,9 +4786,11 @@ async function openNoticeModal() {
     const fbR = document.getElementById('msr-fb-result');
     if (fbR) { fbR.style.display = 'none'; fbR.innerHTML = ''; }
     const fbB = document.getElementById('msr-fb-btn');
-    if (fbB) { fbB.disabled = false; fbB.textContent = '👽 Zeeto 피드백 받기 (선택)'; fbB.style.display = 'block'; }
+    if (fbB) { fbB.disabled = false; fbB.textContent = '👽 Zeeto & 🎙️Deeto 만나기'; fbB.style.display = 'block'; }
+    const fbH = document.getElementById('msr-fb-hint'); if (fbH) fbH.style.display = 'block';
+    // ★ V19: 이미 열린 Deeto는 건드리지 않음(오디오 플레이어 그대로 유지 → 재요청 없이 바로 다시 들을 수 있음)
     const ttsA = document.getElementById('msr-tts-area');
-    if (ttsA) { ttsA.style.display = 'none'; ttsA.innerHTML = '<button id="msr-tts-btn" onclick="msrPlayTts()" style="width:100%; border:1px solid #d2e3d5; background:#f0f7f2; color:#4a5d4e; border-radius:11px; padding:10px; font-family:inherit; font-weight:bold; font-size:0.85rem; cursor:pointer;">🔊 Deeto 낭독 듣기</button>'; }
+    if (ttsA && !msrTtsUnlocked) { ttsA.style.display = 'none'; ttsA.innerHTML = '<button id="msr-tts-btn" onclick="msrPlayTts()" style="width:100%; border:1px solid #d2e3d5; background:#f0f7f2; color:#4a5d4e; border-radius:11px; padding:10px; font-family:inherit; font-weight:bold; font-size:0.85rem; cursor:pointer;">🔊 Deeto 낭독 듣기</button>'; }
   }
   function msrStopTracks() {
     try { if (msrProc) { msrProc.disconnect(); msrProc.onaudioprocess = null; } } catch(e) {}
@@ -4871,25 +4890,27 @@ async function openNoticeModal() {
       if (res.error) {
         panel.style.display = 'block';
         panel.innerHTML = '<div style="background:' + (res.soft ? '#fff8e1' : '#fff5f5') + '; border-radius:10px; padding:10px; font-size:0.8rem; color:' + (res.soft ? '#8a6d1a' : '#c62828') + ';">' + escapeHtml(res.error) + '</div>';
-        btn.disabled = false; btn.textContent = res.exhausted ? '피드백 3회 사용 완료' : '👽 다시 시도하기';
-        if (res.exhausted) btn.disabled = true;
-        document.getElementById('msr-tts-area').style.display = 'block'; // 소진·실패여도 모범 낭독은 들을 수 있게
+        btn.disabled = false; btn.textContent = res.exhausted ? '3번 다 만났음! 이제 게시해도 됨 🚀' : '👽 다시 만나기';
+        if (res.exhausted) { btn.disabled = true; const h = document.getElementById('msr-fb-hint'); if (h) h.style.display = 'none'; }
+        msrUnlockTts(); // 소진·실패여도 모범 낭독은 들을 수 있게 (★V19: 이후 재녹음해도 유지)
         msrFbBusy = false; return;
       }
       panel.style.display = 'block';
       panel.innerHTML = msrRenderFeedback(res);
       btn.style.display = 'none';
-      document.getElementById('msr-tts-area').style.display = 'block'; // ★ 피드백 후 모범 낭독 듣기 공개
+      const fbH2 = document.getElementById('msr-fb-hint'); if (fbH2) fbH2.style.display = 'none';
+      msrUnlockTts(); // ★ 피드백 후 모범 낭독 듣기 공개 (★V19: 이후 재녹음해도 유지)
     } catch(e) {
       panel.style.display = 'block';
       panel.innerHTML = '<div style="background:#fff8e1; border-radius:10px; padding:10px; font-size:0.8rem; color:#8a6d1a;">우주 통신 불량임 🛸 일단 게시해도 괜찮아요!</div>';
-      btn.disabled = false; btn.textContent = '👽 다시 시도하기';
+      btn.disabled = false; btn.textContent = '👽 다시 만나기';
     }
     msrFbBusy = false;
   }
 
   function msrRenderFeedback(fb) {
-    const story = (window._msrPending.finalStory || '').replace(/<br\s*\/?>/gi, ' ').replace(/<[^>]+>/g, ' ');
+    // ★V20(2026-08-11): 교정 마크(^ ~~) 제거. V19에서 낭독 원고만 고치고 이 하이라이트 본문을 빠뜨렸음.
+    const story = toPlainStory(window._msrPending.finalStory || '').replace(/\n/g, ' ');
     const missed = (fb.missedWords || []).map(w => String(w).toLowerCase());
     const misreadMap = {};
     (fb.misreadWords || []).forEach(m => { if (m && m.expected) misreadMap[String(m.expected).toLowerCase()] = String(m.heard || ''); });
@@ -4909,12 +4930,36 @@ async function openNoticeModal() {
       return escapeHtml(t);
     });
     const missCnt = (fb.missedWords || []).length, misCnt = (fb.misreadWords || []).length;
+    // ★ V21(2026-08-11): 상단 요약 — 읽은 단어 n/n, WPM (계획서 235행 스펙, 그동안 미구현)
+    // Gemini 단독(29초 초과) 경우엔 추정치이므로 '약' 표시
+    const insWords = fb.insertedWords || [];
+    let topCards = '';
+    if (typeof fb.wordsTotal === 'number' && fb.wordsTotal > 0) {
+      const est = fb.estimated ? '약 ' : '';
+      topCards =
+        '<div style="display:flex; gap:6px; margin-bottom:7px;">' +
+          '<div style="flex:1; background:#eef4f0; border-radius:9px; padding:6px 8px; text-align:center;">' +
+            '<div style="font-size:0.61rem; color:#7d8f84;">읽은 단어</div>' +
+            '<div style="font-size:0.9rem; font-weight:700; color:#33453a;">' + est + fb.wordsRead +
+            '<span style="font-size:0.68rem; color:#8a978f;">/' + fb.wordsTotal + '</span></div></div>' +
+          '<div style="flex:1; background:#eef4f0; border-radius:9px; padding:6px 8px; text-align:center;">' +
+            '<div style="font-size:0.61rem; color:#7d8f84;">읽기 속도</div>' +
+            '<div style="font-size:0.9rem; font-weight:700; color:#33453a;">' + est + (fb.wpm || 0) +
+            '<span style="font-size:0.6rem; color:#8a978f;"> WPM</span></div>' +
+            // ★숫자만 주면 좋은지 나쁜지 알 수 없어 기준선을 같이 보여줌
+            '<div style="font-size:0.56rem; color:#a3b0a8; margin-top:1px;">' +
+              ((fb.wpm||0) < 70 ? '천천히' : ((fb.wpm||0) > 130 ? '빠름' : '편안한 속도')) +
+            '</div></div>' +
+        '</div>';
+    }
     const summary = (missCnt === 0 && misCnt === 0)
       ? '<span style="background:#e8f0eb; color:#4a5d4e; border-radius:8px; padding:3px 9px; font-size:0.72rem; font-weight:bold;">✨ 완벽하게 다 읽었음!</span>'
-      : '<span style="background:#fff3cd; color:#8a6d1a; border-radius:8px; padding:3px 9px; font-size:0.72rem; font-weight:bold;">건너뜀 ' + missCnt + '</span> <span style="background:#ffebee; color:#c62828; border-radius:8px; padding:3px 9px; font-size:0.72rem; font-weight:bold;">다르게 들림 ' + misCnt + '</span>';
-    return '<div style="background:white; border:1px solid #eee; border-radius:11px; padding:11px;">' +
+      : '<span style="background:#fff3cd; color:#8a6d1a; border-radius:8px; padding:3px 9px; font-size:0.72rem; font-weight:bold;">건너뜀 ' + missCnt + '</span> <span style="background:#ffebee; color:#c62828; border-radius:8px; padding:3px 9px; font-size:0.72rem; font-weight:bold;">다르게 들림 ' + misCnt + '</span>'
+        + (insWords.length ? ' <span style="background:#e3f0fb; color:#1565c0; border-radius:8px; padding:3px 9px; font-size:0.72rem; font-weight:bold;">덧붙임 ' + insWords.length + '</span>' : '');
+    return '<div style="background:white; border:1px solid #eee; border-radius:11px; padding:11px;">' + topCards +
       '<div style="margin-bottom:7px;">' + summary + ' <span style="font-size:0.68rem; color:#aaa;">피드백 ' + (fb.remaining >= 0 ? fb.remaining : 0) + '회 남음</span></div>' +
       '<div style="font-size:0.85rem; line-height:1.9; color:#444; max-height:150px; overflow-y:auto;">' + tokens.join('') + '</div>' +
+      (insWords.length ? '<div style="font-size:0.67rem; color:#1565c0; margin-top:6px;">원문에 없이 들린 말: ' + escapeHtml(insWords.join(', ')) + '</div>' : '') +
       '</div>' +
       '<div style="background:#e8f0eb; border-radius:11px; padding:10px 12px; margin-top:7px;">' +
       '<div style="font-weight:bold; color:#4a5d4e; font-size:0.78rem; margin-bottom:4px;">👽 Zeeto</div>' +
