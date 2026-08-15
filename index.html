@@ -294,6 +294,8 @@
   /* 스마트폰: 화면 꽉 채움, 둥근 모서리 제거 */
   @media (max-width: 480px) {
     body { align-items: flex-start; }
+    /* ★V23: iPhone Safari는 16px 미만 입력창 탭 시 화면 자동 확대(복귀 안 됨) → 모바일에선 입력류만 16px */
+    .input-field, .chat-input { font-size: 16px; }
     .mobile-app {
       max-width: 100%;
       width: 100%;
@@ -433,6 +435,8 @@
   .req-star { color: #d9534f; font-weight: bold; }
   .readonly-box { background: #e8f0eb; padding: 15px; border-radius: 15px; font-size: 0.95rem; color: #555; margin-bottom: 15px; line-height: 1.4; border: 1px solid #d2e3d5; }
   .zeeto-box { border: 2px dashed #4a5d4e; background: #fff; padding: 15px; border-radius: 15px; margin-bottom: 15px; }
+  /* ★V22: Showcase 잠금 해제 배너 등장 */
+  @keyframes scUnlock { from { opacity:0; transform:translateY(-6px); } to { opacity:1; transform:none; } }
   .zeeto-title { font-weight: bold; color: #4a5d4e; margin-bottom: 8px; font-size: 0.9rem; display: flex; align-items: center; gap: 5px; }
   .error-new-box { background: #fff; border: 1px solid #ddd; padding: 15px; border-radius: 15px; margin-bottom: 15px; }
   .step-title { font-size: 1.2rem; font-weight: bold; color: #4a5d4e; margin-bottom: 15px; border-bottom: 2px solid #e8f0eb; padding-bottom: 5px; }
@@ -1078,7 +1082,7 @@
           <div class="zeeto-title">✨ 완벽 최종본</div>
           <div style="font-size:0.72rem; color:#777; margin:-2px 0 7px; line-height:1.6;">
             <span style="color:#d9534f; font-weight:bold;">빨강</span> = 아래 🚨 <b>Oops Point에서 설명하는 내 실수</b><br>
-            <span style="color:#999; text-decoration:underline; text-decoration-color:#c9c9c9; text-underline-offset:3px;">회색</span> = 그 밖에 Zeeto가 <b>고친 부분</b> (💡 Tip에서 중요한 것만 설명)
+            <span style="color:#767676; text-decoration:underline; text-decoration-color:#c9c9c9; text-underline-offset:3px;">회색</span> = 그 밖에 Zeeto가 <b>고친 부분</b> (💡 Tip에서 중요한 것만 설명)
           </div>
           <div id="ms-zeeto-final" style="font-size:0.9rem; line-height:1.4; white-space: pre-wrap;">(최종본 표시 영역)</div>
         </div>
@@ -1643,7 +1647,14 @@
   // 🛡️ 중2병 해커 차단막 (여기 쏙 들어갔습니다!)
   function escapeHtml(str) {
     if(!str) return "";
-    return String(str).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
+    return String(str).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;').replace(/'/g, '&#39;');
+  }
+
+  // 🛡️ V23(2026-08-15): onclick 속성 안 JS 문자열 인자 전용 이스케이프.
+  // 브라우저는 onclick 속성값의 HTML 엔티티를 JS 실행 전에 디코드하므로 &#39;만으로는 따옴표 탈출을 못 막음.
+  // → JS 이스케이프(\ ' " 개행)를 먼저 하고, 그 결과를 escapeHtml로 감싸는 이중 처리.
+  function jsAttr(str) {
+    return escapeHtml(String(str == null ? "" : str).replace(/\\/g, '\\\\').replace(/'/g, "\\'").replace(/"/g, '\\"').replace(/\r?\n/g, '\\n'));
   }
 
   // ★ V12 패치(2026-07-11): 구글이 drive.google.com/thumbnail 임베드를 막아서 모든 이미지가 깨짐.
@@ -1681,7 +1692,7 @@
     safe = safe.replace(/<\/?[a-zA-Z][^>]*>/g, '');  // 실제 HTML 태그만 제거
     safe = safe.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
     safe = safe.replace(/\x00RS\x00/g, '<span style="color:#d9534f; font-weight:bold;">');
-    safe = safe.replace(/\x00PS\x00/g, '<span style="color:#999; text-decoration:underline; text-decoration-color:#c9c9c9; text-underline-offset:3px;">');
+    safe = safe.replace(/\x00PS\x00/g, '<span style="color:#767676; text-decoration:underline; text-decoration-color:#c9c9c9; text-underline-offset:3px;">');
     safe = safe.replace(/\x00RE\x00/g, '</span>');
     safe = safe.replace(/\n/g, '<br>');
     return safe;
@@ -1984,7 +1995,7 @@ checkNewComments();
 
   // ★V17: 최종본 색 상수 (한 곳에서 관리)
   var MS_ERR_SPAN = '<span style="color:#d9534f; font-weight:bold;">';
-  var MS_POL_SPAN = '<span style="color:#999; text-decoration:underline; text-decoration-color:#c9c9c9; text-underline-offset:3px;">';
+  var MS_POL_SPAN = '<span style="color:#767676; text-decoration:underline; text-decoration-color:#c9c9c9; text-underline-offset:3px;">';
   function formatForPersonal(text) {
     if(!text) return "";
     return text.replace(/\^([^^]+)\^/g, '<span style="color:#d9534f; font-weight:bold;">$1</span>');
@@ -4155,7 +4166,7 @@ checkNewComments();
         <div class="log-label" style="color:#ff9800; margin-bottom:5px;">👽 Zeeto's Feedback</div>
         <div class="log-text" style="font-size:0.85rem; color:#666;">${safeSavedHtml(currentStoryData.feedback || "-")}</div>
         <div class="log-label" style="color:#4a5d4e; margin-top:10px; margin-bottom:5px;">✨ 완벽 최종본</div>
-        <div style="font-size:0.68rem; color:#888; margin-bottom:4px; line-height:1.5;"><span style="color:#d9534f; font-weight:bold;">빨강</span> = Oops Point에서 다룬 실수 · <span style="color:#999; text-decoration:underline; text-decoration-color:#c9c9c9; text-underline-offset:3px;">회색</span> = 그 밖에 고친 부분</div>
+        <div style="font-size:0.68rem; color:#888; margin-bottom:4px; line-height:1.5;"><span style="color:#d9534f; font-weight:bold;">빨강</span> = Oops Point에서 다룬 실수 · <span style="color:#767676; text-decoration:underline; text-decoration-color:#c9c9c9; text-underline-offset:3px;">회색</span> = 그 밖에 고친 부분</div>
         <div class="log-text" style="font-size:0.95rem;">${redFinalStory || "-"}</div>
         <div class="log-label" style="color:#2196f3; margin-top:10px; margin-bottom:5px;">💡 Zeeto's Tip</div>
         <div class="log-text" style="font-size:0.85rem; color:#0d47a1;">${formatForPersonal(safeSavedHtml(currentStoryData.tip || "-"))}</div>
@@ -4164,7 +4175,7 @@ checkNewComments();
       </div>`;
       // ★ V14: 낭독하기 / 다시 하기 (도장 상세에서 재녹음 진입) — 2학기(L5+)만. 1학기 1~4과는 현행 유지
       if (parseInt(currentStoryData.lesson, 10) >= AUDIO_FROM_LESSON)
-      htmlStory += `<button onclick="msrOpenFromArchive('${escapeHtml(String(currentStoryData.lesson))}', decodeURIComponent('${encodeURIComponent(currentStoryData.title || '')}'))" style="width:100%; border:1.5px dashed #4a5d4e; background:#e8f0eb; color:#4a5d4e; border-radius:12px; padding:11px; font-family:inherit; font-size:0.85rem; font-weight:bold; cursor:pointer; margin-bottom:10px;">${currentStoryData.hasAudio ? '🔄 낭독 다시 하기' : '🎙️ 낭독하기 (아직 안 했어요!)'}</button>`;
+      htmlStory += `<button onclick="msrOpenFromArchive('${jsAttr(String(currentStoryData.lesson))}', decodeURIComponent('${encodeURIComponent(currentStoryData.title || '').replace(/'/g, '%27')}'))" style="width:100%; border:1.5px dashed #4a5d4e; background:#e8f0eb; color:#4a5d4e; border-radius:12px; padding:11px; font-family:inherit; font-size:0.85rem; font-weight:bold; cursor:pointer; margin-bottom:10px;">${currentStoryData.hasAudio ? '🔄 낭독 다시 하기' : '🎙️ 낭독하기 (아직 안 했어요!)'}</button>`;
       // ★ V6→V8: Oops Point 교정 내용 표시 (구형 answer / 신형 corrected+reason 호환)
       try {
         const corr = JSON.parse(currentStoryData.corrections || '[]');
@@ -4391,7 +4402,7 @@ checkNewComments();
             <div style="display:flex; align-items:center;">
               <b>${escapeHtml(c.name)}</b>
               <span style="font-size:0.7rem; color:#999; margin-left:5px;">${formatTime(c.date)}</span>
-              <button class="engsta-reply-btn" onclick="prepareEngstaReply('${escapeHtml(post.id)}', '${escapeHtml(c.id)}', '${escapeHtml(c.name)}')">답글</button>
+              <button class="engsta-reply-btn" onclick="prepareEngstaReply('${jsAttr(post.id)}', '${jsAttr(c.id)}', '${jsAttr(c.name)}')">답글</button>
             </div>
             <div style="margin-top:3px; white-space:pre-line;">${textHtml}</div>
           </div>
@@ -4407,9 +4418,9 @@ checkNewComments();
       const hasNewComment = newCommentData.posts && newCommentData.posts.some(p => p.postId === post.id);
       const newBadge = (isMyPost && hasNewComment) ? `<span style="background:#c62828;color:white;font-size:0.65rem;font-weight:900;padding:2px 6px;border-radius:8px;margin-left:6px;">NEW 💬</span>` : '';
 
-      postDiv.innerHTML = `<div class="post-header"><span style="cursor:pointer;" onclick="filterUser('${escapeHtml(post.name)}')">${escapeHtml(post.name)}</span>${newBadge} <span style="font-size:0.75rem; color:#999; float:right;">${formatTime(post.date)}</span></div>${imgHtml}<div class="post-content">${escapeHtml(post.content)}</div><div class="comment-section">${commentHtml}
+      postDiv.innerHTML = `<div class="post-header"><span style="cursor:pointer;" onclick="filterUser('${jsAttr(post.name)}')">${escapeHtml(post.name)}</span>${newBadge} <span style="font-size:0.75rem; color:#999; float:right;">${formatTime(post.date)}</span></div>${imgHtml}<div class="post-content">${escapeHtml(post.content)}</div><div class="comment-section">${commentHtml}
       <div id="reply-indicator-${escapeHtml(post.id)}" style="display:none; margin-top:10px; margin-bottom:5px;"></div>
-      <div style="display:flex; margin-top:5px;"><input type="text" id="input-${escapeHtml(post.id)}" placeholder="댓글 달기..." style="flex:1; border:none; border-bottom:1px solid #eee; outline:none; padding:5px;"><button onclick="addComment('${escapeHtml(post.id)}')" style="background:none; border:none; color:#4a5d4e; font-weight:bold; cursor:pointer; padding:0 10px;">등록</button></div></div>`;
+      <div style="display:flex; margin-top:5px;"><input type="text" id="input-${escapeHtml(post.id)}" placeholder="댓글 달기..." style="flex:1; border:none; border-bottom:1px solid #eee; outline:none; padding:5px;"><button onclick="addComment('${jsAttr(post.id)}')" style="background:none; border:none; color:#4a5d4e; font-weight:bold; cursor:pointer; padding:0 10px;">등록</button></div></div>`;
       
       feed.appendChild(postDiv);
     });
@@ -4440,6 +4451,7 @@ checkNewComments();
 
   async function uploadPost() {
     if(isLoading) return;
+    if (isUndercover) { alert('👩‍🏫 잠입 모드에선 학생 명의로 글을 쓸 수 없음! (본인 계정으로 돌아가면 가능)'); return; } // ★V23: 학생ID+교사토큰 조합이 Unauthorized→강제 로그아웃되는 사고 방지
     const content = document.getElementById('insta-content').value.trim(); if(!content) return alert("글을 적어주세요!");
     if (currentFilterUser) clearFilter(); // ★ V12(2026-06-09): 필터 보는 중 글쓰면 전체 피드로 복귀 (낙관적 삽입이 화면에 반영되도록)
     let image = document.getElementById('insta-preview').style.display === 'block' ? document.getElementById('insta-preview').src : "";
@@ -4499,7 +4511,7 @@ checkNewComments();
     const indicator = document.getElementById(`reply-indicator-${postId}`);
     
     // 안내 문구와 [취소 ✖] 버튼 띄우기
-    indicator.innerHTML = `<span class="engsta-replying-to">@${escapeHtml(targetUserName)} 님에게 답글 작성 중</span> <button class="cancel-reply-btn" onclick="cancelEngstaReply('${escapeHtml(postId)}')">취소 ✖</button>`;
+    indicator.innerHTML = `<span class="engsta-replying-to">@${escapeHtml(targetUserName)} 님에게 답글 작성 중</span> <button class="cancel-reply-btn" onclick="cancelEngstaReply('${jsAttr(postId)}')">취소 ✖</button>`;
     indicator.style.display = "block";
     
     input.placeholder = "대댓글을 입력하세요...";
@@ -4522,6 +4534,7 @@ checkNewComments();
   // ★ 기존 댓글 함수 업그레이드
   async function addComment(postId) {
     if(isLoading) return;
+    if (isUndercover) { alert('👩‍🏫 잠입 모드에선 학생 명의로 댓글을 쓸 수 없음! (본인 계정으로 돌아가면 가능)'); return; } // ★V23: 강제 로그아웃 사고 방지
     const input = document.getElementById(`input-${postId}`);
     const comment = input.value.trim();
     if(!comment) return;
@@ -4642,7 +4655,7 @@ function showNoticePopup() {
 async function confirmCurrentNotice() {
   const n = unreadUrgentNotices[currentNoticeIndex];
   try {
-    await fetch(SHEET_URL, { method:'POST', body: JSON.stringify({ type:'mark_notice_read', noticeId: n.noticeId || n[3], studentId: currentStudentId }) });
+    await fetch(SHEET_URL, { method:'POST', body: JSON.stringify({ type:'mark_notice_read', noticeId: n.noticeId || n[3], studentId: currentStudentId, token: currentToken }) });
   } catch(e) {}
   currentNoticeIndex++;
   showNoticePopup();
@@ -4657,7 +4670,7 @@ async function openNoticeModal() {
      const unreadNormal = allUnreadNotices.filter(n => (n.urgent || n[4]) !== 'Y');
      if (unreadNormal.length > 0) {
        const ids = unreadNormal.map(n => n.noticeId || n[3]);
-       fetch(SHEET_URL, { method:'POST', body: JSON.stringify({ type:'mark_notice_read', noticeIds: ids, studentId: currentStudentId }) });
+       fetch(SHEET_URL, { method:'POST', body: JSON.stringify({ type:'mark_notice_read', noticeIds: ids, studentId: currentStudentId, token: currentToken }) });
      }
      allUnreadNotices = [];
   }
@@ -5105,6 +5118,23 @@ async function openNoticeModal() {
     }
   }
 
+  // ★ V22(2026-08-11): 잠금 해제를 '팝업 → 확인 → 새로고침'이 아니라 한 흐름으로 잇는다.
+  // 브라우저 alert는 ① 블로킹이라 "열렸어요"를 말하는 시점에 뒤 화면이 아직 잠겨 있고
+  // ② 'apfelnnewton.github.io 내용:'이라는 브라우저 문구가 떠서 앱 세계관이 깨지고
+  // ③ 닫고 나면 피드가 통째로 다시 그려져 방금 연 카드를 학생이 다시 찾아야 했다.
+  function showcaseUnlockedFlow(postId, msgHtml) {
+    const card = document.querySelector('[data-sc-post="' + String(postId).replace(/"/g, '') + '"]');
+    if (!card) return;
+    // 카드 맨 위에 배너 삽입 (앱 톤 유지)
+    const b = document.createElement('div');
+    b.style.cssText = 'background:linear-gradient(135deg,#e8f0eb,#d2e3d5); border:1.5px solid #a5d6a7; border-radius:12px; padding:11px 13px; margin-bottom:11px; text-align:center; animation:scUnlock .45s ease;';
+    b.innerHTML = msgHtml;
+    card.insertBefore(b, card.firstChild);
+    // 카드로 부드럽게 이동 — 학생이 방금 연 내용을 바로 보게
+    try { card.scrollIntoView({ behavior: 'smooth', block: 'start' }); } catch (e) { card.scrollIntoView(); }
+    setTimeout(function () { b.style.transition = 'opacity .6s'; b.style.opacity = '0.55'; }, 4000);
+  }
+
   async function loadShowcasePosts() {
     const feed = document.getElementById('showcase-feed');
     feed.innerHTML = '<div style="text-align:center; margin-top:50px; color:#999;">우주 서버에서 명작들을 불러오는 중... 🛸</div>';
@@ -5175,7 +5205,7 @@ async function openNoticeModal() {
           <div style="${pBg} padding:8px 10px; border-radius:10px; margin-bottom:5px;">
             <div style="font-size:0.85rem;"><b>${pAnimal}</b> ${pBadge} <span style="font-size:0.7rem; color:#999; float:right;">${formatTime(p.date)}</span></div>
             <div style="font-size:0.9rem; margin-top:3px; word-break:break-all;">${escapeHtml(p.text)}</div>
-            ${!isMyPost ? `<div style="font-size:0.75rem; color:#999; cursor:pointer; margin-top:5px; font-weight:bold; display:inline-block;" onclick="prepareReply('${escapeHtml(post.id)}', '${escapeHtml(p.commentId)}', '${escapeHtml(pAnimal)}')">↳ 답글 달기</div>` : ''}
+            ${!isMyPost ? `<div style="font-size:0.75rem; color:#999; cursor:pointer; margin-top:5px; font-weight:bold; display:inline-block;" onclick="prepareReply('${jsAttr(post.id)}', '${jsAttr(p.commentId)}', '${jsAttr(pAnimal)}')">↳ 답글 달기</div>` : ''}
           </div>
         `;
 
@@ -5200,6 +5230,7 @@ async function openNoticeModal() {
       });
 
       const postDiv = document.createElement('div');
+      postDiv.setAttribute('data-sc-post', String(post.id));   // ★V22: 잠금 해제 후 이 카드로 스크롤하기 위한 식별자
       postDiv.style.cssText = `background: ${bgStyle}; margin-bottom: 15px; border-radius: 15px; border: ${borderStyle}; padding: 15px; box-shadow: 0 4px 10px rgba(0,0,0,0.03);`;
       const cleanContent = formatForShowcase(post.content);
 
@@ -5253,7 +5284,7 @@ async function openNoticeModal() {
         <div style="border-top: 1px dashed #ddd; padding-top:10px;">
           <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:10px;">
             <span style="font-size:0.85rem; color:#4a5d4e; font-weight:bold;">Comments</span>
-            ${(!isMyPost && !gatedView) ? `<span style="cursor:pointer; font-size:1.1rem; user-select:none;" onclick="toggleShowcaseLike('${escapeHtml(post.id)}')">${heartIcon} <span style="font-size:0.9rem; color:#333;">${post.likes.length}</span></span>` : `<span style="font-size:0.85rem; color:#999;">❤️ ${post.likes.length}</span>`}
+            ${(!isMyPost && !gatedView) ? `<span style="cursor:pointer; font-size:1.1rem; user-select:none;" onclick="toggleShowcaseLike('${jsAttr(post.id)}')">${heartIcon} <span style="font-size:0.9rem; color:#333;">${post.likes.length}</span></span>` : `<span style="font-size:0.85rem; color:#999;">❤️ ${post.likes.length}</span>`}
           </div>
 
           ${(post.gateApplies && !isMyPost && !post.myResponse && (post.commentCount || 0) > post.comments.length) ? `<div style="background:#fff8e1; border:1px dashed #ffe082; border-radius:10px; padding:9px 11px; margin-bottom:8px; font-size:0.78rem; color:#8a6d1a; text-align:center;">🔒 친구들의 댓글 <b>${(post.commentCount || 0) - post.comments.length}개</b>가 기다리고 있어요 — <b>2nd 댓글</b>까지 쓰면 열려요!</div>` : ''}
@@ -5262,12 +5293,12 @@ async function openNoticeModal() {
           ${!isMyPost ? `
           <div style="display:flex; flex-direction:column; gap:5px; margin-top:10px; background:#f0f0f0; padding:10px; border-radius:15px;">
             <div id="reply-indicator-${escapeHtml(post.id)}" style="font-size:0.75rem; color:#4a5d4e; font-weight:bold; display:none;">
-              <span id="reply-to-${escapeHtml(post.id)}"></span>에게 답글 작성 중... <span style="cursor:pointer; color:#d9534f; float:right;" onclick="cancelReply('${escapeHtml(post.id)}')">✖ 취소</span>
+              <span id="reply-to-${escapeHtml(post.id)}"></span>에게 답글 작성 중... <span style="cursor:pointer; color:#d9534f; float:right;" onclick="cancelReply('${jsAttr(post.id)}')">✖ 취소</span>
             </div>
 
             <div style="display:flex; gap:5px;">
               <input type="text" id="comment-input-${escapeHtml(post.id)}" class="input-field" style="flex:1; margin-bottom:0; padding:8px; border-radius:10px; border:none;" placeholder="${gatedView ? '1st 추측: 어떤 이야기일 것 같아요?' : (post.gateApplies && post.myGuess && !post.myResponse ? '2nd: 추측과 비교 + 낭독 칭찬!' : '익명으로 댓글 남기기...')}">
-              <button onclick="addShowcaseComment('${escapeHtml(post.id)}')" style="background:none; border:none; color:#4a5d4e; font-weight:bold; cursor:pointer;">등록</button>
+              <button onclick="addShowcaseComment('${jsAttr(post.id)}')" style="background:none; border:none; color:#4a5d4e; font-weight:bold; cursor:pointer;">등록</button>
             </div>
           </div>
           ` : ''}
@@ -5421,15 +5452,21 @@ async function openNoticeModal() {
       });
       const txt = await res.text();
       if (txt.indexOf("Showcase Comment Saved") !== -1 && stage === "guess") {
-        // ★ 추측 댓글 성공 → 서버에서 공개된 본문+진짜 목소리 다시 받기
-        alert('🔓 추측 완료! 본문과 작가의 진짜 목소리가 열렸어요.\n추측과 비교한 생각·느낌, 그리고 작가의 낭독에서 좋았던 점 하나를 2nd로 남겨봐요!');
-        loadShowcasePosts();
+        // ★ V22: 먼저 실제로 열고(await) → 그 카드로 이동 → 카드 안에 배너. alert 없음.
+        await loadShowcasePosts();
+        showcaseUnlockedFlow(postId,
+          '<div style="font-size:1.3rem; margin-bottom:3px;">🔓</div>' +
+          '<div style="font-size:0.86rem; font-weight:bold; color:#33453a;">본문과 작가의 진짜 목소리가 열렸어요!</div>' +
+          '<div style="font-size:0.74rem; color:#5c7263; margin-top:4px; line-height:1.55;">읽어보고 들어본 다음,<br>추측과 뭐가 달랐는지 · 낭독에서 좋았던 점 하나를 <b>2nd</b>로 남겨줘요</div>');
         return;
       }
       if (txt.indexOf("Showcase Comment Saved") !== -1 && stage === "response") {
-        // ★ 개정: 2nd까지 완료 → 친구들의 댓글 전체 공개
-        alert('🎉 2nd 완료! 이제 친구들의 추측과 반응이 모두 열렸어요!');
-        loadShowcasePosts();
+        // ★ V22: 2nd까지 완료 → 친구들 댓글 공개. 여기도 alert 없이 카드 안에서 알림.
+        await loadShowcasePosts();
+        showcaseUnlockedFlow(postId,
+          '<div style="font-size:1.3rem; margin-bottom:3px;">🎉</div>' +
+          '<div style="font-size:0.86rem; font-weight:bold; color:#33453a;">친구들의 추측과 반응이 모두 열렸어요!</div>' +
+          '<div style="font-size:0.74rem; color:#5c7263; margin-top:4px;">아래에서 다른 친구들은 뭐라고 추측했는지 봐요 👀</div>');
         return;
       }
       if (txt.indexOf("Showcase Comment Saved") === -1) {
@@ -5483,7 +5520,7 @@ function openUndercoverStudentPicker() {
   Object.keys(byGrade).sort().forEach(grade => {
     listHtml += `<div style="font-weight:700; color:#4a5d4e; margin:12px 0 6px; font-size:0.9rem;">📚 ${grade}학년 (${byGrade[grade].length}명)</div>`;
     byGrade[grade].forEach(s => {
-      listHtml += `<div onclick="enterUndercoverAsStudent('${escapeHtml(String(s.studentId))}', '${escapeHtml(s.firstName)}', '${escapeHtml(s.emoji || '👤')}')" style="background:white; border:1px solid #ddd; border-radius:10px; padding:10px 12px; margin-bottom:6px; cursor:pointer; display:flex; justify-content:space-between; align-items:center;">
+      listHtml += `<div onclick="enterUndercoverAsStudent('${jsAttr(String(s.studentId))}', '${jsAttr(s.firstName)}', '${jsAttr(s.emoji || '👤')}')" style="background:white; border:1px solid #ddd; border-radius:10px; padding:10px 12px; margin-bottom:6px; cursor:pointer; display:flex; justify-content:space-between; align-items:center;">
         <span><span style="font-size:1.1rem;">${escapeHtml(s.emoji || '👤')}</span> <b>${escapeHtml(s.lastName || '')}${escapeHtml(s.firstName)}</b> <span style="font-size:0.75rem; color:#888;">(${escapeHtml(String(s.studentId))})</span></span>
         <span style="color:#534AB7; font-weight:500; font-size:0.85rem;">잠입 →</span>
       </div>`;
@@ -5938,7 +5975,7 @@ function renderLogStatus() {
     notSubmitted.forEach(u => {
       html += `<span style="background:#ffebee; color:#c62828; padding:5px 8px; border-radius:8px; font-size:0.8rem; display:flex; align-items:center; gap:5px;">
         ${escapeHtml(u.emoji)} ${escapeHtml(u.firstName)}
-        <button onclick="poke('${escapeHtml(u.studentId)}','${escapeHtml(u.firstName)}')" style="background:#d9534f; color:white; border:none; border-radius:6px; padding:2px 6px; font-size:0.7rem; cursor:pointer;">👉 콕</button>
+        <button onclick="poke('${jsAttr(u.studentId)}','${jsAttr(u.firstName)}')" style="background:#d9534f; color:white; border:none; border-radius:6px; padding:2px 6px; font-size:0.7rem; cursor:pointer;">👉 콕</button>
       </span>`;
     });
     html += `</div>`;
@@ -5973,7 +6010,7 @@ function renderStoryStatus() {
     notSubmitted.forEach(u => {
       html += `<span style="background:#ffebee; color:#c62828; padding:5px 8px; border-radius:8px; font-size:0.8rem; display:flex; align-items:center; gap:5px;">
         ${escapeHtml(u.emoji)} ${escapeHtml(u.firstName)}
-        <button onclick="poke('${escapeHtml(u.studentId)}','${escapeHtml(u.firstName)}')" style="background:#d9534f; color:white; border:none; border-radius:6px; padding:2px 6px; font-size:0.7rem; cursor:pointer;">👉 콕</button>
+        <button onclick="poke('${jsAttr(u.studentId)}','${jsAttr(u.firstName)}')" style="background:#d9534f; color:white; border:none; border-radius:6px; padding:2px 6px; font-size:0.7rem; cursor:pointer;">👉 콕</button>
       </span>`;
     });
     html += `</div>`;
@@ -6032,14 +6069,14 @@ function renderStudentList() {
   let html = '';
   users.forEach(u => {
     html += `<div style="background:white; border-radius:12px; padding:12px 15px; margin-bottom:8px; border:1px solid #eee; display:flex; align-items:center; justify-content:space-between;">
-      <div style="display:flex; align-items:center; gap:10px; cursor:pointer;" onclick="openStudentModal('${u.studentId}')">
+      <div style="display:flex; align-items:center; gap:10px; cursor:pointer;" onclick="openStudentModal('${jsAttr(u.studentId)}')">
         <div style="font-size:1.8rem;">${escapeHtml(u.emoji)}</div>
         <div>
           <div style="font-weight:bold; color:#333;">${escapeHtml(u.lastName)}${escapeHtml(u.firstName)} <span style="font-size:0.8rem; color:#999;">(${escapeHtml(u.studentId)})</span></div>
           <div style="font-size:0.75rem; color:#999;">📝 ${u.logCount} &nbsp; 📖 ${u.storyCount} &nbsp; 📸 ${u.postCount || 0} &nbsp; 👾 ${u.teachCount || 0}</div>
         </div>
       </div>
-      <button onclick="deleteStudent('${escapeHtml(u.id)}', '${escapeHtml(u.firstName)}')" style="background:none; border:1px solid #ffcccc; color:#d9534f; border-radius:8px; padding:5px 8px; font-size:0.75rem; cursor:pointer;">삭제</button>
+      <button onclick="deleteStudent('${jsAttr(u.id)}', '${jsAttr(u.firstName)}')" style="background:none; border:1px solid #ffcccc; color:#d9534f; border-radius:8px; padding:5px 8px; font-size:0.75rem; cursor:pointer;">삭제</button>
     </div>`;
   });
   document.getElementById('t-student-list').innerHTML = html || '<div style="text-align:center; color:#999; padding:20px;">검색 결과가 없어요.</div>';
@@ -6263,7 +6300,7 @@ function switchStudentModal(type) {
         <div style="font-size:0.8rem;color:#999;margin-bottom:6px;">${formatTime(p.date)}${exitBadge}</div>
         ${p.image ? `<img src="${fixImgUrl(p.image)}" style="width:100%;border-radius:10px;margin-bottom:8px;object-fit:cover;max-height:200px;">` : ''}
         <div style="font-size:0.9rem;color:#333;margin-bottom:8px;">${escapeHtml(p.content)}</div>
-        <button onclick="teacherDeletePost('${p.id}')" style="background:none;border:1px solid #ffcccc;color:#d9534f;border-radius:8px;padding:5px 10px;font-size:0.8rem;cursor:pointer;">🗑️ 삭제</button>
+        <button onclick="teacherDeletePost('${jsAttr(p.id)}')" style="background:none;border:1px solid #ffcccc;color:#d9534f;border-radius:8px;padding:5px 10px;font-size:0.8rem;cursor:pointer;">🗑️ 삭제</button>
       </div>`;
     });
   }
@@ -6694,7 +6731,7 @@ async function loadNoticeHistory() {
             ${isUrgent ? '<span style="background:#ffebee;color:#d9534f;font-size:0.75rem;font-weight:bold;padding:2px 7px;border-radius:8px;">🚨 긴급</span>' : '<span style="background:#e8f0eb;color:#4a5d4e;font-size:0.75rem;font-weight:bold;padding:2px 7px;border-radius:8px;">일반</span>'}
             <span style="background:#f0f0f0;color:#666;font-size:0.75rem;padding:2px 7px;border-radius:8px;">📌 ${targetLabel}</span>
           </div>
-          <button onclick="deleteNotice('${noticeId}')" style="background:none;border:1px solid #ffcccc;color:#d9534f;border-radius:8px;padding:3px 8px;font-size:0.75rem;cursor:pointer;">삭제</button>
+          <button onclick="deleteNotice('${jsAttr(noticeId)}')" style="background:none;border:1px solid #ffcccc;color:#d9534f;border-radius:8px;padding:3px 8px;font-size:0.75rem;cursor:pointer;">삭제</button>
         </div>
         <div style="font-size:0.75rem;color:#999;margin-bottom:4px;">${formatTime(date)}</div>
         <div style="font-size:0.9rem;color:#333;">${escapeHtml(String(message))}</div>
