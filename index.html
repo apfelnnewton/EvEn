@@ -409,7 +409,6 @@
   .fl-item.done { background:#f4f8f5; }
   .fl-item.done .st { color:#4a7a55; font-weight:bold; }
   .fl-item.locked { opacity:.55; cursor:not-allowed; }
-  .fl-item.empty { opacity:.4; cursor:not-allowed; background:repeating-linear-gradient(45deg,#fff,#fff 6px,#f6f8f6 6px,#f6f8f6 12px); }
 
   .fl-box { flex:1; padding:18px; overflow-y:auto; display:flex; flex-direction:column; gap:12px; min-height:0; }
   .fl-phase { display:flex; align-items:center; gap:8px; margin:4px 0 -2px; }
@@ -1036,7 +1035,7 @@
         </div>
 
         <div class="fl-list" id="fl-list-view">
-          <div class="fl-intro">📡 열림 · 🔒 선생님이 아직 안 엶 · <span style="opacity:.6">빗금 = 내용 준비 중</span></div>
+          <div class="fl-intro">📡 열림 · 🔒 잠금 — 선생님이 열어주면 들어갈 수 있음</div>
           <div id="fl-list">불러오는 중...</div>
         </div>
 
@@ -5922,10 +5921,10 @@ async function showFlipped() {
     d.list.forEach(g => {
       if (String(g.lesson) !== String(curLes)) { curLes = g.lesson; html += '<div class="fl-les">LESSON ' + escapeHtml(String(g.lesson)) + '</div>'; }
       const nm = escapeHtml(g.grammarName);
-      if (!g.hasContent) {
-        html += '<button class="fl-item empty" disabled><span>📄</span><span class="nm">' + nm + '</span><span class="st">준비 중</span></button>';
-      } else if (!g.isOpen) {
-        html += '<button class="fl-item locked" disabled><span>🔒</span><span class="nm">' + nm + '</span><span class="st">아직 안 열림</span></button>';
+      // ★ 내용이 없는 문법과 아직 안 연 문법을 학생 화면에선 구분하지 않음 — 둘 다 '잠금'.
+      //   학생 입장에선 "왜 못 들어가는지"의 차이가 의미 없고, 준비 중이라는 사정은 교사 화면에서만 필요함.
+      if (!g.hasContent || !g.isOpen) {
+        html += '<button class="fl-item locked" disabled><span>🔒</span><span class="nm">' + nm + '</span><span class="st">잠금</span></button>';
       } else {
         const cls = g.doneCount > 0 ? 'fl-item done' : 'fl-item';
         const icon = g.doneCount > 0 ? '✅' : '📡';
