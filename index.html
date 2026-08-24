@@ -1,4 +1,5 @@
 <!DOCTYPE html>
+<!-- EvEn V24 (2026-08-24) — 📡 예습하기(Zeeto Flipped) 추가. ⚠️ Apps Script V25와 반드시 세트 배포 (새 엔드포인트 6개). -->
 <html lang="ko"><head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -390,6 +391,100 @@
   .nav-item.active .nav-icon { filter: none; opacity: 1; }
   .nav-badge { position: absolute; top: -2px; right: 15%; background: #c62828; color: white; font-size: 0.6rem; font-weight: 900; min-width: 16px; height: 16px; line-height: 16px; border-radius: 8px; text-align: center; display: none; }
 
+
+  /* ═══ V24(2026-08-24): 📡 예습하기 (Zeeto Flipped Learning) ═══ */
+  #flipped-view { display:none; flex-direction:column; height:100%; flex:1; min-height:0; }
+  .fl-progress-wrap { padding: 12px 18px 6px; background:#fff; flex-shrink:0; border-bottom:1px solid #eee; }
+  .fl-track { height:6px; background:#e6ece7; border-radius:4px; overflow:hidden; }
+  .fl-fill { height:100%; width:0%; background:#4a5d4e; border-radius:4px; transition: width .35s ease-out; }
+  .fl-plabel { font-size:0.68rem; color:#9aa89e; margin-top:6px; display:flex; justify-content:space-between; }
+
+  .fl-list { flex:1; overflow-y:auto; padding:14px 16px 24px; }
+  .fl-intro { font-size:0.78rem; color:#7d8a80; line-height:1.6; margin-bottom:12px; }
+  .fl-les { font-size:0.74rem; font-weight:900; color:#9aa89e; letter-spacing:.06em; margin:14px 0 7px; }
+  .fl-item { display:flex; align-items:center; gap:10px; background:#fff; border:1.5px solid #e6ece7; border-radius:14px; padding:13px 14px; margin-bottom:8px; cursor:pointer; font-family:inherit; width:100%; text-align:left; transition:border-color .15s; }
+  .fl-item .nm { flex:1; font-size:0.87rem; font-weight:bold; color:#334137; }
+  .fl-item .st { font-size:0.74rem; color:#9aa89e; flex-shrink:0; }
+  .fl-item:hover:not(:disabled) { border-color:#4a5d4e; }
+  .fl-item.done { background:#f4f8f5; }
+  .fl-item.done .st { color:#4a7a55; font-weight:bold; }
+  .fl-item.locked { opacity:.55; cursor:not-allowed; }
+  .fl-item.empty { opacity:.4; cursor:not-allowed; background:repeating-linear-gradient(45deg,#fff,#fff 6px,#f6f8f6 6px,#f6f8f6 12px); }
+
+  .fl-box { flex:1; padding:18px; overflow-y:auto; display:flex; flex-direction:column; gap:12px; min-height:0; }
+  .fl-phase { display:flex; align-items:center; gap:8px; margin:4px 0 -2px; }
+  .fl-pill { font-size:0.7rem; font-weight:900; padding:3px 11px; border-radius:10px; letter-spacing:.04em; }
+  .fl-phase .fl-line { flex:1; height:1px; background:#e2e9e4; }
+  .fl-ph-find { background:#fff4e0; color:#a2670c; }
+  .fl-ph-tell { background:#e3f2e5; color:#2e5c37; }
+  .fl-ph-use  { background:#e6edf6; color:#35577f; }
+
+  .fl-row { display:flex; gap:8px; align-items:flex-start; }
+  .fl-face { font-size:1.4rem; flex-shrink:0; margin-top:2px; }
+  .fl-msg { background:#fff; border:1px solid #e0e0e0; border-radius:20px; border-bottom-left-radius:5px; padding:13px 16px; font-size:0.92rem; line-height:1.55; color:#333; white-space:pre-line; max-width:88%; }
+  .fl-sent { background:#d2e3d5; border:none; border-radius:20px; border-bottom-right-radius:5px; align-self:flex-end; padding:11px 15px; font-size:0.92rem; max-width:82%; }
+  .fl-sent-en { font-family: ui-monospace, Menlo, monospace; }
+
+  .fl-en { background:#f2f6f3; border-left:3px solid #4a5d4e; border-radius:8px; padding:10px 12px; margin:9px 0 2px; font-size:0.89rem; line-height:1.75; color:#2f3d33; }
+  .fl-en b { color:#1b5e20; }
+  .fl-en .gap { display:inline-block; min-width:52px; border-bottom:2px solid #4a5d4e; }
+  .fl-en .num { color:#9aa89e; font-weight:bold; margin-right:4px; }
+  .fl-en u { text-decoration-color:#7fae8b; text-underline-offset:3px; }
+  .fl-en .hole { display:inline-block; width:26px; border-bottom:2px dotted #c0392b; margin:0 2px; }
+
+  .fl-rule { background:#fff; border:1.5px solid #cfe0d3; border-radius:16px; padding:14px 16px; font-size:0.88rem; line-height:1.65; color:#334137; }
+  .fl-rule h4 { margin:0 0 8px; font-size:0.8rem; color:#4a5d4e; }
+  .fl-rule ul { margin:0; padding-left:17px; }
+  .fl-rule li { margin-bottom:5px; }
+  .fl-rule li:last-child { margin-bottom:0; }
+  .fl-rule b { color:#1b5e20; }
+
+  .fl-q { font-size:0.93rem; font-weight:bold; color:#2f3d33; line-height:1.5; }
+  .fl-opts { display:flex; flex-direction:column; gap:8px; }
+  .fl-opt { text-align:left; background:#fff; border:1.5px solid #dfe7e0; border-radius:14px; padding:12px 14px; font-size:0.89rem; line-height:1.45; color:#334137; font-family:inherit; cursor:pointer; transition:border-color .15s, background .15s; }
+  .fl-opt:hover:not(:disabled) { border-color:#4a5d4e; background:#f4f8f5; }
+  .fl-opt:disabled { cursor:default; }
+  /* 오답 피드백이 떠 있는 동안 나머지 선지가 잠긴 게 눈에 보이게 (연타 방지 가드가 무반응으로 보이지 않도록) */
+  .fl-opt:disabled:not(.correct):not(.wrong) { opacity:.5; }
+  .fl-opt.correct { background:#e3f2e5; border-color:#4a5d4e; font-weight:bold; }
+  .fl-opt.wrong { background:#ffebee; border-color:#ef9a9a; color:#a03a3a; }
+  .fl-opt.dim { opacity:.45; }
+  .fl-opt.choice { border-style:dashed; border-color:#b9cdbe; }
+
+  .fl-fb { border-radius:14px; padding:12px 14px; font-size:0.87rem; line-height:1.6; display:flex; gap:8px; align-items:flex-start; }
+  .fl-fb.bad { background:#fff4f4; border:1px solid #ffd7d7; color:#8d3b3b; }
+  .fl-fb.good { background:#eaf5ec; border:1px solid #c8e0cd; color:#2c4a33; }
+
+  .fl-inrow { display:flex; gap:8px; }
+  .fl-input { flex:1; min-width:0; padding:12px 14px; border:1.5px solid #dfe7e0; border-radius:14px; font-size:16px; font-family:inherit; outline:none; background:#fff; }
+  .fl-input:focus { border-color:#4a5d4e; }
+  .fl-btn { padding:12px 20px; background:#4a5d4e; color:#fff; border:none; border-radius:14px; font-size:0.92rem; font-weight:bold; font-family:inherit; cursor:pointer; flex-shrink:0; }
+  .fl-btn.wide { width:100%; }
+  .fl-btn.ghost { background:#fff; color:#4a5d4e; border:1.5px solid #4a5d4e; }
+
+  .fl-done { text-align:center; padding:16px 6px 2px; }
+  .fl-done .emo { font-size:2.6rem; }
+  .fl-done .h { font-weight:900; color:#4a5d4e; font-size:1.05rem; margin:8px 0 4px; }
+  .fl-done .sub { font-size:0.82rem; color:#7d8a80; line-height:1.6; }
+  .fl-score { display:flex; gap:8px; margin:16px 0 6px; }
+  .fl-cell { flex:1; background:#fff; border:1px solid #e6ece7; border-radius:14px; padding:11px 6px; text-align:center; }
+  .fl-cell .n { font-size:1.1rem; font-weight:900; color:#4a5d4e; }
+  .fl-cell .l { font-size:0.68rem; color:#9aa89e; margin-top:2px; }
+  .fl-ask { background:#fff; border:1.5px dashed #b9cdbe; border-radius:16px; padding:13px 14px; margin-top:6px; }
+
+  /* 교사 개방 관리 */
+  .fl-op-row { display:flex; align-items:center; gap:9px; padding:8px 11px; border:1px solid #eef2ef; border-radius:11px; margin-bottom:5px; background:#fcfdfc; flex-wrap:wrap; }
+  .fl-op-row .nm { flex:1; min-width:120px; font-size:0.81rem; color:#334137; font-weight:bold; }
+  .fl-op-row .gr { font-size:0.71rem; color:#9aa89e; flex-shrink:0; width:66px; }
+  .fl-op-row.open { background:#f4f8f5; border-color:#d9e6dc; }
+  .fl-op-row.noc { opacity:.55; }
+  .fl-op-btn { border:1.5px solid #4a5d4e; background:#4a5d4e; color:#fff; border-radius:10px; padding:5px 12px; font-size:0.73rem; font-weight:bold; font-family:inherit; cursor:pointer; flex-shrink:0; }
+  .fl-op-btn.undo { background:#fff; color:#7d8a80; border-color:#dfe7e0; }
+  .fl-op-btn:disabled { background:#f2f4f2; color:#b9c2bb; border-color:#e6ece7; cursor:not-allowed; }
+  .fl-badge { font-size:0.68rem; font-weight:bold; padding:2px 8px; border-radius:9px; flex-shrink:0; }
+  .fl-b-y { background:#e3f2e5; color:#2e5c37; }
+  .fl-b-n { background:#f1f3f1; color:#97a29a; }
+
   #mypage-screen { background-color: #f9fbf9; }
   
   .mypage-dashboard { display: flex; gap: 10px; padding: 15px; align-items: stretch; margin-bottom: 5px; }
@@ -651,6 +746,12 @@
   .alien-card .alien-emoji { font-size: 3rem; margin-bottom: 10px; }
   .alien-card .alien-name { font-size: 1.1rem; font-weight: 700; color: #4a5d4e; }
   .alien-card .alien-desc { font-size: 0.8rem; color: #999; margin-top: 5px; }
+  /* ★ V24(2026-08-24): 카드 2개 → 3개. 폰(390px)에서 2+1로 줄바꿈되지 않게 폭·여백 축소 */
+  .alien-cards { gap: 10px; }
+  .alien-card { padding: 20px 6px; min-width: 0; flex: 1 1 0; }
+  .alien-card .alien-emoji { font-size: 2.3rem; margin-bottom: 8px; }
+  .alien-card .alien-name { font-size: 0.85rem; white-space: nowrap; }
+  .alien-card .alien-desc { font-size: 0.68rem; margin-top: 4px; word-break: keep-all; }
 
   .grammar-select { padding: 15px; flex: 1; overflow-y: auto; }
   .grammar-select h3 { color: #4a5d4e; margin-bottom: 15px; font-size: 1.1rem; text-align: center; }
@@ -881,12 +982,17 @@
           <div class="header-right"><span id="student-notice-btn" style="font-size:0.85rem; color:#4a5d4e; cursor:pointer; font-weight:bold;" onclick="openNoticeModal()">📢 공지</span>&nbsp;&nbsp;<span class="logout-btn" onclick="logout()">로그아웃</span></div>
         </div>
         <div class="aliens-select">
-          <h2>누구와 대화할까요?</h2>
+          <h2>뭐 하러 왔음?</h2>
           <div class="alien-cards">
             <div class="alien-card" onclick="showZeetoChat()">
               <div class="alien-emoji">👽</div>
               <div class="alien-name">Zeeto</div>
               <div class="alien-desc">영어 질문있음?</div>
+            </div>
+            <div class="alien-card" onclick="showFlipped()">
+              <div class="alien-emoji">📡</div>
+              <div class="alien-name">Zeeto's class</div>
+              <div class="alien-desc">수업 전에 미리 봄</div>
             </div>
             <div class="alien-card" onclick="showWeeto()">
               <div class="alien-emoji">👾</div>
@@ -912,6 +1018,29 @@
           <input type="text" class="chat-input" id="chat-input" placeholder="Send a message...">
           <button class="send-btn" onclick="sendMessage()">Send</button>
         </div>
+      </div>
+
+      <!-- ★ V24(2026-08-24): 📡 예습하기 (Zeeto Flipped Learning) -->
+      <div id="flipped-view">
+        <div class="chat-header">
+          <div class="header-left">
+            <span class="back-btn" style="display:inline" onclick="flippedBack()">←</span>
+            <span style="font-size:1.3rem">📡</span>&nbsp;&nbsp;<strong id="fl-head-title">Zeeto's class</strong>
+          </div>
+          <div class="header-right"><span class="logout-btn" onclick="logout()">로그아웃</span></div>
+        </div>
+
+        <div class="fl-progress-wrap" id="fl-progress-wrap" style="display:none;">
+          <div class="fl-track"><div class="fl-fill" id="fl-bar"></div></div>
+          <div class="fl-plabel"><span id="fl-plabel">발견</span><span>예상 4분</span></div>
+        </div>
+
+        <div class="fl-list" id="fl-list-view">
+          <div class="fl-intro">📡 열림 · 🔒 선생님이 아직 안 엶 · <span style="opacity:.6">빗금 = 내용 준비 중</span></div>
+          <div id="fl-list">불러오는 중...</div>
+        </div>
+
+        <div class="fl-box" id="fl-run-view" style="display:none;"></div>
       </div>
 
       <!-- Weeto Teaching Mode View -->
@@ -1367,6 +1496,7 @@
     <div id="t-tab-students" onclick="switchTeacherTab('students')" style="flex:1; text-align:center; padding:8px; border-radius:10px; font-size:0.8rem; font-weight:bold; cursor:pointer; color:#999;">👨‍🎓 학생</div>
     <div id="t-tab-stats" onclick="switchTeacherTab('stats')" style="flex:1; text-align:center; padding:8px; border-radius:10px; font-size:0.8rem; font-weight:bold; cursor:pointer; color:#999;">📊 통계</div>
     <div id="t-tab-notice" onclick="switchTeacherTab('notice')" style="flex:1; text-align:center; padding:8px; border-radius:10px; font-size:0.8rem; font-weight:bold; cursor:pointer; color:#999;">📢 공지</div>
+    <div id="t-tab-flipped" onclick="switchTeacherTab('flipped')" style="flex:1; text-align:center; padding:8px; border-radius:10px; font-size:0.8rem; font-weight:bold; cursor:pointer; color:#999;">📡 예습</div>
     <div id="t-tab-approve" onclick="switchTeacherTab('approve')" style="flex:1; text-align:center; padding:8px; border-radius:10px; font-size:0.8rem; font-weight:bold; cursor:pointer; color:#999;">✅ 승인 <span id="t-approve-badge" style="display:none; background:#d9534f; color:white; border-radius:9px; padding:0 6px; font-size:0.65rem; font-weight:900; vertical-align:middle;">0</span></div>
   </div>
 
@@ -1457,6 +1587,13 @@
         <div style="font-weight:bold; color:#4a5d4e; margin-bottom:8px;">📋 최근 공지 내역</div>
         <div id="t-notice-history" style="color:#999; font-size:0.9rem;">불러오는 중...</div>
       </div>
+    </div>
+
+    <!-- ★ V24(2026-08-24): 📡 예습 개방 관리 -->
+    <div id="t-panel-flipped" style="display:none;">
+      <div style="font-weight:bold; color:#4a5d4e; margin-bottom:4px;">📡 예습 개방 관리</div>
+      <div style="font-size:0.78rem; color:#999; margin-bottom:12px; line-height:1.6;">열기 = 그 학년 학생 목록에 나타납니다. 날짜 자동 개방은 없습니다 — 진도에 맞춰 직접 열어주세요.<br>내용이 없는 문법은 열 수 없습니다(학생에게 빈 화면이 되므로).</div>
+      <div id="t-flipped-list" style="color:#999; font-size:0.9rem;">불러오는 중...</div>
     </div>
 
     <div id="t-panel-approve" style="display:none;">
@@ -1826,6 +1963,7 @@ checkNewComments();
       document.getElementById('aliens-select-view').style.display = 'block';
       document.getElementById('zeeto-chat-view').style.display = 'none';
       document.getElementById('weeto-view').style.display = 'none';
+      document.getElementById('flipped-view').style.display = 'none';  // ★ V24
     }
     else if(screenId === 'log-screen') { document.getElementById('nav-log').classList.add('active'); document.getElementById('log-date').value = new Date().toLocaleDateString('ko-KR'); if (isLateMode) exitLateMode(); }
     else if(screenId === 'mystory-screen') { document.getElementById('nav-mystory').classList.add('active'); attachMyStoryAutosave(); restoreMyStoryDraft(); }
@@ -5700,7 +5838,7 @@ function exitUndercoverMode() {
   document.getElementById('teacher-screen').style.display = 'flex'; document.body.classList.add('teacher-mode');
 }
 function switchTeacherTab(tab) {
-  ['dashboard','students','stats','notice','approve'].forEach(t => {
+  ['dashboard','students','stats','notice','flipped','approve'].forEach(t => {
     const panel = document.getElementById(`t-panel-${t}`);
     const tabEl = document.getElementById(`t-tab-${t}`);
     if (panel) panel.style.display = 'none';
@@ -5720,7 +5858,414 @@ function switchTeacherTab(tab) {
   if (tab === 'students' && allStudentsData.length === 0) loadAllStudents();
   if (tab === 'stats') loadStats();
   if (tab === 'notice') loadNoticeHistory();
+  if (tab === 'flipped') loadFlippedAdmin();  // ★ V24
   if (tab === 'approve') { loadPendingUsers(); loadClearRequests(); loadPendingImages(); }
+}
+
+
+// ═══════════════════════════════════════════════════════════════════════════
+// ★ V24(2026-08-24): 📡 예습하기 (Zeeto Flipped Learning)
+// 흐름: Aliens → 📡 예습하기 → 문법 목록 → 발견 → 설명(+보충) → 적용 3문항 → 완료
+// 콘텐츠는 Flipped / FlippedItems 시트에서 그대로 내려옴 — AI 호출 없음(비용 0, 학생 전원 동일).
+// 채점도 프론트에서 함. 정답이 클라이언트에 노출되지만 17명 규모 + 문법당 1점이라
+// 문항마다 서버 왕복하는 비용이 더 큼. 점수 인플레는 서버의 "문법당 1점" 상한이 막음.
+// ═══════════════════════════════════════════════════════════════════════════
+let flData = null;        // 현재 문법 콘텐츠
+let flSteps = [];         // 발견/설명/적용 스텝 배열
+let flIdx = 0;
+let flFindTries = 0, flAppOK = 0, flAppTotal = 0, flRetries = 0, flExtras = [];
+let flExtraUsed = { ex: false, ko: false };
+let flSaving = false;
+
+const FL_PH = { find: ['발견', 'fl-ph-find'], tell: ['설명', 'fl-ph-tell'], use: ['적용', 'fl-ph-use'] };
+
+function flBox() { return document.getElementById('fl-run-view'); }
+function flScroll() { const b = flBox(); b.scrollTop = b.scrollHeight; }
+function flEl(cls, html) { const d = document.createElement('div'); d.className = cls; d.innerHTML = html; flBox().appendChild(d); return d; }
+function flBubble(html) {
+  const r = document.createElement('div'); r.className = 'fl-row';
+  r.innerHTML = '<div class="fl-face">👽</div><div class="fl-msg">' + html + '</div>';
+  flBox().appendChild(r); return r;
+}
+function flPhase(p) {
+  const m = FL_PH[p] || FL_PH.use;
+  flEl('fl-phase', '<span class="fl-pill ' + m[1] + '">' + m[0] + '</span><span class="fl-line"></span>');
+}
+function flProgress() {
+  const d = Math.min(flIdx, flSteps.length) / (flSteps.length || 1);
+  document.getElementById('fl-bar').style.width = (d * 100) + '%';
+  const lab = document.getElementById('fl-plabel');
+  lab.textContent = flIdx >= flSteps.length ? '완료' : (FL_PH[flSteps[flIdx].phase] || FL_PH.use)[0];
+}
+
+// ─── 진입: 문법 목록 ───
+async function showFlipped() {
+  document.getElementById('aliens-select-view').style.display = 'none';
+  document.getElementById('zeeto-chat-view').style.display = 'none';
+  document.getElementById('weeto-view').style.display = 'none';
+  document.getElementById('flipped-view').style.display = 'flex';
+  document.getElementById('fl-list-view').style.display = 'block';
+  document.getElementById('fl-run-view').style.display = 'none';
+  document.getElementById('fl-progress-wrap').style.display = 'none';
+  document.getElementById('fl-head-title').textContent = "Zeeto's class";
+  const host = document.getElementById('fl-list');
+  host.innerHTML = '<p style="text-align:center;color:#999;font-size:0.85rem;">불러오는 중...</p>';
+  try {
+    const res = await fetch(SHEET_URL, { method: 'POST', body: JSON.stringify({
+      type: "get_flipped_list", studentId: currentStudentId, token: currentToken }) });
+    const d = await res.json();
+    if (d.error) { host.innerHTML = '<p style="text-align:center;color:#d9534f;font-size:0.85rem;">' + escapeHtml(d.error) + '</p>'; return; }
+    if (d.notReady || !d.list || !d.list.length) {
+      host.innerHTML = '<p style="text-align:center;color:#999;font-size:0.85rem;padding:20px;">아직 예습할 문법이 없음.<br>선생님이 열어주면 여기에 나타남 🛸</p>'; return;
+    }
+    let html = '', curLes = null;
+    d.list.forEach(g => {
+      if (String(g.lesson) !== String(curLes)) { curLes = g.lesson; html += '<div class="fl-les">LESSON ' + escapeHtml(String(g.lesson)) + '</div>'; }
+      const nm = escapeHtml(g.grammarName);
+      if (!g.hasContent) {
+        html += '<button class="fl-item empty" disabled><span>📄</span><span class="nm">' + nm + '</span><span class="st">준비 중</span></button>';
+      } else if (!g.isOpen) {
+        html += '<button class="fl-item locked" disabled><span>🔒</span><span class="nm">' + nm + '</span><span class="st">아직 안 열림</span></button>';
+      } else {
+        const cls = g.doneCount > 0 ? 'fl-item done' : 'fl-item';
+        const icon = g.doneCount > 0 ? '✅' : '📡';
+        const st = g.doneCount > 0 ? '완료 · 다시' : '도전 →';
+        html += '<button class="' + cls + '" onclick="startFlipped(\'' + jsAttr(String(g.lesson)) + '\', \'' + jsAttr(g.grammarName) + '\')">' +
+                '<span>' + icon + '</span><span class="nm">' + nm + '</span><span class="st">' + st + '</span></button>';
+      }
+    });
+    host.innerHTML = html;
+  } catch (e) {
+    host.innerHTML = '<p style="text-align:center;color:#d9534f;font-size:0.85rem;">목록을 못 불러왔음. 인터넷 확인하고 다시 들어와 보셈.</p>';
+  }
+}
+
+function flippedBack() {
+  // 진행 중이면 목록으로, 목록이면 Aliens로
+  if (document.getElementById('fl-run-view').style.display !== 'none') {
+    document.getElementById('fl-run-view').style.display = 'none';
+    document.getElementById('fl-progress-wrap').style.display = 'none';
+    document.getElementById('fl-list-view').style.display = 'block';
+    document.getElementById('fl-head-title').textContent = "Zeeto's class";
+    showFlipped();
+    return;
+  }
+  backToAliens();
+}
+
+// ─── 콘텐츠 로드 후 시작 ───
+async function startFlipped(lesson, grammarName) {
+  const host = document.getElementById('fl-list');
+  const prev = host.innerHTML;
+  host.innerHTML = '<p style="text-align:center;color:#999;font-size:0.85rem;">Zeeto 부르는 중... 🛸</p>';
+  try {
+    const res = await fetch(SHEET_URL, { method: 'POST', body: JSON.stringify({
+      type: "get_flipped_content", studentId: currentStudentId, token: currentToken,
+      lesson: lesson, grammarName: grammarName }) });
+    const d = await res.json();
+    if (d.error || !d.items || !d.items.length) {
+      host.innerHTML = prev;
+      alert(d.error || '이 문법은 아직 내용이 없음.');
+      return;
+    }
+    flData = d;
+    flSteps = [];
+    const finds = d.items.filter(i => i.phase === 'find');
+    const uses = d.items.filter(i => i.phase !== 'find');
+    finds.forEach(i => flSteps.push(i));
+    flSteps.push({ phase: 'tell', type: 'teach' });
+    uses.forEach(i => flSteps.push(i));
+
+    flIdx = 0; flFindTries = 0; flAppOK = 0; flAppTotal = 0; flRetries = 0; flExtras = [];
+    flExtraUsed = { ex: false, ko: false }; flSaving = false;
+
+    document.getElementById('fl-list-view').style.display = 'none';
+    document.getElementById('fl-run-view').style.display = 'flex';
+    document.getElementById('fl-progress-wrap').style.display = 'block';
+    document.getElementById('fl-head-title').textContent = d.grammarName;
+    flBox().innerHTML = '';
+    flBubble((currentFirstName ? escapeHtml(currentFirstName) + '! ' : '') + '🛸 왔음?\n오늘 수업 나가기 전에 Zeeto가 먼저 보여줌.\nLesson ' + escapeHtml(String(d.lesson)) + ' · <b>' + escapeHtml(d.grammarName) + '</b>임. 4분이면 끝남.');
+    flRender();
+  } catch (e) {
+    host.innerHTML = prev;
+    alert('내용을 못 불러왔음. 잠시 후 다시 해보셈.');
+  }
+}
+
+function flRender() {
+  flProgress();
+  if (flIdx >= flSteps.length) return flDone();
+  const s = flSteps[flIdx];
+  flPhase(s.phase);
+  if (s.type === 'teach') {
+    let body = '방금 본 그게 이름이 있음. Zeeto가 이름표만 붙여줌 ✨';
+    if (flData.ruleExample) body += '<div class="fl-en fl-en-block">' + flData.ruleExample + '</div>';
+    flBubble(body);
+    flEl('fl-rule', '<h4>📌 ' + escapeHtml(flData.ruleTitle) + '</h4><ul>' + flData.rules.map(r => '<li>' + r + '</li>').join('') + '</ul>');
+    flOfferExtra();
+    flScroll();
+    return;
+  }
+  let body = s.phase === 'find' ? '설명 먼저 안 함. 아래 문장부터 보셈 👀' : '풀어보셈 🚀';
+  if (s.stem) body += '<div class="fl-en fl-en-block">' + s.stem + '</div>';
+  flBubble(body);
+  if (s.type === 'input') flInput(s); else flMC(s);
+  flScroll();
+}
+
+function flOfferExtra() {
+  const left = [];
+  if (!flExtraUsed.ex && flData.extraExamples) left.push('ex');
+  if (!flExtraUsed.ko && flData.extraKorean) left.push('ko');
+  const q = flEl('fl-q', left.length ? '더 필요한 거 있음?' : '보충 설명은 다 봤음. 이제 풀어보셈');
+  const wrap = flEl('fl-opts', '');
+  const clear = () => { q.remove(); wrap.remove(); };
+  const LBL = { ex: '📄 예시 더 보기', ko: '🌏 한국어로 다시 설명' };
+  left.forEach(k => {
+    const b = document.createElement('button');
+    b.className = 'fl-opt choice'; b.innerHTML = LBL[k];
+    b.onclick = () => {
+      flExtraUsed[k] = true; flExtras.push(k === 'ex' ? '예시' : '한국어');
+      clear();
+      flEl('fl-sent', LBL[k]);
+      flBubble(k === 'ex' ? flData.extraExamples : flData.extraKorean);
+      flOfferExtra(); flScroll();
+    };
+    wrap.appendChild(b);
+  });
+  const go = document.createElement('button');
+  go.className = 'fl-opt'; go.innerHTML = '▶️ 바로 문제 풀기';
+  go.onclick = () => { clear(); flEl('fl-sent', '바로 문제 풀기'); flIdx++; flRender(); flScroll(); };
+  wrap.appendChild(go);
+}
+
+function flMC(s) {
+  const isFind = s.phase === 'find';
+  if (!isFind) flAppTotal++;
+  let attempted = false;
+  flEl('fl-q', s.question);
+  const wrap = flEl('fl-opts', '');
+  const opts = s.opts.slice().sort(() => Math.random() - 0.5);   // 정답 위치 공유 방지
+  opts.forEach(o => {
+    const b = document.createElement('button');
+    b.className = 'fl-opt'; b.innerHTML = o.t;
+    b.onclick = () => {
+      if (o.ok) {
+        if (isFind) flFindTries++; else if (!attempted) flAppOK++;
+        Array.prototype.forEach.call(wrap.children, c => { c.disabled = true; if (c !== b) c.classList.add('dim'); });
+        b.classList.add('correct');
+        flEl('fl-fb good', '<span>👽</span><div>' + o.fb + '</div>');
+        const nb = document.createElement('button');
+        nb.className = 'fl-btn wide'; nb.textContent = '다음 →';
+        nb.onclick = () => { nb.remove(); flIdx++; flRender(); flScroll(); };
+        flBox().appendChild(nb); flScroll();
+      } else {
+        if (!attempted && isFind) flFindTries++;
+        attempted = true; flRetries++;
+        b.classList.add('wrong'); b.disabled = true; b.dataset.dead = '1';
+        Array.prototype.forEach.call(wrap.children, c => { c.disabled = true; });
+        // 발견 문항은 한 번 틀린 뒤에만 힌트 지문으로 교체 (힌트는 실패 뒤에)
+        if (isFind && s.stemHint) {
+          const blocks = flBox().querySelectorAll('.fl-en-block');
+          if (blocks.length) blocks[blocks.length - 1].innerHTML = s.stemHint;
+        }
+        const f = flEl('fl-fb bad', '<span>👽</span><div>' + o.fb + '</div>');
+        const rb = document.createElement('button');
+        rb.className = 'fl-btn wide ghost'; rb.textContent = '↑ 다시 고르기';
+        rb.onclick = () => {
+          f.remove(); rb.remove();
+          Array.prototype.forEach.call(wrap.children, c => { if (!c.dataset.dead) c.disabled = false; });
+          flScroll();
+        };
+        flBox().appendChild(rb); flScroll();
+      }
+    };
+    wrap.appendChild(b);
+  });
+}
+
+function flInput(s) {
+  flAppTotal++;
+  let attempted = false;
+  flEl('fl-q', s.question);
+  const row = flEl('fl-inrow', '');
+  const inp = document.createElement('input');
+  inp.className = 'fl-input'; inp.placeholder = '입력'; inp.autocomplete = 'off';
+  const btn = document.createElement('button');
+  btn.className = 'fl-btn'; btn.textContent = '확인';
+  row.appendChild(inp); row.appendChild(btn);
+  const norm = t => String(t).trim().toLowerCase().replace(/[.,!?]/g, '').replace(/[’`]/g, "'").replace(/\s+/g, ' ');
+  const check = () => {
+    const v = norm(inp.value); if (!v) return;
+    const raw = inp.value.trim();
+    if ((s.accept || []).map(norm).indexOf(v) !== -1) {
+      if (!attempted) flAppOK++;
+      flEl('fl-sent fl-sent-en', escapeHtml(raw)); row.remove();
+      flEl('fl-fb good', '<span>👽</span><div>' + (s.okFeedback || '맞음! 🛸') + '</div>');
+      const nb = document.createElement('button');
+      nb.className = 'fl-btn wide'; nb.textContent = '예습 끝내기 🚀';
+      nb.onclick = () => { nb.remove(); flIdx++; flRender(); flScroll(); };
+      flBox().appendChild(nb); flScroll();
+    } else {
+      attempted = true; flRetries++;
+      flEl('fl-sent fl-sent-en', escapeHtml(raw));
+      inp.value = ''; row.remove();
+      let msg = s.missFeedback || '아쉬움. 다시 해보셈.';
+      const traps = s.traps || {};
+      Object.keys(traps).forEach(k => { if (norm(k) === v) msg = traps[k]; });
+      const f = flEl('fl-fb bad', '<span>👽</span><div>' + msg + '</div>');
+      const rb = document.createElement('button');
+      rb.className = 'fl-btn wide ghost'; rb.textContent = '↓ 다시 쓰기';
+      rb.onclick = () => { f.remove(); rb.remove(); flBox().appendChild(row); inp.focus(); flScroll(); };
+      flBox().appendChild(rb); flScroll();
+    }
+  };
+  btn.onclick = check;
+  // ★ 한국어 IME composing 중 Enter 방지 (V11에서 Zeeto 채팅에 적용한 것과 같은 처리)
+  inp.addEventListener('keydown', e => { if (e.key === 'Enter' && !e.isComposing) check(); });
+}
+
+async function flDone() {
+  if (flSaving) return;
+  flSaving = true;
+  flProgress();
+  const appTotal = flAppTotal;
+  flEl('', '<div class="fl-done">' +
+    '<div class="emo">🛸</div>' +
+    '<div class="h">예습 완료</div>' +
+    '<div class="sub">오늘 수업에서 이 문법 그대로 나옴.<br>선생님 화면에 완료 표시됨.</div>' +
+    '<div class="fl-score">' +
+      '<div class="fl-cell"><div class="n">' + (flFindTries <= 1 ? '1회' : flFindTries + '회') + '</div><div class="l">발견 시도</div></div>' +
+      '<div class="fl-cell"><div class="n">' + flAppOK + ' / ' + appTotal + '</div><div class="l">적용 첫 시도</div></div>' +
+      '<div class="fl-cell"><div class="n" id="fl-pt">…</div><div class="l">획득 점수</div></div>' +
+    '</div></div>');
+  const ask = flEl('fl-ask', '<div style="font-size:0.8rem;color:#4a5d4e;font-weight:bold;margin-bottom:9px;">👽 여기까지 하고 궁금한 거 있음?</div>');
+  const arow = document.createElement('div'); arow.className = 'fl-inrow';
+  const ainp = document.createElement('input'); ainp.className = 'fl-input'; ainp.placeholder = 'Zeeto한테 바로 물어보기';
+  const abtn = document.createElement('button'); abtn.className = 'fl-btn'; abtn.textContent = '전송';
+  abtn.onclick = () => {
+    const q = ainp.value.trim(); if (!q) return;
+    // Zeeto 채팅(👽 Zeeto 카드)으로 질문을 들고 이동 — 문맥이 살아있는 자리에서 질문하게 하는 게 목적
+    backToAliens();
+    showZeetoChat();
+    const ci = document.getElementById('chat-input');
+    if (ci) { ci.value = q; if (typeof sendMessage === 'function') sendMessage(); }
+  };
+  arow.appendChild(ainp); arow.appendChild(abtn); ask.appendChild(arow);
+  const back = document.createElement('button');
+  back.className = 'fl-btn ghost wide'; back.style.marginTop = '10px'; back.textContent = '↻ 목록으로';
+  back.onclick = () => flippedBack();
+  flBox().appendChild(back);
+  flScroll();
+
+  try {
+    const res = await fetch(SHEET_URL, { method: 'POST', body: JSON.stringify({
+      type: "save_flipped_result",
+      studentId: currentStudentId, token: currentToken, studentName: currentFirstName,
+      lesson: flData.lesson, grammarName: flData.grammarName,
+      findTries: flFindTries, appOK: flAppOK, appTotal: appTotal,
+      retries: flRetries, extras: flExtras.join(',') }) });
+    const d = await res.json();
+    const pt = document.getElementById('fl-pt');
+    if (pt) {
+      if (d && d.success) pt.textContent = d.firstTime ? '+1점' : '0점';
+      else pt.textContent = '⚠️';
+    }
+    if (!d || !d.success) {
+      flEl('fl-fb bad', '<span>⚠️</span><div>기록 저장에 실패했음. 인터넷 확인하고 <b>다시 한 번</b> 풀어주셈 — 지금은 선생님 화면에 안 뜸.</div>');
+      flScroll();
+    }
+  } catch (e) {
+    const pt = document.getElementById('fl-pt'); if (pt) pt.textContent = '⚠️';
+    flEl('fl-fb bad', '<span>⚠️</span><div>기록 저장에 실패했음. 인터넷 확인하고 <b>다시 한 번</b> 풀어주셈 — 지금은 선생님 화면에 안 뜸.</div>');
+    flScroll();
+  }
+}
+
+// ═══ 선생님: 📡 예습 개방 관리 ═══
+let flAdminList = [];
+async function loadFlippedAdmin() {
+  const host = document.getElementById('t-flipped-list');
+  host.innerHTML = '<div style="text-align:center;color:#999;">불러오는 중...</div>';
+  try {
+    const res = await fetch(SHEET_URL, { method: 'POST', body: JSON.stringify({
+      type: "get_flipped_admin", id: currentLoginId, pw: teacherPw }) });
+    const d = await res.json();
+    if (d.error) { host.innerHTML = '<div style="text-align:center;color:#d9534f;">' + escapeHtml(d.error) + '</div>'; return; }
+    if (d.notReady || !d.list || !d.list.length) {
+      host.innerHTML = '<div style="text-align:center;color:#999;padding:20px;">Flipped 시트가 아직 없습니다.<br>시트를 만들고 내용을 붙여넣으면 여기에 나타납니다.</div>'; return;
+    }
+    flAdminList = d.list;
+    let html = '', curKey = null;
+    d.list.forEach((g, i) => {
+      const key = g.grade + '-' + g.lesson;
+      if (key !== curKey) {
+        curKey = key;
+        html += '<div style="font-size:0.72rem;font-weight:bold;color:#9aa89e;letter-spacing:.06em;margin:12px 0 6px;">' +
+                (g.grade === '9' ? '테스트' : escapeHtml(g.grade) + '학년') + ' · LESSON ' + escapeHtml(String(g.lesson)) + '</div>';
+      }
+      const open = !!g.openedAt;
+      html += '<div class="fl-op-row' + (open ? ' open' : '') + (g.hasContent ? '' : ' noc') + '">' +
+        '<span class="gr">' + (g.grade === '9' ? '테스트' : escapeHtml(g.grade) + '학년') + '</span>' +
+        '<span>' + (!g.hasContent ? '📄' : open ? '📡' : '🔒') + '</span>' +
+        '<span class="nm">' + escapeHtml(g.grammarName) + '</span>' +
+        '<span class="fl-badge ' + (g.hasContent ? 'fl-b-y' : 'fl-b-n') + '">' + (g.hasContent ? '내용 있음' : '내용 없음') + '</span>' +
+        '<span style="font-size:0.71rem;color:#9aa89e;">' + (open ? '개방 ' + escapeHtml(g.openedAt) : '잠김') + '</span>' +
+        '<span style="font-size:0.71rem;color:#4a7a55;font-weight:bold;">예습 ' + g.doneStudents + '/' + g.totalStudents + '</span>' +
+        '<button class="fl-op-btn' + (open ? ' undo' : '') + '"' + (g.hasContent ? '' : ' disabled') +
+          ' onclick="toggleFlippedOpen(' + i + ')">' + (open ? '되돌리기' : '열기') + '</button>' +
+        (g.doneStudents > 0 ? '<button class="fl-op-btn undo" onclick="loadFlippedStatus(' + i + ')">현황</button>' : '') +
+        '</div><div id="fl-status-' + i + '" style="display:none;margin:-2px 0 8px;background:#f4f8f5;border-radius:10px;padding:10px;font-size:0.78rem;"></div>';
+    });
+    host.innerHTML = html;
+  } catch (e) {
+    host.innerHTML = '<div style="text-align:center;color:#d9534f;">불러오기 실패</div>';
+  }
+}
+
+async function toggleFlippedOpen(i) {
+  const g = flAdminList[i]; if (!g) return;
+  const open = !g.openedAt;
+  if (!open && !confirm('‘' + g.grammarName + '’ 을(를) 다시 잠글까요?\n학생 목록에서 사라집니다. (기록은 남습니다)')) return;
+  try {
+    const res = await fetch(SHEET_URL, { method: 'POST', body: JSON.stringify({
+      type: "set_flipped_open", id: currentLoginId, pw: teacherPw,
+      grade: g.grade, lesson: g.lesson, grammarName: g.grammarName, open: open }) });
+    const d = await res.json();
+    if (d.error) { alert(d.error); return; }
+    loadFlippedAdmin();
+  } catch (e) { alert('처리 실패. 잠시 후 다시 시도해 주세요.'); }
+}
+
+async function loadFlippedStatus(i) {
+  const g = flAdminList[i]; if (!g) return;
+  const box = document.getElementById('fl-status-' + i);
+  if (!box) return;
+  if (box.style.display !== 'none') { box.style.display = 'none'; return; }
+  box.style.display = 'block';
+  box.innerHTML = '불러오는 중...';
+  try {
+    const res = await fetch(SHEET_URL, { method: 'POST', body: JSON.stringify({
+      type: "get_flipped_status", id: currentLoginId, pw: teacherPw,
+      grade: g.grade, lesson: g.lesson, grammarName: g.grammarName }) });
+    const d = await res.json();
+    if (d.error) { box.innerHTML = '<span style="color:#d9534f;">' + escapeHtml(d.error) + '</span>'; return; }
+    let html = '<table style="width:100%;border-collapse:collapse;font-size:0.76rem;">' +
+      '<tr style="color:#9aa89e;"><th style="text-align:left;padding:4px;">학생</th><th style="text-align:left;padding:4px;">상태</th>' +
+      '<th style="text-align:left;padding:4px;">발견</th><th style="text-align:left;padding:4px;">적용</th>' +
+      '<th style="text-align:left;padding:4px;">보충</th><th style="text-align:left;padding:4px;">시각</th></tr>';
+    d.rows.forEach(r => {
+      html += '<tr style="border-top:1px solid #e6ece7;">' +
+        '<td style="padding:4px;font-weight:bold;">' + escapeHtml(r.name) + '</td>' +
+        '<td style="padding:4px;">' + (r.done ? (r.retries ? '<span style="color:#8a5a10;">완료(재시도)</span>' : '<span style="color:#2e5c37;">완료</span>') : '<span style="color:#a03a3a;">미완료</span>') + '</td>' +
+        '<td style="padding:4px;">' + (r.done ? (r.findTries <= 1 ? '1회' : r.findTries + '회') : '–') + '</td>' +
+        '<td style="padding:4px;">' + (r.done ? r.appOK + '/' + r.appTotal : '–') + '</td>' +
+        '<td style="padding:4px;">' + (r.extras ? escapeHtml(r.extras) : '–') + '</td>' +
+        '<td style="padding:4px;color:#9aa89e;">' + escapeHtml(r.when || '') + '</td></tr>';
+    });
+    html += '</table>';
+    box.innerHTML = html;
+  } catch (e) { box.innerHTML = '<span style="color:#d9534f;">불러오기 실패</span>'; }
 }
 
 // ★ V13(2026-08-09): Weeto CLEAR 요청 대기 목록
@@ -6860,6 +7405,7 @@ function backToAliens() {
   document.getElementById('aliens-select-view').style.display = 'block';
   document.getElementById('zeeto-chat-view').style.display = 'none';
   document.getElementById('weeto-view').style.display = 'none';
+  document.getElementById('flipped-view').style.display = 'none';  // ★ V24
 }
 
 function backToGrammarSelect() {
