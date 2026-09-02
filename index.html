@@ -2649,6 +2649,43 @@ checkNewComments();
     }
   });
 
+
+  // ═══════════════════════════════════════════════════════════
+  // ★ V25(2026-08-26): 1st Practice 판정 파서
+  //   AI 응답에서 "VERDICT: OK|FIX" 줄만 읽음. 본문에 무슨 말이 있든 통과 여부엔 영향 없음.
+  //   형식이 깨졌을 때만 예전 CORRECT 방식으로 폴백(배포 직후 과도기 방어).
+  // ═══════════════════════════════════════════════════════════
+  function parsePracticeVerdict_(raw) {
+    var t = String(raw || "");
+    var vm = t.match(/(?:^|\n)\s*VERDICT\s*[:\uff1a]\s*(OK|FIX)\b/i);
+    var mm = t.match(/(?:^|\n)\s*MSG\s*[:\uff1a]\s*([\s\S]+)/i);
+    var verdict = vm ? vm[1].toUpperCase() : null;
+    var msg = mm ? mm[1] : t;
+    msg = String(msg).replace(/^\s*(VERDICT|MSG)\s*[:\uff1a].*$/gim, "").trim();
+
+    if (!verdict) {
+      var hasC = /(^|[^A-Za-z])CORRECT([^A-Za-z]|$)/.test(t)
+              && !/\b(not|isn'?t|aren'?t|never|but|however)\s+CORRECT\b/i.test(t);
+      verdict = hasC ? "OK" : "FIX";
+      msg = t.replace(/['\u2018\u2019"]?CORRECT['\u2018\u2019"]?\s*[!.]?/g, "").trim() || t;
+    }
+
+    // ★★★ 안전장치 — OK라고 해놓고 본문에서 지적하면 FIX로 뒤집음 ★★★
+    //   이번 문제의 핵심 패턴임 — "완벽함. CORRECT! 하지만 …"
+    //   신호 둘: (a) 지적 어휘  (b) 길이 — OK면 "한 줄"을 요구하므로, 길면 뭔가 더 붙은 것.
+    //   [측정] 과거 CORRECT 판정 271건 회귀:
+    //     지적어만 → 비문 23건 중 8건 / 길이>120만 → 14건 / ★둘을 OR★ → 15건 (FIX 전환 80/271)
+    //   [비대칭] 잘못 FIX = 2차를 한 번 더 씀(원래 설계된 흐름, 손해 없음)
+    //            잘못 OK  = 틀린 문장을 맞다고 배움(학습 손상) → 잡는 쪽으로 기울임.
+    //   ※ 나머지 8건은 Zeeto가 오류를 아예 못 본 경우라 이 장치로 못 잡음. 그건 프롬프트 몫.
+    if (verdict === "OK") {
+      var NITPICK = /(하지만|근데|그런데|다만|아쉬|빠졌|빠진|누락|틀렸|틀린|어색|고치|고쳐|대신|다시 한번|다시 한 번|고려해|한 번 더|더 좋을|더 좋겠|해보면 좋|살짝|덧붙이면)/;
+      var NEGATED = /(어색한 데 없|어색하지 않|아쉬운 점 없|빠진 것 없|빠진 게 없|틀린 곳 없|틀린 부분(은|이)? ?없|틀린 거 없)/;
+      if ((NITPICK.test(msg) && !NEGATED.test(msg)) || msg.length > 120) verdict = "FIX";
+    }
+    return { verdict: verdict, msg: msg };
+  }
+
   async function checkPractice(step) {
     if (isLoading) return; // ★ V11 패치(2026-05-13): ✔️ 스팸 클릭 방지 (병렬 Gemini 호출 차단)
     const input = document.getElementById(`practice-${step}`).value.trim(); if(!input) return;
@@ -2657,8 +2694,8 @@ checkNewComments();
     const context = `[오늘 배운 내용: ${summary}] [새로 알게 된 점: ${newThings}]`;
 
     const prompt = step === 1
-      ? `너는 외계인 Zeeto. 학생이 오늘 배운 내용을 활용해 영작한 문장을 확인해줘. 반드시 한국어 음슴체(~음/임/함/셈)로 답할 것. 마크다운 기호 절대 금지.\n${context}\n학생 문장: "${input}"\n규칙: 문법·철자가 완벽하면 반드시 "CORRECT"라는 단어를 포함해서 한 줄 칭찬. 틀리면 틀린 부분만 콕 짚어 힌트 1줄로. 정답은 절대 알려주지 말 것.`
-      : `너는 외계인 Zeeto. 학생이 힌트를 보고 수정한 최종 영작을 확인해줘. 반드시 한국어 음슴체(~음/임/함/셈)로 답할 것. 마크다운 기호 절대 금지.\n${context}\n학생 문장: "${input}"\n규칙: 맞으면 한 줄 칭찬. 틀리면 정답 + 이유를 1~2문장으로 짧게.`;
+      ? `너는 중학생 영어 학습을 돕는 외계인 'Zeeto'야. 학생이 오늘 수업에서 배운 걸 활용해 영어 문장을 썼어.\n\n${context}\n[학생 문장] "${input}"\n\n[1단계 — 판정 (먼저 확정할 것)]\n아래를 순서대로 확인함. 하나라도 걸리면 FIX임.\n① 관사(a/an/the)가 빠졌거나 잘못 쓴 곳 없나? ★학생들이 가장 자주 놓치는 항목이니 제일 먼저 볼 것★\n② 주어-동사 수 일치, 시제, be동사 누락 없나?\n③ 전치사, 단수/복수 틀린 곳 없나?\n④ 철자·대소문자·문장부호 틀린 곳 없나? (평서문에 물음표, 의문문에 마침표 등)\n※ ①~④는 ★배운 영역이 문법이든 어휘든 읽기든 상관없이 항상★ 적용함. 문장은 어느 수업에서든 문법적으로 옳아야 함.\n\n★★★판정 규칙★★★\n- ①~④ 중 하나라도 지적할 게 있으면 반드시 FIX. ★지적을 하면서 OK를 주는 건 절대 금지★.\n- 다 통과하면 OK. OK면 학생은 2단계를 건너뛰므로, 확신이 없으면 FIX를 줄 것.\n- ★[오늘 배운 내용]은 채점 기준이 아님★. 학생 문장이 수업과 다른 소재·상황을 다루거나 오늘 배운 걸 안 썼어도 그것만으로는 절대 FIX 금지. 이 칸은 힌트를 학생이 알아듣기 쉬운 말로 쓰는 데만 참고할 것.\n\n[2단계 — 학생에게 쓰는 글]\n- FIX일 때: 잘한 점 한 조각을 먼저 짚고, 그다음 ★가장 중요한 오류 하나만★ 힌트로.\n  ★정답 문장이나 정답 단어를 절대 알려주지 말 것★ — 어디가 비었는지, 어떤 종류의 말이 필요한지만.\n  좋은 예: "'cap' 앞이 허전하지 않음? 셀 수 있는 명사 하나를 말할 때 앞에 붙는 그거임 👀"\n  나쁜 예: "'a cap'으로 고치면 됨" (정답을 줌)\n- OK일 때: 무엇을 잘했는지 구체적으로 ★한 줄만★. ★아쉬운 점을 덧붙이지 말 것★.\n  '하지만', '근데', '다만'으로 이어가면 안 됨. 덧붙일 게 있으면 그건 OK가 아니라 FIX임.\n- 학생에게 ★직접 말하듯★ 쓸 것(2인칭). "학생이 ~했음" 같은 3인칭 보고체 절대 금지.\n- 말투: 인터넷 음슴체(~음/임/함/셈). 단 '셈'은 권유·명령에만 ("해보셈" O / "완벽하셈" X).\n  반말('~했어','~해야 해') 금지. 질문은 '~어?','~까?'로 자연스럽게.\n- 이모지 1~2개. 마크다운 기호(*, #) 절대 금지. 영어로 설명하지 말 것 — 한국어로.\n- 2~3줄 이내.\n\n[출력 형식 — 정확히 두 줄. 머리말·꼬리말 일절 금지]\nVERDICT: OK 또는 FIX\nMSG: <위 규칙대로 쓴 문장>\n\n※ VERDICT 줄에는 OK / FIX 외에 아무것도 쓰지 말 것.\n※ 'CORRECT' 같은 다른 단어로 판정하지 말 것. 판정은 VERDICT 줄로만 함.`
+      : `너는 중학생 영어 학습을 돕는 외계인 'Zeeto'야. 학생이 힌트를 보고 다시 쓴 최종 문장이야. 이번이 마지막 단계임.\n\n${context}\n[학생 문장] "${input}"\n\n[채점 기준]\n① 관사(a/an/the) → ② 수 일치·시제·be동사 → ③ 전치사·단복수 → ④ 철자·문장부호 순서로 볼 것.\n★채점 기준은 문법임★. [오늘 배운 내용]과 다른 이야기를 써도 그건 오류가 아님.\n수업 주제와 다르다는 이유로 ★문법적으로 맞는 문장을 틀렸다고 하면 절대 안 됨★.\n\n[쓸 내용]\n- 맞으면: 무엇을 잘 고치거나 잘 썼는지 구체적으로 한 줄. 억지로 흠잡지 말 것.\n- 틀렸으면: 이번은 마지막 단계이므로 ★올바른 문장 + 왜 그런지 이유★를 1~2문장으로 짧게 알려줄 것.\n- 학생에게 ★직접 말하듯★ 쓸 것(2인칭). "학생이 ~하였음" 같은 3인칭 보고체 절대 금지.\n- 말투: 인터넷 음슴체(~음/임/함/셈). '셈'은 권유·명령에만. 반말 금지.\n- 이모지 1~2개. 마크다운 기호 절대 금지. 영어로 설명하지 말 것.\n- 'CORRECT' 같은 판정 단어 쓰지 말 것. 머리말·꼬리말 없이 본문만. 3줄 이내.`;
 
     showLoading("Zeeto가 영작 확인 중... 👽");
     try {
@@ -2669,24 +2706,24 @@ checkNewComments();
       if (!result) return alert("😵 Zeeto가 응답을 못했어요. 다시 시도해주세요!");
       if(step === 1) {
         document.getElementById('hint-area').style.display = "block";
-        // ★ V11 패치(2026-05-13): CORRECT 매칭을 단어 경계 + 부정어 제외로 강화
-        // - 이전엔 `includes("CORRECT")`라 "Not CORRECT"/"incorrect" 모두 false positive로 통과시킴
-        // - 이제: CORRECT 단어가 단독으로 등장하되, 부정 표현 옆에 있으면 무시
-        const isCorrect = (() => {
-          // 단어 경계 검사: CORRECT 앞뒤가 영문자가 아니어야 함 (incorrect의 CORRECT는 제외됨)
-          if (!/(^|[^A-Za-z])CORRECT([^A-Za-z]|$)/.test(result)) return false;
-          // 부정 표현 체크: "not CORRECT", "isn't CORRECT", "but not CORRECT" 등 거부
-          if (/\b(not|isn'?t|aren'?t|never|but|however|but not|never)\s+CORRECT\b/i.test(result)) return false;
-          return true;
-        })();
-        if (isCorrect) {
-          document.getElementById('hint-text').innerHTML = safeAiRender(result);
-          // ★ Practice 1 정답 → Practice 2 자동 패스
+        // ═══ ★ V25(2026-08-26): 판정을 응답 본문에서 분리 ═══
+        // [왜] 기존엔 본문에 'CORRECT'라는 단어가 있으면 통과시켰음. 그러니 Zeeto가
+        //   "문법·철자 완벽함. CORRECT! 하지만 …"처럼 ★지적과 통과를 한 응답에 같이★
+        //   담으면 그대로 자동패스됨. V11 부정어 가드는 "not CORRECT" 같은 ★영어★만
+        //   잡아서 한국어 지적은 전부 통과했음.
+        //   실측(전체 426건): CORRECT 판정 271건 → 자동패스 254건 → 그중 비문 약 20건(8%).
+        //   최근 사례 2026-08-24 / 08-25 / 08-26 — 현재진행형이었음.
+        // [지금] AI는 VERDICT 줄로만 판정하고, 코드는 ★그 줄만★ 읽음.
+        //   자동패스 동작 자체는 기존과 동일하게 유지.
+        const pv = parsePracticeVerdict_(result);
+        document.getElementById('hint-text').innerHTML = safeAiRender(pv.msg);
+        if (pv.verdict === 'OK') {
+          // ★ Practice 1 정답 → Practice 2 자동 패스 (기존 동작 그대로)
           document.getElementById('practice-2').value = input;
           document.getElementById('answer-area').style.display = "block";
           document.getElementById('answer-text').innerText = "1st Practice에서 완벽했음! 패스 👽✨";
         } else {
-          document.getElementById('hint-text').innerHTML = safeAiRender(result);
+          document.getElementById('answer-area').style.display = "none";
         }
       } else {
         document.getElementById('answer-area').style.display = "block";
