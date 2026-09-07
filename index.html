@@ -2983,14 +2983,31 @@ checkNewComments();
 
       let feedbackPart = "", finalPart = "", tipPart = "", oopsPart = "";
       try {
-        const parts = rawText.split(/={2,}/);
-        parts.forEach((p, idx) => {
-          const label = p.trim().toLowerCase();
-          if(label.includes("피드백") || label.includes("feedback")) { if(parts[idx+1]) feedbackPart = parts[idx+1].trim(); }
-          else if(label.includes("최종본") || label.includes("final")) { if(parts[idx+1]) finalPart = parts[idx+1].trim(); }
-          else if(label.includes("꿀팁") || label.includes("tip")) { if(parts[idx+1]) tipPart = parts[idx+1].trim(); }
-          else if(label.includes("oops") || label.includes("오류")) { if(parts[idx+1]) oopsPart = parts[idx+1].trim(); }
-        });
+        // ═══ ★ V29(2026-09-07): 섹션 파서 전면 교체 ═══
+        // [사고] 하람 2026-09-06 — 완벽 최종본 자리에 "Zeeto의 꿀팁"이라는 ★라벨 문자열★이 저장됨.
+        // [원인] 기존 파서는 rawText를 '==='로 자른 뒤 ★모든 조각★을 라벨 후보로 검사했고,
+        //   뒤에서 매치되면 앞의 값을 덮어썼음. 그래서 학생 스토리 본문에 'Finally'가 들어가면
+        //   "final"에 걸려서 finalPart가 ★다음 섹션의 라벨★로 교체됐음.
+        //   ("Finally, I won a trophy." — 중학생 영작에서 가장 흔한 연결어 중 하나)
+        //   같은 함정: 'tip'(multiple, tiptoe…), 'oops', '오류'.
+        // [지금] ① 라벨은 ★한 줄 안에서 ===로 감싸인 짧은 텍스트★일 때만 인정 → 본문은 라벨이 될 수 없음
+        //        ② 먼저 찾은 값을 유지(덮어쓰기 금지)  ③ 본문 = 그 헤더 다음부터 다음 헤더 직전까지
+        const headRe = /={2,}[ \t]*([^=\n]{1,30}?)[ \t]*={2,}/g;
+        const heads = [];
+        let hm;
+        while ((hm = headRe.exec(rawText)) !== null) {
+          heads.push({ label: hm[1].trim().toLowerCase(), bodyStart: headRe.lastIndex, headStart: hm.index });
+        }
+        for (let hi = 0; hi < heads.length; hi++) {
+          const bodyEnd = (hi + 1 < heads.length) ? heads[hi + 1].headStart : rawText.length;
+          const body = rawText.slice(heads[hi].bodyStart, bodyEnd).trim();
+          if (!body) continue;
+          const lb = heads[hi].label;
+          if (!feedbackPart && (lb.includes("피드백") || lb.includes("feedback"))) feedbackPart = body;
+          else if (!finalPart && (lb.includes("최종본") || lb.includes("final"))) finalPart = body;
+          else if (!tipPart && (lb.includes("꿀팁") || lb.includes("tip"))) tipPart = body;
+          else if (!oopsPart && (lb.includes("oops") || lb.includes("오류"))) oopsPart = body;
+        }
       } catch(e) {}
 
       // ★ V10(2026-05-12): 파싱 실패 감지 강화 — 4개 섹션 중 하나라도 비면 실패로 간주
@@ -2999,6 +3016,10 @@ checkNewComments();
       // - rawText에 잘림 마커("이어짐 생략됨"/"✂️")가 있으면 위에서 truncated:true로 이미 return됨
       // - 여기 도달했는데 섹션이 비었으면 형식 어긋남(parseFailed)이지 잘림이 아님
       if (!feedbackPart || !finalPart || !tipPart || !oopsPart) return { ok: false, parseFailed: true };
+      // ★ V29: 비어있음만 보던 가드에 ★내용 검사★ 추가.
+      //   최종본은 영어 스토리임 — 알파벳이 10자도 없으면 라벨·한국어 조각이 잘못 들어온 것.
+      //   이게 통과하면 시트에 저장되고 낭독 원고·Azure 채점 기준·Deeto TTS까지 전부 오염됨.
+      if ((String(finalPart).match(/[A-Za-z]/g) || []).length < 10) return { ok: false, parseFailed: true };
 
       document.getElementById('ms-zeeto-feedback').innerHTML = safeAiRender(feedbackPart);
       // ★ V10(2026-05-12): finalPart || rawText 폴백 제거 — 파싱 실패하면 위에서 이미 return함
