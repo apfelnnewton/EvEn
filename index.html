@@ -3197,7 +3197,7 @@ checkNewComments();
     // ★V18(2026-08-11): 안 고치고 그대로 제출하면 AI에 보내지 않음.
     // 예전엔 그대로 통과시켜 "완벽하게 맞았음!" 칭찬이 나갔음(비문이 사실 정문이었던 경우 포함).
     // 진짜 이의가 있으면 이미 있는 🔁 검증 경로로 보냄.
-    const _norm = (t) => String(t).toLowerCase().replace(/[^a-z0-9']+/g, ' ').trim();
+    const _norm = (t) => String(t).replace(/\s+/g, ' ').trim();
     if (_norm(correctedText) === _norm(errText)) {
       return alert("아직 안 고쳤음! 🤔\n\n이 문장이 진짜 맞는 문장이라고 생각하면\n🔁 버튼을 눌러서 Zeeto한테 확인받아보셈 👽");
     }
@@ -3217,6 +3217,7 @@ checkNewComments();
       const _r = String(data.result || ''); const _t = _r.replace(/\s+/g,'');
       if (_t.length > 40) { const _c = {}; let _mx = 0, _u = 0; for (const ch of _t) { _c[ch] = (_c[ch]||0)+1; } for (const k in _c) { _u++; if (_c[k] > _mx) _mx = _c[k]; } if ((_mx/_t.length > 0.45) || (_t.length > 120 && _u < 12)) { alert('Zeeto가 헷갈렸음 😵 다시 채점받아줘!'); return; } }
       const fb = document.getElementById(`ms-feedback-${boxNum}`); fb.style.display = "block"; fb.innerHTML = "👽 " + safeAiRender(data.result);
+      autoSaveMyStoryDraft(); // GPT MS-006: AI 결과 도착 후에도 저장
     } catch(e) { hideLoading(); alert("통신 오류 🛸"); }
   }
 
@@ -3309,7 +3310,7 @@ checkNewComments();
       // 케이스 B: 검증 결과 "정문이었음" OR forceRegen 모드 — 새 비문 교체
       let newBiumun = newBiumunMatch ? newBiumunMatch[1].trim() : '';
       // 정제: 꺾쇠/마크다운 제거 + 영어 평서문 골라내기
-      const lines = newBiumun.replace(/~~/g, '').replace(/\^/g, '').replace(/[*#`"']/g, '').split('\n').map(s=>s.trim()).filter(s=>s.length>0);
+      const lines = cleanMsQuizText(newBiumun).split('\n').map(s=>s.trim()).filter(s=>s.length>0);
       let cleaned = lines.find(s => /^[A-Z]/.test(s) && !/[가-힣]/.test(s) && s.length >= 5) || lines[0] || newBiumun;
       if (!cleaned) {
         alert('Zeeto 응답 형식이 이상함 🛸 다시 시도해보셈!');
@@ -3687,7 +3688,7 @@ checkNewComments();
 
       // 케이스 B: 정문이었음 OR forceRegen 모드 — 새 비문 교체
       let newBiumun = newBiumunMatch ? newBiumunMatch[1].trim() : '';
-      const lines = newBiumun.replace(/~~/g, '').replace(/\^/g, '').replace(/[*#`"']/g, '').split('\n').map(s=>s.trim()).filter(s=>s.length>0);
+      const lines = cleanMsQuizText(newBiumun).split('\n').map(s=>s.trim()).filter(s=>s.length>0);
       let cleaned = lines.find(s => /^[A-Z]/.test(s) && !/[가-힣]/.test(s) && s.length >= 5) || lines[0] || newBiumun;
       if (!cleaned) { alert('Zeeto 응답 형식이 이상함 🛸'); return; }
       if (cleaned.length > 200) { alert('Zeeto가 너무 길게 만들었음 😵'); return; }
@@ -4048,6 +4049,19 @@ checkNewComments();
   // ★ V10(2026-05-12): My Story 작성 내용 자동저장/복원 — 새로고침해도 내용 안 날아가게
   const MYSTORY_DRAFT_KEY = 'even_mystory_draft';
   let _msSaveTimer = null;
+  // GPT MS-009: 바깥 인용 부호만 제거. don't / student's 내부 부호 보존.
+  function cleanMsQuizText(text) {
+    return String(text).replace(/~~|\^|[*#`]/g, '').split('\n').map(line => {
+      const s = line.trim();
+      return /^(?:"[\s\S]*"|'[\s\S]*'|“[\s\S]*”|‘[\s\S]*’)$/.test(s) ? s.slice(1, -1) : s;
+    }).join('\n');
+  }
+
+  function resetMsSubmitButton() {
+    const btn = document.querySelector('#story-step-4 button.btn');
+    if (btn) { btn.disabled = false; btn.style.opacity = '1'; }
+  }
+
   function autoSaveMyStoryDraft() {
     if (!currentStudentId) return;
     clearTimeout(_msSaveTimer);
@@ -4075,6 +4089,10 @@ checkNewComments();
           error1: getVal('ms-error-1'), corrected1: getVal('ms-corrected-1'), reason1: getVal('ms-reason-1'),
           error2: getVal('ms-error-2'), corrected2: getVal('ms-corrected-2'), reason2: getVal('ms-reason-2'),
           error3: getVal('ms-error-3'), corrected3: getVal('ms-corrected-3'), reason3: getVal('ms-reason-3'),
+          practiceFeedback: [1, 2, 3].map(i => {
+            const el = document.getElementById('ms-feedback-' + i);
+            return el && el.style.display !== 'none' ? el.innerHTML : '';
+          }),
           // ★ V10 추가(M2 fix): 재호출/재시도에 필요한 in-memory 상태도 같이 저장
           msCombinedWords: (typeof msCombinedWords !== 'undefined') ? msCombinedWords : '',
           hintRetryCount: (typeof hintRetryCount !== 'undefined') ? hintRetryCount : 0,
@@ -4132,6 +4150,11 @@ checkNewComments();
         setVal('ms-error-'+i, d['error'+i]);
         setVal('ms-corrected-'+i, d['corrected'+i]);
         setVal('ms-reason-'+i, d['reason'+i]);
+        const fb = document.getElementById('ms-feedback-' + i);
+        if (fb) {
+          fb.innerHTML = Array.isArray(d.practiceFeedback) ? (d.practiceFeedback[Number(i)-1] || '') : '';
+          fb.style.display = fb.innerHTML.trim() ? 'block' : 'none';
+        }
       });
       if (d.activeStep) {
         document.querySelectorAll('.story-step').forEach(s => s.classList.remove('active'));
@@ -4244,6 +4267,7 @@ checkNewComments();
       }
       hideLoading();
       // ★ V14(2026-08-10): 제출 성공 → 낭독 녹음 단계(Step 5)로
+      resetMsSubmitButton(); // GPT MS-005: 다음 글도 제출 가능하게 복구
       window._msrPending = { lesson: payload.lesson, title: payload.title, finalStory: payload.finalStory };
       myStories.push({ date: new Date().toISOString(), lesson: payload.lesson, grammar: payload.grammar, words: payload.reqWords, title: payload.title, draft: payload.draft, hint: payload.hint, revision: payload.revision, feedback: payload.feedback, finalStory: payload.finalStory, tip: payload.tip, oops: payload.oops, reflection: payload.reflection, corrections: payload.corrections , hasAudio: false });
       // ★ sessionStorage 동기화 (새로고침 착시 방지)
@@ -4256,6 +4280,8 @@ checkNewComments();
       document.getElementById('ms-grammar').value = '';
       document.getElementById('ms-grammar-display').textContent = '먼저 Lesson을 선택하세요';
       ['ms-display-draft','ms-zeeto-hint','ms-display-revision','ms-zeeto-feedback','ms-zeeto-final','ms-zeeto-tip','ms-oops-point','ms-oops-point-copy'].forEach(id => document.getElementById(id).innerHTML = "");
+      delete document.getElementById('ms-zeeto-final').dataset.rawFinal;
+      delete document.getElementById('ms-oops-point').dataset.original;
       ['ms-feedback-1','ms-feedback-2','ms-feedback-3'].forEach(id => document.getElementById(id).style.display = 'none');
       
       document.querySelectorAll('.story-step').forEach(step => step.classList.remove('active'));
