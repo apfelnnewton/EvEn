@@ -1238,7 +1238,7 @@
           <div id="ms-oops-point-copy" style="font-size:0.9rem; line-height:1.4; color:#c62828; white-space: pre-wrap;">(앞에서 찾은 오류가 여기에 다시 뜹니다)</div>
         </div>
 
-        <div style="font-size:0.85rem; font-weight:bold; color:#4a5d4e; margin-bottom:8px;">👽 비문을 정문으로 고치고 이유를 적어보셈!</div>
+        <div id="ms-practice-instruction" style="font-size:0.85rem; font-weight:bold; color:#4a5d4e; margin-bottom:8px;">👽 비문을 정문으로 고치고 이유를 적어보셈!</div>
 
         <div id="error-container">
           <div class="error-new-box">
@@ -3182,6 +3182,7 @@ checkNewComments();
       }
     }
     
+    updateMsPracticeInstruction();
     document.querySelectorAll('.story-step').forEach(step => step.classList.remove('active'));
     document.getElementById(`story-step-${stepNumber}`).classList.add('active');
     document.getElementById('mystory-screen').scrollTop = 0;
@@ -4057,6 +4058,16 @@ checkNewComments();
     }).join('\n');
   }
 
+  function updateMsPracticeInstruction() {
+    const label = document.getElementById('ms-practice-instruction');
+    if (!label) return;
+    const count = [1, 2, 3].filter(i => (document.getElementById('ms-error-' + i).value || '').trim()).length;
+    const hasOops = /❌/.test(document.getElementById('ms-oops-point').textContent || '');
+    label.textContent = count ? '👽 비문을 정문으로 고치고 이유를 적어보셈!'
+      : hasOops ? '연습 문제를 불러오지 못했음. 성찰을 적고 선생님께 알려주셈.'
+      : '교정할 문법 오류가 없었음! 이번 글을 돌아보고 성찰을 적어주셈 🌱';
+  }
+
   function resetMsSubmitButton() {
     const btn = document.querySelector('#story-step-4 button.btn');
     if (btn) { btn.disabled = false; btn.style.opacity = '1'; }
@@ -4174,6 +4185,7 @@ checkNewComments();
           }
         }
       }
+      updateMsPracticeInstruction();
       return true;
     } catch(e) { console.warn('restoreMyStoryDraft failed:', e); return false; }
   }
