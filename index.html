@@ -5288,20 +5288,89 @@ async function openNoticeModal() {
     new Int16Array(buf, 44).set(out);
     return new Blob([buf], { type: 'audio/wav' });
   }
+  // MS-020: Same normalization on the server, restored feedback, and the student screen.
+  function gptReadingWordKey_(value) {
+    if (typeof value !== "string") return "";
+    return (value.normalize("NFKC").toLowerCase().replace(/['\u2018\u2019\u02bc]/g, "").match(/[a-z0-9]+/g) || []).join(" ");
+  }
+  function gptNormalizeReadingFeedback_(feedback, refText) {
+    if (!feedback || typeof feedback !== "object" || Array.isArray(feedback)) return feedback;
+    const out = Object.assign({}, feedback), ref = Object.create(null);
+    (String(refText || "").match(/[A-Za-z0-9]+(?:['\u2018\u2019\u02bc][A-Za-z]+)*/g) || []).forEach(function(w) {
+      ref[gptReadingWordKey_(w)] = w;
+    });
+    let adjusted = !!out.feedbackAdjusted;
+    const seenMiss = Object.create(null), seenMis = Object.create(null), seenPractice = Object.create(null);
+    const missed = [], misread = [], practice = [];
+    function list(value) { if (value == null) return []; if (Array.isArray(value)) return value; adjusted = true; return []; }
+    function sourceWord(value) { const k = gptReadingWordKey_(value); return k && ref[k] ? k : ""; }
+    list(out.missedWords).forEach(function(w) {
+      const k = sourceWord(w);
+      if (!k || seenMiss[k] || missed.length >= 4) { adjusted = true; return; }
+      seenMiss[k] = true; missed.push(ref[k]);
+    });
+    function addPractice(k) {
+      if (!seenPractice[k] && !seenMiss[k] && practice.length < 4) { seenPractice[k] = true; practice.push(ref[k]); }
+    }
+    list(out.misreadWords).forEach(function(m) {
+      const k = m && typeof m === "object" ? sourceWord(m.expected) : "";
+      if (!k || seenMiss[k] || seenMis[k] || misread.length >= 4) { adjusted = true; return; }
+      const heard = typeof m.heard === "string" ? m.heard.trim() : "";
+      const h = gptReadingWordKey_(heard);
+      if (!h || h === k) {
+        adjusted = true;
+        // Azure's pronunciation signal is independent of Gemini's word transcription.
+        // A saved Azure result without a distinct heard word is practice, never a substitution.
+        if (out.engine === "azure") addPractice(k);
+        return;
+      }
+      seenMis[k] = true; misread.push({expected: ref[k], heard: heard});
+    });
+    list(out.pronunciationWords).forEach(function(w) {
+      const k = sourceWord(w);
+      if (out.engine !== "azure" || !k) { adjusted = true; return; }
+      addPractice(k);
+    });
+    out.missedWords = missed;
+    out.misreadWords = misread;
+    out.pronunciationWords = practice.filter(function(w) { return !seenMis[gptReadingWordKey_(w)]; }).slice(0, Math.max(0, 4 - misread.length));
+    out.insertedWords = list(out.insertedWords).filter(function(w) { return typeof w === "string" && !!gptReadingWordKey_(w); }).slice(0, 4);
+    out.feedbackAdjusted = adjusted;
+    if (adjusted) {
+      // Do not leave the removed word in a generated tip/praise, or manufacture "perfect" reading.
+      // Empty/malformed AI feedback must remain invalid for the existing no-charge guard.
+      if (typeof out.praise === "string" && out.praise.trim()) out.praise = "소리 내어 읽으며 연습한 점이 좋았음! 🛸";
+      if (typeof out.tip === "string" && out.tip.trim()) out.tip = gptReadingFeedbackTip_(out);
+    }
+    return out;
+  }
+  function gptReadingFeedbackTip_(fb) {
+    if (fb.missedWords.length) return fb.missedWords.slice(0, 2).join(", ") + " 부분을 녹음과 모범 낭독에서 비교해 들어보셈. 잘 안 들린 것으로 표시됐지만 인식이 다를 수도 있음!";
+    if (fb.misreadWords.length) return fb.misreadWords.slice(0, 2).map(function(m) { return m.expected; }).join(", ") + " 부분을 녹음과 모범 낭독에서 비교해 들어보셈. 다른 단어로 들린 것으로 표시됐지만 인식이 다를 수도 있음!";
+    if (fb.pronunciationWords.length) return fb.pronunciationWords.slice(0, 2).join(", ") + " 부분은 모범 소리를 듣고 비교해보셈. 다른 단어로 읽었다는 뜻은 아니며, 발음 측정이 다를 수도 있음!";
+    return "모범 낭독을 듣고 문장 사이에서 쉬는 위치를 살펴보셈. 다음 녹음에서 한 가지를 적용해보면 좋겠음!";
+  }
+
   function msrRenderFeedback(fb) {
     // ★V20(2026-08-11): 교정 마크(^ ~~) 제거. V19에서 낭독 원고만 고치고 이 하이라이트 본문을 빠뜨렸음.
     const story = toPlainStory(window._msrPending.finalStory || '').replace(/\n/g, ' ');
-    const missed = (fb.missedWords || []).map(w => String(w).toLowerCase());
-    const misreadMap = {};
-    (fb.misreadWords || []).forEach(m => { if (m && m.expected) misreadMap[String(m.expected).toLowerCase()] = String(m.heard || ''); });
-    const usedMissed = {}, usedMisread = {};
+    fb = gptNormalizeReadingFeedback_(fb, story);
+    const missed = fb.missedWords.map(gptReadingWordKey_);
+    const practice = fb.pronunciationWords.map(gptReadingWordKey_);
+    const misreadMap = Object.create(null);
+    fb.misreadWords.forEach(m => { misreadMap[gptReadingWordKey_(m.expected)] = m.heard; });
+    const usedMissed = {}, usedMisread = {}, usedPractice = {};
     const tokens = story.split(/(\s+)/).map(t => {
-      const w = t.replace(/[^A-Za-z']/g, '').toLowerCase();
+      const w = gptReadingWordKey_(t);
       if (!w) return escapeHtml(t);
       if (misreadMap[w] !== undefined && !usedMisread[w]) {
         usedMisread[w] = 1;
-        const heardNote = misreadMap[w] ? ' →"' + escapeHtml(misreadMap[w]) + '"로 들렸음' : ' →발음 연습!';
+        const heardNote = ' →"' + escapeHtml(misreadMap[w]) + '"로 들렸음';
         return '<span style="background:#ffebee; color:#c62828; border-radius:4px; padding:0 3px;">' + escapeHtml(t) + '</span><span style="font-size:0.68rem; color:#c62828; font-weight:bold;">' + heardNote + '</span>';
+      }
+      if (practice.includes(w) && !usedPractice[w]) {
+        usedPractice[w] = 1;
+        return '<span style="background:#e8f0eb; color:#4a5d4e; border-radius:4px; padding:0 3px;">' + escapeHtml(t) + '</span><span style="font-size:0.68rem; color:#4a5d4e;"> · 모범 소리와 비교</span>';
       }
       if (missed.includes(w) && !usedMissed[w]) {
         usedMissed[w] = 1;
@@ -5332,12 +5401,15 @@ async function openNoticeModal() {
             '</div></div>' +
         '</div>';
     }
-    const summary = (missCnt === 0 && misCnt === 0)
-      ? '<span style="background:#e8f0eb; color:#4a5d4e; border-radius:8px; padding:3px 9px; font-size:0.72rem; font-weight:bold;">✨ 완벽하게 다 읽었음!</span>'
+    const summary = (missCnt === 0 && misCnt === 0 && practice.length === 0 && insWords.length === 0)
+      ? '<span style="background:#e8f0eb; color:#4a5d4e; border-radius:8px; padding:3px 9px; font-size:0.72rem; font-weight:bold;">뚜렷하게 확인된 누락·다른 단어는 없어요.</span>'
       : '<span style="background:#fff3cd; color:#8a6d1a; border-radius:8px; padding:3px 9px; font-size:0.72rem; font-weight:bold;">건너뜀 ' + missCnt + '</span> <span style="background:#ffebee; color:#c62828; border-radius:8px; padding:3px 9px; font-size:0.72rem; font-weight:bold;">다르게 들림 ' + misCnt + '</span>'
+        + (practice.length ? ' <span style="background:#e8f0eb; color:#4a5d4e; border-radius:8px; padding:3px 9px; font-size:0.72rem; font-weight:bold;">모범 소리와 비교 ' + practice.length + '</span>' : '')
         + (insWords.length ? ' <span style="background:#e3f0fb; color:#1565c0; border-radius:8px; padding:3px 9px; font-size:0.72rem; font-weight:bold;">덧붙임 ' + insWords.length + '</span>' : '');
     return '<div style="background:white; border:1px solid #eee; border-radius:11px; padding:11px;">' + topCards +
       '<div style="margin-bottom:7px;">' + summary + ' <span style="font-size:0.68rem; color:#aaa;">피드백 ' + (fb.remaining >= 0 ? fb.remaining : 0) + '회 남음</span></div>' +
+      (fb.feedbackAdjusted ? '<div style="font-size:0.68rem; color:#748378; margin:6px 0;">단어가 다르게 들렸는지 불확실한 부분은 오류로 표시하지 않았어요.</div>' : '') +
+      (practice.length ? '<div style="font-size:0.68rem; color:#4a5d4e; margin:6px 0;">모범 소리와 비교: 다른 단어로 읽었다는 뜻은 아니에요. 내 녹음과 비교해 보세요.</div>' : '') +
       '<div style="font-size:0.85rem; line-height:1.9; color:#444; max-height:150px; overflow-y:auto;">' + tokens.join('') + '</div>' +
       (insWords.length ? '<div style="font-size:0.67rem; color:#1565c0; margin-top:6px;">원문에 없이 들린 말: ' + escapeHtml(insWords.join(', ')) + '</div>' : '') +
       '</div>' +
