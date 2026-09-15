@@ -1,3 +1,4 @@
+<!-- GPT V37 TEST-DEPLOYMENT CANDIDATE: My Story full pipeline. Production verification pending. -->
 <!DOCTYPE html>
 <!-- EvEn GPT HTML V35 (2026-09-14): DL-001 Daily Log intent shown in teacher and student history. -->
 <!-- EvEn V24 (2026-08-24) — 📡 예습하기(Zeeto Flipped) 추가. ⚠️ Apps Script V25와 반드시 세트 배포 (새 엔드포인트 6개). -->
@@ -1199,7 +1200,7 @@
       </div>
 
       <div id="story-step-3" class="story-step">
-        <div class="step-title">Step 3. 완벽 확인 💯</div>
+        <div class="step-title">Step 3. 최종본 확인</div>
         <button id="retry-final-btn-2" class="btn" style="display:none; width:100%; margin-bottom:12px; background:#ff9800;" onclick="retryMsFinal()">🔄 Zeeto 다시 부르기</button>
         <div id="retry-final-msg-2" style="display:none; font-size:0.85rem; color:#d32f2f; text-align:center; margin-bottom:12px; line-height:1.4;"></div>
         <div class="readonly-box" id="ms-display-revision">나의 수정본이 여기에 표시됩니다.</div>
@@ -1210,12 +1211,13 @@
         </div>
 
         <div class="zeeto-box" style="border-color:#2e7d32;">
-          <div class="zeeto-title">✨ 완벽 최종본</div>
+          <div class="zeeto-title">✨ 최종본</div>
           <div style="font-size:0.72rem; color:#777; margin:-2px 0 7px; line-height:1.6;">
             <span style="color:#d9534f; font-weight:bold;">빨강</span> = 아래 🚨 <b>Oops Point에서 설명하는 내 실수</b><br>
-            <span style="color:#767676; text-decoration:underline; text-decoration-color:#c9c9c9; text-underline-offset:3px;">회색</span> = 그 밖에 Zeeto가 <b>고친 부분</b> (💡 Tip에서 중요한 것만 설명)
+            <span style="color:#767676; text-decoration:underline; text-decoration-color:#c9c9c9; text-underline-offset:3px;">회색</span> = 그 밖에 Zeeto가 <b>고친 부분</b> (교정 내용과 이유에서 전체 확인)
           </div>
           <div id="ms-zeeto-final" style="font-size:0.9rem; line-height:1.4; white-space: pre-wrap;">(최종본 표시 영역)</div>
+          <details id="ms-v39-changes" style="margin-top:14px;font-size:0.85rem;line-height:1.7"><summary>교정 내용과 이유 보기</summary><div id="ms-v39-change-list"></div></details>
         </div>
 
         <div class="zeeto-box" style="border-color:#2196f3; background:#f0f8ff;">
@@ -1228,6 +1230,7 @@
           <div id="ms-oops-point" style="font-size:0.9rem; line-height:1.4; color:#c62828; white-space: pre-wrap;">(핵심 오류 설명 영역)</div>
         </div>
 
+        <button class="btn" style="width:100%;margin-bottom:10px;background:#60776a" onclick="gptStoryBackToRevision_()">수정본 다시 쓰기</button>
         <button class="btn" style="width:100%;" onclick="goToStoryStep(4)">오류 활용하기 ➡️</button>
       </div>
 
@@ -1247,10 +1250,10 @@
             <div style="display:flex; justify-content:flex-end; margin-bottom:8px;">
               <button onclick="regenBiumun(1)" id="ms-regen-1" style="background:none; border:1px solid #d9534f; color:#d9534f; padding:3px 8px; font-size:0.9rem; border-radius:10px; cursor:pointer; line-height:1;" title="이 비문 새로 만들기">🔁</button>
             </div>
-            <textarea id="ms-corrected-1" class="input-field" style="width:100%; box-sizing:border-box; border-color:#2e7d32; margin-bottom:5px; resize:none; line-height:1.4;" rows="2" placeholder="✅ 올바른 문장 (정문)"></textarea>
+            <textarea id="ms-corrected-1" class="input-field" style="width:100%; box-sizing:border-box; border-color:#2e7d32; margin-bottom:5px; resize:none; line-height:1.4;" rows="2" placeholder="내가 고친 문장"></textarea>
             <div style="display:flex; gap:5px; align-items:flex-start;">
               <textarea id="ms-reason-1" class="input-field" style="flex:1; margin-bottom:0; border-color:#4a5d4e; resize:none; line-height:1.4;" rows="2" placeholder="💡 왜 틀렸는지 이유"></textarea>
-              <button onclick="checkMsNew(1)" style="background:none; border:none; font-size:1.5rem; cursor:pointer; margin-top:5px;">✔️</button>
+              <button aria-label="답과 이유 확인 (선택)" title="답과 이유 확인 (선택)" onclick="checkMsNew(1)" style="background:none; border:none; font-size:1.5rem; cursor:pointer; margin-top:5px;">✔️</button>
             </div>
             <div id="ms-feedback-1" style="font-size: 0.85rem; color: #4a5d4e; margin-top: 8px; font-weight: bold; display: none;"></div>
           </div>
@@ -1260,10 +1263,10 @@
             <div style="display:flex; justify-content:flex-end; margin-bottom:8px;">
               <button onclick="regenBiumun(2)" id="ms-regen-2" style="background:none; border:1px solid #d9534f; color:#d9534f; padding:3px 8px; font-size:0.9rem; border-radius:10px; cursor:pointer; line-height:1;" title="이 비문 새로 만들기">🔁</button>
             </div>
-            <textarea id="ms-corrected-2" class="input-field" style="width:100%; box-sizing:border-box; border-color:#2e7d32; margin-bottom:5px; resize:none; line-height:1.4;" rows="2" placeholder="✅ 올바른 문장 (정문)"></textarea>
+            <textarea id="ms-corrected-2" class="input-field" style="width:100%; box-sizing:border-box; border-color:#2e7d32; margin-bottom:5px; resize:none; line-height:1.4;" rows="2" placeholder="내가 고친 문장"></textarea>
             <div style="display:flex; gap:5px; align-items:flex-start;">
               <textarea id="ms-reason-2" class="input-field" style="flex:1; margin-bottom:0; border-color:#4a5d4e; resize:none; line-height:1.4;" rows="2" placeholder="💡 왜 틀렸는지 이유"></textarea>
-              <button onclick="checkMsNew(2)" style="background:none; border:none; font-size:1.5rem; cursor:pointer; margin-top:5px;">✔️</button>
+              <button aria-label="답과 이유 확인 (선택)" title="답과 이유 확인 (선택)" onclick="checkMsNew(2)" style="background:none; border:none; font-size:1.5rem; cursor:pointer; margin-top:5px;">✔️</button>
             </div>
             <div id="ms-feedback-2" style="font-size: 0.85rem; color: #4a5d4e; margin-top: 8px; font-weight: bold; display: none;"></div>
           </div>
@@ -1273,10 +1276,10 @@
             <div style="display:flex; justify-content:flex-end; margin-bottom:8px;">
               <button onclick="regenBiumun(3)" id="ms-regen-3" style="background:none; border:1px solid #d9534f; color:#d9534f; padding:3px 8px; font-size:0.9rem; border-radius:10px; cursor:pointer; line-height:1;" title="이 비문 새로 만들기">🔁</button>
             </div>
-            <textarea id="ms-corrected-3" class="input-field" style="width:100%; box-sizing:border-box; border-color:#2e7d32; margin-bottom:5px; resize:none; line-height:1.4;" rows="2" placeholder="✅ 올바른 문장 (정문)"></textarea>
+            <textarea id="ms-corrected-3" class="input-field" style="width:100%; box-sizing:border-box; border-color:#2e7d32; margin-bottom:5px; resize:none; line-height:1.4;" rows="2" placeholder="내가 고친 문장"></textarea>
             <div style="display:flex; gap:5px; align-items:flex-start;">
               <textarea id="ms-reason-3" class="input-field" style="flex:1; margin-bottom:0; border-color:#4a5d4e; resize:none; line-height:1.4;" rows="2" placeholder="💡 왜 틀렸는지 이유"></textarea>
-              <button onclick="checkMsNew(3)" style="background:none; border:none; font-size:1.5rem; cursor:pointer; margin-top:5px;">✔️</button>
+              <button aria-label="답과 이유 확인 (선택)" title="답과 이유 확인 (선택)" onclick="checkMsNew(3)" style="background:none; border:none; font-size:1.5rem; cursor:pointer; margin-top:5px;">✔️</button>
             </div>
             <div id="ms-feedback-3" style="font-size: 0.85rem; color: #4a5d4e; margin-top: 8px; font-weight: bold; display: none;"></div>
           </div>
@@ -2254,7 +2257,8 @@ checkNewComments();
   }
 
   // 최종본 렌더링 (diff = 위치, 마크 = 색등급). 실패 시 폴백
-  function renderFinalDiff(finalRaw, revisionRaw) {
+  function renderFinalDiff(finalRaw, revisionRaw, storyMeta) {
+    if(storyMeta?.state && storyMeta.state.plain===String(finalRaw||"")){const marked=gptStoryFinalMarkup_(storyMeta.state,storyMeta.exercises);if(marked!==null)return marked;}
     var fallback = function() { return formatForPersonal(safeSavedHtml(finalRaw)); };
     try {
       var pm = parseMarks(String(finalRaw == null ? "" : finalRaw));
@@ -2881,6 +2885,381 @@ checkNewComments();
   }
 
   let msCombinedWords = "";
+// V36 My Story client state. Store facts and their input together; discard stale results.
+let gptStoryUi={hint:null,final:null,assessments:{},meaning:''};
+function gptStoryInputs_() {
+  const value=id=>{const e=document.getElementById(id);return e?String(e.value||'').trim():'';};
+  const required=[1,2,3].map(i=>value('ms-word-req'+i)),optional=[1,2].map(i=>value('ms-word-opt'+i)).filter(Boolean);
+  const words=required.every(Boolean)?required.join(', ')+(optional.length?' (선택: '+optional.join(', ')+')':''):msCombinedWords;
+  return {title:value('ms-title'),draft:value('ms-draft'),revision:value('ms-revision'),
+    grammar:value('ms-grammar'),grammarGoals:getMsGrammarGoals(),lesson:value('ms-lesson'),
+    reqWords:words,intendedMeaning:value('ms-intended-meaning')};
+}
+function gptStoryInputKey_(input,stage) {
+  return JSON.stringify({studentId:currentStudentId,lesson:input.lesson,title:input.title,source:stage==='hint'?input.draft:input.revision,
+    goals:input.grammarGoals,words:input.reqWords,...(stage==='final'?{draft:input.draft,meaning:input.intendedMeaning}:{})});
+}
+async function gptStoryPost_(type,data) {
+  const studentId=currentStudentId,token=currentToken,key=JSON.stringify([studentId,type,data]);
+  if(gptStoryUi.pendingJob?.key!==key)gptStoryUi.pendingJob={key:key,id:'ms_'+Date.now().toString(36)+'_'+Math.random().toString(36).slice(2)};
+  const job=gptStoryUi.pendingJob;let previous='',stalled=0;
+  if(typeof autoSaveMyStoryDraft==='function')autoSaveMyStoryDraft();
+  for(let step=0;step<24;step++){
+    if(currentStudentId!==studentId||currentToken!==token)return {error:'Unauthorized'};
+    const response=await fetch(SHEET_URL,{method:'POST',body:JSON.stringify({...data,type:type,studentId:studentId,token:token,storyContract:'mystory-v39',storyRequestId:job.id})});
+    const text=await response.text();if(text.trim()==='Unauthorized')return {error:'Unauthorized'};
+    let result;try{result=JSON.parse(text);}catch(e){return {error:'bad_response'};}
+    if(result.status!=='working'){
+      const resumable=/story_model_(transport|incomplete|http:(429|5\d\d))/.test(String(result.errorReason||''));
+      if(!resumable&&gptStoryUi.pendingJob===job)gptStoryUi.pendingJob=null;
+      if(typeof autoSaveMyStoryDraft==='function')autoSaveMyStoryDraft();return result;
+    }
+    if(result.storyContract!=='mystory-v39'||typeof result.progressKey!=='string')return {error:'bad_progress'};
+    stalled=result.progressKey===previous?stalled+1:0;previous=result.progressKey;
+    if(stalled>=2)return {errorReason:'story_progress_expired',message:'검토 중간 결과를 이어받지 못했음. 작성 내용은 보존되어 있으니 다시 확인해주셈.'};
+  }
+  return {errorReason:'story_progress_limit',message:'검토가 길어져 잠시 멈췄음. 작성 내용과 끝낸 검토는 보존됨. 다시 확인해주셈.'};
+}
+function gptStoryClientError_(data) {
+  if(data&&data.error==='Unauthorized'){alert('세션이 만료됐음. 다시 로그인해주셈.');logout();return {ok:false,sessionExpired:true};}
+  if(!data||data.error||data.errorReason)return {ok:false,message:'Zeeto의 분석을 확인하지 못했음. 작성한 내용은 보존되어 있으니 다시 시도해주셈.'};
+  if(data.storyContract!=='mystory-v39')return {ok:false,message:'서버와 화면의 버전이 달라 새 분석을 시작할 수 없음. 선생님께 알려주셈. 작성한 내용은 보존됨.'};
+  return null;
+}
+async function gptStoryPerformHint_() {
+  const input=gptStoryInputs_(),key=gptStoryInputKey_(input,'hint');
+  try{
+    const data=await gptStoryPost_('ms_hint',input),error=gptStoryClientError_(data);
+    if(error)return error;
+    if(key!==gptStoryInputKey_(gptStoryInputs_(),'hint'))return {ok:false,message:'분석 중 초안이나 조건이 바뀌었음. 현재 내용으로 다시 힌트를 받아주셈.'};
+    if(!data.hintState||data.hintState.source!==input.draft||!String(data.result||'').trim())return {ok:false,message:'초안과 분석 결과가 일치하지 않아 다시 확인해야 함.'};
+    gptStoryUi.hint={inputKey:key,state:data.hintState};
+    msCombinedWords=input.reqWords;
+    gptStoryUi.final=null;gptStoryUi.assessments={};gptStoryUi.meaning='';gptStoryUi.followup=null;
+    const meaning=document.getElementById('ms-intended-meaning');if(meaning)meaning.value='';
+    const panel=document.getElementById('ms-v39-followup');if(panel)panel.hidden=true;
+    document.getElementById('ms-zeeto-hint').innerHTML=safeAiRender(data.result);
+    document.getElementById('ms-display-draft').innerHTML='<b>'+escapeHtml(input.title)+'</b><br><br>'+escapeHtml(input.draft);
+    autoSaveMyStoryDraft();
+    return {ok:true};
+  }catch(e){return {ok:false,message:'분석에 연결하지 못했음. 초안은 보존되어 있으니 다시 시도해주셈.'};}
+}
+
+function gptStoryTextHtml_(text) {return escapeHtml(String(text||'')).replace(/\n/g,'<br>');}
+function gptStoryMeaningPanel_() {
+  let panel=document.getElementById('ms-v39-followup');if(panel)return panel;
+  panel=document.createElement('div');panel.id='ms-v39-followup';panel.hidden=true;
+  panel.style.cssText='padding:14px;margin:14px 0;border:1px solid #819087;border-radius:12px;background:#f3f7f4';
+  panel.innerHTML='<div id="ms-v39-followup-message" role="status"></div><div id="ms-v39-meaning-wrap" hidden><label for="ms-intended-meaning">이 문장으로 하고 싶은 말</label><textarea id="ms-intended-meaning" placeholder="위 질문에 답하거나, 문장으로 표현하려던 뜻을 한국어로 적어주세요."></textarea></div>';
+  const revision=document.getElementById('ms-revision');revision.insertAdjacentElement('afterend',panel);
+  const field=document.getElementById('ms-intended-meaning');field.value=gptStoryUi.meaning||'';
+  field.addEventListener('input',()=>{gptStoryUi.meaning=field.value;gptStoryUi.final=null;gptStoryUi.assessments={};autoSaveMyStoryDraft();});
+  return panel;
+}
+function gptStoryRenderFollowup_(data) {
+  const panel=gptStoryMeaningPanel_();panel.hidden=false;
+  document.querySelectorAll('.story-step').forEach(e=>e.classList.remove('active'));
+  document.getElementById('story-step-2').classList.add('active');
+  const meaning=data.status==='needs_meaning';
+  document.getElementById('ms-v39-meaning-wrap').hidden=!meaning;
+  const lines=meaning?(data.questions||[]).map(q=>'「'+q.before+'」\n'+q.question):
+    (data.missing.goals||[]).map(x=>'목표 문법: '+x).concat((data.missing.words||[]).map(x=>'필수 단어: '+x));
+  document.getElementById('ms-v39-followup-message').innerHTML=gptStoryTextHtml_([data.message].concat(lines).join('\n\n'));
+  gptStoryUi.followup=data;autoSaveMyStoryDraft();
+  panel.scrollIntoView({block:'center',behavior:'smooth'});
+}
+function gptStoryFinalMarkup_(state,exerciseOverride) {
+  if(!state||typeof state.source!=='string'||typeof state.plain!=='string'||!Array.isArray(state.edits))return null;
+  const chosen=Array.isArray(exerciseOverride)?exerciseOverride:state.exerciseStatus==='ready'?state.exercises||[]:state.practiceTargets||[];
+  const selected=new Set(chosen.map(q=>q.sourceIssueId||q.id));let cursor=0,html='',plain='';
+  for(const e of state.edits){
+    if(!Number.isInteger(e.start)||!Number.isInteger(e.end)||e.start<cursor||e.end<e.start||e.end>state.source.length||state.source.slice(e.start,e.end)!==e.before||typeof e.after!=='string')return null;
+    const unchanged=state.source.slice(cursor,e.start);plain+=unchanged+e.after;html+=escapeHtml(unchanged);
+    html+='<span style="color:'+(selected.has(e.id)?'#c62828':'#777')+';font-weight:bold;'+(selected.has(e.id)?'':'text-decoration:underline;')+'" title="'+escapeHtml(e.reason||'')+'">'+escapeHtml(e.after)+'</span>';cursor=e.end;
+  }
+  plain+=state.source.slice(cursor);if(plain!==state.plain)return null;
+  return (html+escapeHtml(state.source.slice(cursor))).replace(/\n/g,'<br>');
+}
+function gptStoryRenderFinal_(state) {
+  document.getElementById('ms-zeeto-feedback').innerHTML=gptStoryTextHtml_(state.feedback);
+  const final=document.getElementById('ms-zeeto-final');final.dataset.rawFinal=state.plain;
+  // Exact replacement locations, including repeated words and punctuation insertions.
+  const markup=gptStoryFinalMarkup_(state);final.innerHTML=markup===null?gptStoryTextHtml_(state.plain):markup;
+  const changes=document.getElementById('ms-v39-change-list');
+  if(changes)changes.innerHTML=state.edits.map(e=>'<p>'+gptStoryTextHtml_('「'+(e.before||'(문장 경계)')+'」 → 「'+(e.after||'(삭제)')+'」\n'+e.reason)+'</p>').join('');
+  const details=document.getElementById('ms-v39-changes');if(details)details.hidden=!state.edits.length;
+  document.getElementById('ms-zeeto-tip').innerHTML=gptStoryTextHtml_(state.tip);
+  document.getElementById('ms-display-revision').innerText=state.source;
+  const oops=document.getElementById('ms-oops-point');oops.dataset.original='';
+  oops.innerHTML=(state.practiceTargets||[]).length?(state.practiceTargets||[]).map((e,i)=>'<p>'+gptStoryTextHtml_((i+1)+'. 「'+e.before+'」 → 「'+(e.after||'(삭제)')+'」\n'+e.reason)+'</p>').join('')+'<p>다음 단계에서 같은 원리를 연습할 새 문장을 준비할게.</p>':'연습을 시작할 때 이 글에서 필요한 Oops Point를 확인할게.';
+  if(state.exerciseStatus==='ready'&&typeof gptStoryRenderOops_==='function')gptStoryRenderOops_(state);
+}
+async function gptStoryPerformFinal_() {
+  gptStoryMeaningPanel_();
+  const input=gptStoryInputs_(),key=gptStoryInputKey_(input,'final');
+  gptStoryUi.final=null;gptStoryUi.assessments={};autoSaveMyStoryDraft();
+  try{
+    const data=await gptStoryPost_('ms_final',{...input,hint:document.getElementById('ms-zeeto-hint').innerText}),error=gptStoryClientError_(data);
+    if(error)return error;
+    if(key!==gptStoryInputKey_(gptStoryInputs_(),'final'))return {ok:false,message:'분석 중 수정본이나 뜻 설명이 바뀌었음. 현재 내용으로 다시 확인해주셈.'};
+    if(['needs_meaning','needs_requirements'].includes(data.status)){
+      if(data.source!==input.revision)return {ok:false,message:'수정본과 확인 질문이 일치하지 않음. 다시 확인해주셈.'};
+      gptStoryRenderFollowup_(data);showFinalRetryBtn(false,'',null);return {ok:false,blocked:true};
+    }
+    const state=data.finalState;
+    if(data.status!=='review_ready'||!state||state.source!==input.revision||!state.plain||!Array.isArray(state.edits))return {ok:false,message:'최종본을 검증하지 못했음. 수정본은 보존됨.'};
+    gptStoryUi.final={inputKey:key,state:state,saveId:data.saveId||'',receipt:data.finalReceipt||'',practiceReceipt:''};gptStoryUi.followup=null;
+    msCombinedWords=input.reqWords;
+    document.getElementById('ms-v39-followup').hidden=true;
+    gptStoryRenderFinal_(state);autoSaveMyStoryDraft();return {ok:true};
+  }catch(e){return {ok:false,message:'최종본 분석에 연결하지 못했음. 수정본과 뜻 설명은 보존됨.'};}
+}
+function gptStoryRestoreFollowup_() {
+  gptStoryMeaningPanel_();
+  document.getElementById('ms-intended-meaning').value=gptStoryUi.meaning||'';
+  if(gptStoryUi.followup)gptStoryRenderFollowup_(gptStoryUi.followup);
+}
+function gptStoryFinalCurrent_() {return !!(gptStoryUi.final&&gptStoryUi.final.inputKey===gptStoryInputKey_(gptStoryInputs_(),'final'));}
+function gptStoryBackToRevision_() {
+  document.querySelectorAll('.story-step').forEach(e=>e.classList.remove('active'));
+  document.getElementById('story-step-2').classList.add('active');
+  document.getElementById('ms-revision').scrollIntoView({block:'center',behavior:'smooth'});
+  autoSaveMyStoryDraft();
+}
+async function goToStoryStep(stepNumber) {
+  if(stepNumber===4){
+    if(!gptStoryFinalCurrent_()){alert('현재 수정본의 최종본 확인을 먼저 완료해주셈.');return;}
+    if(typeof gptStoryPrepareOopsUi_!=='function'){alert('현재 수정본의 최종본과 Oops Point 준비를 먼저 완료해주셈.');return;}
+    if(!await gptStoryPrepareOopsUi_())return;
+    gptStoryOpenPractice_();return;
+  }
+  return gptStoryLegacyGoStep_(stepNumber);
+}
+
+function gptStoryRenderOops_(state) {
+  const exercises=state.exercises||[],lines=exercises.map((q,i)=>(i+1)+'. ❌ '+(q.sourceBefore||'(문장 경계)')+' → '+q.sourceAfter+'\n'+q.explanation+'\n👽 Zeeto의 비문 예시: '+q.question);
+  const text=lines.length?lines.join('\n\n'):'이 수정본에서는 Oops Point로 연습할 문법 교정을 찾지 못했음. 성찰을 적고 글을 제출할 수 있음.';
+  const oops=document.getElementById('ms-oops-point');oops.dataset.original=lines.join('\n\n');oops.innerHTML=gptStoryTextHtml_(text);
+  document.getElementById('ms-oops-point-copy').innerHTML=oops.innerHTML;
+}
+async function gptStoryPrepareOopsUi_() {
+  if(!gptStoryFinalCurrent_()||isLoading)return false;
+  const final=gptStoryUi.final;
+  if(final.state.exerciseStatus==='ready'&&final.practiceReceipt)return true;
+  if(!final.receipt){alert('이 최종본의 서버 확인 정보가 없음. 수정본으로 돌아가 최종본 확인을 다시 해주셈. 작성 내용은 보존됨.');return false;}
+  showLoading('이 글에 필요한 Oops Point를 확인하는 중...');
+  try {
+    const data=await gptStoryPost_('ms_prepare_oops',{finalReceipt:final.receipt}),error=gptStoryClientError_(data);
+    if(error){if(!error.sessionExpired)alert(data.message||error.message);return false;}
+    if(gptStoryUi.final!==final||!gptStoryFinalCurrent_()){alert('작성 내용이 바뀌었음. 현재 글의 최종본부터 확인해주셈.');return false;}
+    if(data.status!=='ready'||!Array.isArray(data.exercises)||data.exercises.length>3||!data.practiceReceipt)throw Error('oops_shape');
+    if(data.exercises.some(q=>!q.id||!q.question||!final.state.edits.some(e=>e.id===q.sourceIssueId&&e.kind==='grammar')))throw Error('oops_binding');
+    final.state.exercises=data.exercises;final.state.exerciseStatus='ready';final.practiceReceipt=data.practiceReceipt;
+    gptStoryUi.assessments={};gptStoryRenderFinal_(final.state);autoSaveMyStoryDraft();return true;
+  }catch(e){alert('Oops Point 준비를 마치지 못했음. 최종본은 보존했으니 연습 시작을 다시 눌러주셈.');return false;}
+  finally {hideLoading();}
+}
+function gptStoryOpenPractice_() {
+  const state=gptStoryUi.final.state;gptStoryRenderOops_(state);
+  for(let i=1;i<=3;i++){
+    if(typeof gptStoryWatchAssessment_==='function')gptStoryWatchAssessment_(i);
+    const q=state.exercises[i-1],field=document.getElementById('ms-error-'+i),changed=field.value!==(q?q.question:'');
+    field.parentElement.style.display=q?'block':'none';field.value=q?q.question:'';field.readOnly=true;
+    if(changed||!q){['corrected','reason'].forEach(k=>document.getElementById('ms-'+k+'-'+i).value='');
+      const fb=document.getElementById('ms-feedback-'+i);fb.innerHTML='';fb.style.display='none';delete gptStoryUi.assessments[i];}
+  }
+  updateMsPracticeInstruction();document.querySelectorAll('.story-step').forEach(e=>e.classList.remove('active'));
+  document.getElementById('story-step-4').classList.add('active');document.getElementById('mystory-screen').scrollTop=0;autoSaveMyStoryDraft();
+}
+async function gptStoryRegenerateOopsUi_(boxNum,forceRegen) {
+  if(isLoading||!gptStoryFinalCurrent_())return;
+  const final=gptStoryUi.final,q=final.state.exercises[boxNum-1];if(!q)return;
+  showLoading('연습 문장을 다시 확인하는 중...');
+  try {
+    const data=await gptStoryPost_('ms_regen_biumun',{finalReceipt:final.receipt,practiceReceipt:final.practiceReceipt,exerciseId:q.id,forceRegen:forceRegen===true});
+    const error=gptStoryClientError_(data);if(error){if(!error.sessionExpired)alert(data.message||error.message);return;}
+    if(gptStoryUi.final!==final||!gptStoryFinalCurrent_()||final.state.exercises[boxNum-1].question!==q.question)return;
+    const fb=document.getElementById('ms-feedback-'+boxNum);
+    if(data.status==='problem_valid'){
+      fb.style.display='block';fb.innerHTML=gptStoryTextHtml_(data.message);
+      const button=document.createElement('button');button.type='button';button.textContent='같은 유형의 다른 문제로 바꾸기';button.className='btn';button.style.cssText='display:block;margin-top:10px';
+      button.addEventListener('click',()=>gptStoryRegenerateOopsUi_(boxNum,true));fb.appendChild(button);return;
+    }
+    if(data.status!=='ready'||!data.practiceReceipt||!Array.isArray(data.exercises)||data.exercises.length!==final.state.exercises.length)throw Error('regen_shape');
+    const replacement=data.exercises[boxNum-1];if(!replacement||replacement.id!==q.id||replacement.sourceIssueId!==q.sourceIssueId||replacement.question===q.question)throw Error('regen_binding');
+    if(data.exercises.some((e,i)=>i!==boxNum-1&&JSON.stringify(e)!==JSON.stringify(final.state.exercises[i])))throw Error('regen_other_changed');
+    final.state.exercises=data.exercises;final.practiceReceipt=data.practiceReceipt;delete gptStoryUi.assessments[boxNum];
+    gptStoryRenderFinal_(final.state);gptStoryOpenPractice_();alert(data.message||'새 문제를 준비했음.');
+  }catch(e){alert('새 문제를 확인하지 못했음. 글과 기존 답은 보존됨. 다시 시도해주셈.');}
+  finally {hideLoading();}
+}
+
+function gptStoryAssessmentKey_(quiz,corrected,reason) {return JSON.stringify([String(quiz).trim(),String(corrected).trim(),String(reason).trim()]);}
+function gptStoryAssessmentCurrent_(i) {
+  const a=gptStoryUi.assessments[i];if(!a)return null;
+  const key=gptStoryAssessmentKey_(document.getElementById('ms-error-'+i).value,document.getElementById('ms-corrected-'+i).value,document.getElementById('ms-reason-'+i).value);
+  return a.inputKey===key?a:null;
+}
+function gptStoryAssessmentLabel_(status) {
+  return {verified:'답·이유 확인됨',needs_revision:'답 수정 필요',needs_reason:'이유 보완 필요',problem_invalid:'문항 재확인 필요',uncertain:'판정 보류',ungraded:'AI 검토 전'}[status]||'이전 기록 · 판정 확인 불가';
+}
+function gptStoryWatchAssessment_(i) {
+  ['corrected','reason'].forEach(k=>{const field=document.getElementById('ms-'+k+'-'+i);if(field.dataset.v39Watch)return;field.dataset.v39Watch='1';
+    field.addEventListener('input',()=>{if(gptStoryUi.assessments[i]&&!gptStoryAssessmentCurrent_(i)){delete gptStoryUi.assessments[i];const fb=document.getElementById('ms-feedback-'+i);fb.innerHTML='';fb.style.display='none';}autoSaveMyStoryDraft();});});
+}
+async function gptStoryCheckUi_(i) {
+  if(isLoading||!gptStoryFinalCurrent_())return;
+  const final=gptStoryUi.final,q=final.state.exercises[i-1];if(!q)return;
+  const item={id:q.id,quiz:document.getElementById('ms-error-'+i).value.trim(),corrected:document.getElementById('ms-corrected-'+i).value.trim(),reason:document.getElementById('ms-reason-'+i).value.trim()};
+  if(!item.corrected||!item.reason){alert('고친 문장과 이유를 모두 적어주셈.');return;}
+  const key=gptStoryAssessmentKey_(item.quiz,item.corrected,item.reason);
+  showLoading('쓴 답과 이유를 각각 확인하는 중...');
+  try {
+    const data=await gptStoryPost_('ms_check_new',{practiceReceipt:final.practiceReceipt,items:[item]}),error=gptStoryClientError_(data);
+    if(error){if(!error.sessionExpired)alert(data.message||error.message);return;}
+    if(gptStoryUi.final!==final||!gptStoryFinalCurrent_()||key!==gptStoryAssessmentKey_(document.getElementById('ms-error-'+i).value,document.getElementById('ms-corrected-'+i).value,document.getElementById('ms-reason-'+i).value))return;
+    const a=data.assessments&&data.assessments[0];
+    if(data.status!=='assessed'||data.assessments.length!==1||!data.assessmentReceipt||!a||a.id!==item.id||gptStoryAssessmentKey_(a.quiz,a.corrected,a.reason)!==key||!['verified','needs_revision','needs_reason','problem_invalid','uncertain'].includes(a.status))throw Error('assessment_binding');
+    gptStoryUi.assessments[i]={inputKey:key,data:a,receipt:data.assessmentReceipt};
+    const fb=document.getElementById('ms-feedback-'+i);fb.style.display='block';fb.innerHTML=gptStoryTextHtml_(gptStoryAssessmentLabel_(a.status)+'\n'+a.feedback);autoSaveMyStoryDraft();
+  }catch(e){alert('답과 이유의 확인을 마치지 못했음. 입력한 내용은 보존됨.');}
+  finally {hideLoading();}
+}
+
+function gptStorySubmitEvidence_() {
+  if(!gptStoryFinalCurrent_())throw Error('현재 수정본의 최종본 확인을 먼저 완료해주셈. 작성 내용은 보존됨.');
+  const final=gptStoryUi.final;
+  if(!final.receipt||!final.practiceReceipt||final.state.exerciseStatus!=='ready')throw Error('현재 글의 Oops Point 준비를 먼저 완료해주셈.');
+  const receipts=[],items=final.state.exercises.map((q,index)=>{
+    const i=index+1,quiz=document.getElementById('ms-error-'+i).value.trim(),corrected=document.getElementById('ms-corrected-'+i).value.trim(),reason=document.getElementById('ms-reason-'+i).value.trim();
+    if(q.question!==quiz)throw Error('현재 글과 연습 문제가 일치하지 않음. Oops Point를 다시 열어주셈.');
+    if(!corrected||!reason)throw Error('고친 문장과 이유를 모두 적어주셈. AI 검토는 선택임.');
+    const a=gptStoryAssessmentCurrent_(i);if(a)receipts.push(a.receipt);
+    return {id:q.id,quiz:quiz,corrected:corrected,reason:reason,status:a?a.data.status:'ungraded',feedback:a?a.data.feedback:'',contract:'mystory-v39'};
+  });
+  return {finalReceipt:final.receipt,practiceReceipt:final.practiceReceipt,assessmentReceipts:receipts,items:items,intendedMeaning:gptStoryInputs_().intendedMeaning};
+}
+let gptStoryRetryUi=null;
+function gptStoryRetryMatches_(story,record) {
+  const current=story.storyV39,prior=record.assessmentV39;
+  if(current?.saveId&&prior?.storySaveId)return current.saveId===prior.storySaveId;
+  if(story.readingKey&&prior?.readingKey)return story.readingKey===prior.readingKey;
+  if(/^S\d+$/.test(String(record.originalStoryRow||''))&&story.date)return record.originalStoryRow==='S'+new Date(story.date).getTime();
+  return String(record.lesson)===String(story.lesson)&&record.storyTitle===story.title&&(!story.date||toLocalDateStr(record.originalDate)===toLocalDateStr(story.date));
+}
+function gptStoryRetryItems_() {
+  if(!gptStoryRetryUi)return [];
+  return gptStoryRetryUi.exercises.map((q,i)=>({id:q.id,quiz:q.question,corrected:(document.getElementById('oops-retry-corrected-'+(i+1))?.value||'').trim(),reason:(document.getElementById('oops-retry-reason-'+(i+1))?.value||'').trim()}));
+}
+function gptStoryRetryCache_() {
+  if(!gptStoryRetryUi)return;
+  gptStoryRetryUi.answers=gptStoryRetryItems_();
+  const key=getOopsBiumunCacheKey(myStories[gptStoryRetryUi.index]);
+  try{sessionStorage.setItem(key+'_v39',JSON.stringify({...gptStoryRetryUi,savedAt:Date.now()}));}catch(e){}
+}
+function gptStoryRetryChanged_() {
+  const ctx=gptStoryRetryUi;if(!ctx)return;
+  if(ctx.evaluation&&ctx.evaluation.inputKey!==JSON.stringify(gptStoryRetryItems_())){
+    ctx.evaluation=null;ctx.saved=false;document.getElementById('oops-retry-result').style.display='none';
+  }
+  const button=document.getElementById('oops-retry-submit-btn');button.style.display='';button.disabled=false;
+  button.textContent='답·이유 확인하고 저장';gptStoryRetryCache_();
+  if(typeof renderAttemptHistory==='function')renderAttemptHistory(ctx.index);
+}
+function gptStoryRetryRender_() {
+  const ctx=gptStoryRetryUi,container=document.getElementById('oops-retry-error-container');
+  currentOopsRetryBiumuns=ctx.exercises.map(q=>q.question);
+  container.innerHTML=ctx.exercises.map((q,i)=>{
+    const a=(ctx.answers||[]).find(a=>a.id===q.id&&a.quiz===q.question)||{};
+    return '<div class="error-new-box" style="padding:12px;margin-bottom:12px;border:1px solid #a8b4ab;border-radius:10px">'+
+      '<label for="oops-retry-error-'+(i+1)+'">연습 문장 '+(i+1)+'</label><textarea id="oops-retry-error-'+(i+1)+'" class="input-field" readonly>'+escapeHtml(q.question)+'</textarea>'+
+      '<button id="oops-retry-regen-'+(i+1)+'" type="button" onclick="regenOopsRetryBiumun('+(i+1)+')">문항 확인·바꾸기</button><div id="oops-retry-notice-'+(i+1)+'" role="status"></div>'+
+      '<label for="oops-retry-corrected-'+(i+1)+'">내가 고친 문장</label><textarea id="oops-retry-corrected-'+(i+1)+'" class="input-field">'+escapeHtml(a.corrected||'')+'</textarea>'+
+      '<label for="oops-retry-reason-'+(i+1)+'">이렇게 고친 이유</label><textarea id="oops-retry-reason-'+(i+1)+'" class="input-field">'+escapeHtml(a.reason||'')+'</textarea></div>';
+  }).join('')||'<p>이 글에서 다시 연습할 문법 문제를 찾지 못했음. 다른 글을 선택할 수 있음.</p>';
+  ctx.exercises.forEach((q,i)=>['corrected','reason'].forEach(k=>document.getElementById('oops-retry-'+k+'-'+(i+1)).addEventListener('input',gptStoryRetryChanged_)));
+  const btn=document.getElementById('oops-retry-submit-btn');btn.style.display=ctx.exercises.length?'':'none';btn.disabled=false;btn.style.opacity='1';btn.textContent='답·이유 확인하고 저장';
+  document.getElementById('oops-retry-result').style.display='none';
+  if(ctx.evaluation&&ctx.evaluation.inputKey===JSON.stringify(gptStoryRetryItems_())){gptStoryRetryResult_(ctx.evaluation.result);btn.textContent='확인한 결과 다시 저장';if(ctx.saved){btn.style.display='none';document.getElementById('oops-retry-result-master').textContent+=' · 저장됨';}}
+  if(typeof renderAttemptHistory==='function')renderAttemptHistory(ctx.index);
+}
+async function gptStoryRetrySelect_(index) {
+  if(_oopsSubmitInFlight||isLoading)return;
+  gptStoryRetryCache_();const story=myStories[index];if(!story)return;
+  currentOopsRetryStory=index;currentOopsRetryExpanded=false;_cachedOopsEval=null;gptStoryRetryUi=null;
+  document.getElementById('oops-retry-lesson-label').textContent='Lesson '+story.lesson;
+  document.getElementById('oops-retry-story-title').textContent=story.title||'(제목 없음)';
+  document.getElementById('oops-retry-original-date').textContent='처음 작성: '+toLocalDateStr(story.date);
+  const hint=document.getElementById('oops-retry-hint-content');hint.innerHTML=safeSavedHtml(story.oops||'이전 글에 저장된 설명이 없음.');hint.style.display='none';
+  document.getElementById('oops-retry-hint-chevron').textContent='▶';renderAttemptHistory(index);showOopsRetryPracticeView();
+  document.getElementById('oops-retry-result').style.display='none';document.getElementById('oops-retry-submit-btn').style.display='none';
+  const container=document.getElementById('oops-retry-error-container');container.textContent='이 글의 연습 문제를 준비하는 중...';
+  try{
+    const cached=JSON.parse(sessionStorage.getItem(getOopsBiumunCacheKey(story)+'_v39')||'null');
+    if(cached&&Date.now()-cached.savedAt<OOPS_BIUMUN_CACHE_TTL_MS&&cached.practiceReceipt&&Array.isArray(cached.exercises)){gptStoryRetryUi={...cached,index:index};gptStoryRetryRender_();return;}
+  }catch(e){}
+  showLoading('이 글의 Oops Point를 준비하는 중...');
+  try {
+    const data=await gptStoryPost_('oops_retry_prepare',{saveId:story.storyV39?.saveId||'',readingKey:story.readingKey||'',originalStoryRow:'S'+new Date(story.date).getTime(),lesson:story.lesson,storyTitle:story.title}),error=gptStoryClientError_(data);
+    if(error){if(!error.sessionExpired)throw Error(data.message||error.message);return;}
+    if(currentOopsRetryStory!==index)return;
+    if(data.status!=='ready'||!Array.isArray(data.exercises)||data.exercises.length>3||!data.practiceReceipt)throw Error('연습 문제를 확인하지 못했음.');
+    gptStoryRetryUi={index:index,exercises:data.exercises,practiceReceipt:data.practiceReceipt,answers:[],evaluation:null};gptStoryRetryRender_();gptStoryRetryCache_();
+  }catch(e){container.innerHTML=gptStoryTextHtml_(e.message)+'<br><button onclick="selectOopsStory('+index+')">다시 준비하기</button>';}
+  finally{hideLoading();}
+}
+async function gptStoryRetryRegenerate_(i,force) {
+  if(!gptStoryRetryUi||isLoading||_oopsSubmitInFlight)return;gptStoryRetryCache_();
+  const ctx=gptStoryRetryUi,q=ctx.exercises[i-1];if(!q)return;
+  const existing=ctx.answers[i-1];if((existing?.corrected||existing?.reason)&&!confirm('새 문제로 바뀌면 이 문항의 답과 이유를 다시 써야 함. 문항을 확인할까?'))return;
+  showLoading('문항의 문법을 확인하는 중...');
+  try{
+    const data=await gptStoryPost_('ms_regen_biumun',{practiceReceipt:ctx.practiceReceipt,exerciseId:q.id,forceRegen:force===true}),error=gptStoryClientError_(data);
+    if(error){if(!error.sessionExpired)alert(data.message||error.message);return;}if(gptStoryRetryUi!==ctx)return;
+    if(data.status==='problem_valid'){
+      document.getElementById('oops-retry-notice-'+i).innerHTML=gptStoryTextHtml_(data.message)+'<br><button onclick="regenOopsRetryBiumun('+i+',true)">같은 유형의 다른 문제로 바꾸기</button>';return;
+    }
+    if(data.status!=='ready'||!data.practiceReceipt||!Array.isArray(data.exercises)||data.exercises.length!==ctx.exercises.length||data.exercises.some((x,n)=>x.id!==ctx.exercises[n].id||n!==i-1&&x.question!==ctx.exercises[n].question)||data.exercises[i-1].question===q.question)throw Error('replacement_binding');
+    ctx.exercises=data.exercises;ctx.practiceReceipt=data.practiceReceipt;ctx.evaluation=null;ctx.saved=false;gptStoryRetryRender_();gptStoryRetryCache_();
+    document.getElementById('oops-retry-notice-'+i).textContent=data.message;
+  }catch(e){alert('문제 확인을 마치지 못했음. 기존 문제와 답은 보존됨.');}finally{hideLoading();}
+}
+function gptStoryRetryResult_(result) {
+  document.getElementById('oops-retry-result-feedback').innerHTML=result.assessments.map((a,i)=>'<p>'+gptStoryTextHtml_((i+1)+'. '+gptStoryAssessmentLabel_(a.status)+'\n'+a.feedback)+'</p>').join('');
+  const master=document.getElementById('oops-retry-result-master');master.textContent=result.isMaster?'답과 이유를 모두 확인했음 · 마스터 완료':'위 항목별 결과를 확인해주셈.';master.style.background='#edf2ef';master.style.color='#334c3c';
+  document.getElementById('oops-retry-result').style.display='block';
+}
+async function gptStoryRetrySubmit_() {
+  if(isTeacherSelf||isUndercover){alert('둘러보기에서는 제출할 수 없음.');return;}
+  const ctx=gptStoryRetryUi;if(!ctx||isLoading||_oopsSubmitInFlight)return;
+  const items=gptStoryRetryItems_(),key=JSON.stringify(items);
+  if(!items.length||items.some(a=>!a.corrected||!a.reason)){alert('모든 문항의 고친 문장과 이유를 적어주셈.');return;}
+  const btn=document.getElementById('oops-retry-submit-btn');btn.disabled=true;_oopsSubmitInFlight=true;showLoading('답과 이유를 확인하고 저장하는 중...');
+  try{
+    let result=ctx.evaluation?.inputKey===key?ctx.evaluation.result:null;
+    if(!result){
+      result=await gptStoryPost_('oops_retry_evaluate',{practiceReceipt:ctx.practiceReceipt,items:items});const error=gptStoryClientError_(result);
+      if(error){if(!error.sessionExpired)alert(result.message||error.message);return;}
+      if(gptStoryRetryUi!==ctx||key!==JSON.stringify(gptStoryRetryItems_()))return;
+      if(result.status!=='assessed'||!result.assessmentReceipt||!Array.isArray(result.assessments)||result.assessments.length!==items.length||result.assessments.some((a,i)=>a.id!==items[i].id||gptStoryAssessmentKey_(a.quiz,a.corrected,a.reason)!==gptStoryAssessmentKey_(items[i].quiz,items[i].corrected,items[i].reason)))throw Error('assessment_binding');
+      ctx.evaluation={inputKey:key,result:result};gptStoryRetryCache_();
+    }
+    gptStoryRetryResult_(result);btn.textContent='확인한 결과 저장 중...';
+    const response=await fetch(SHEET_URL,{method:'POST',body:JSON.stringify({type:'oops_retry_save',studentId:currentStudentId,token:currentToken,userName:currentUserProfile,grade:String(currentStudentId||'').charAt(0),practiceReceipt:ctx.practiceReceipt,items:items,assessmentReceipts:[result.assessmentReceipt],expandedHint:currentOopsRetryExpanded})});
+    const saved=await response.text();if(saved==='Unauthorized'){alert('세션이 만료됐음. 다시 로그인해주셈.');logout();return;}
+    if(saved!=='OopsRetry Saved')throw Error('save_failed');
+    if(gptStoryRetryUi!==ctx||key!==JSON.stringify(gptStoryRetryItems_()))return;
+    ctx.saved=true;gptStoryRetryCache_();btn.style.display='none';
+    document.getElementById('oops-retry-result-master').textContent+=' · 저장됨';
+    await loadMyOopsRetries();if(typeof renderCalendar==='function')renderCalendar();renderAttemptHistory(ctx.index);
+  }catch(e){alert(ctx.evaluation?'평가 결과는 보존했지만 저장을 확인하지 못했음. 다시 저장을 눌러주셈.':'답과 이유의 확인을 마치지 못했음. 입력한 내용은 보존됨.');}
+  finally{hideLoading();_oopsSubmitInFlight=false;btn.disabled=false;btn.style.opacity='1';btn.textContent=ctx.evaluation?'확인한 결과 다시 저장':'답·이유 확인하고 저장';}
+}
+function gptStoryRetryRecordLabel_(r) {
+  if(!r.assessmentV39)return r.isMaster?'기존 마스터 기록 · 새 기준 검토 전':'이전 풀이 기록 · 새 기준 검토 전';
+  return r.isMaster?'답·이유 모두 확인됨':'항목별 결과 확인';
+}
+
 
   // ★ V9 수정: Lesson 선택 시 해당 Lesson의 핵심 문법 2개를 자동으로 모두 세팅 (학생이 선택하지 않음)
   function updateGrammarDropdown() {
@@ -2966,93 +3345,10 @@ checkNewComments();
   }
 
   // ★ V9 추가: ms_hint 실제 호출 (재사용) — 성공 시 true 리턴
-  async function performMsHint() {
-    const title = document.getElementById('ms-title').value.trim();
-    const draft = document.getElementById('ms-draft').value.trim();
-    const grammar = document.getElementById('ms-grammar').value.trim();
-    try {
-      const res = await fetch(SHEET_URL, { method: 'POST', body: JSON.stringify({ type: "ms_hint", studentId: currentStudentId, token: currentToken, lesson: document.getElementById('ms-lesson').value, grammarGoals: getMsGrammarGoals(), grammar: grammar, reqWords: msCombinedWords, title: title, draft: draft }) });
-      const data = await res.json();
-      if (data.error) { alert("⚠️ 세션이 만료됐음! 다시 로그인하셈 👽"); logout(); return { ok: false, sessionExpired: true }; }
-      const result = (data.result || "").trim();
-      if (!result || result.includes("Zeeto가 잠깐 멈췄음")) return { ok: false, message: data.failureType === 'validation'
-        ? '받은 힌트를 확인하는 중 문제가 생겼음. 다시 불러주셈! 작성한 초안은 그대로 남아있음.'
-        : data.failureType === 'input' ? '목표 문법 정보를 확인하지 못했음. 새로고침 후 Lesson을 다시 선택해주셈. 초안은 임시저장되어 있음.' : '' };
-      document.getElementById('ms-zeeto-hint').innerHTML = safeAiRender(result);
-      document.getElementById('ms-display-draft').innerHTML = `<b>${escapeHtml(title)}</b><br><br>${escapeHtml(draft)}`;
-      return { ok: true };
-    } catch(e) { return { ok: false }; }
-  }
+  async function performMsHint() { return gptStoryPerformHint_(); }
 
   // ★ V9 추가: ms_final 실제 호출 (재사용) — 성공 시 true 리턴
-  async function performMsFinal() {
-    const revision = document.getElementById('ms-revision').value.trim();
-    const hint = document.getElementById('ms-zeeto-hint').innerText;
-    const grammar = document.getElementById('ms-grammar').value.trim();
-    try {
-      const res = await fetch(SHEET_URL, { method: 'POST', body: JSON.stringify({ type: "ms_final", studentId: currentStudentId, token: currentToken, hint: hint, revision: revision, grammar: grammar, reqWords: msCombinedWords }) });
-      const data = await res.json();
-      if (data.error) { alert("⚠️ 세션이 만료됐음! 다시 로그인하셈 👽"); logout(); return { ok: false, sessionExpired: true }; }
-      const rawText = (data.result || "").trim();
-      if (!rawText || rawText.includes("Zeeto가 잠깐 멈췄음")) return { ok: false };
-      // ★ V7 수정(2026-04-21): 응답이 잘렸으면(이어짐 생략됨) 실패 처리해서 "다시 부르기" 버튼 띄우기
-      // → 이렇게 해야 꿀팁/Oops Point가 비어있는 채로 Step 4가 망가지지 않음
-      if (rawText.includes("이어짐 생략됨") || rawText.includes("✂️")) return { ok: false, truncated: true };
-
-      let feedbackPart = "", finalPart = "", tipPart = "", oopsPart = "";
-      try {
-        // ═══ ★ V29(2026-09-07): 섹션 파서 전면 교체 ═══
-        // [사고] 하람 2026-09-06 — 완벽 최종본 자리에 "Zeeto의 꿀팁"이라는 ★라벨 문자열★이 저장됨.
-        // [원인] 기존 파서는 rawText를 '==='로 자른 뒤 ★모든 조각★을 라벨 후보로 검사했고,
-        //   뒤에서 매치되면 앞의 값을 덮어썼음. 그래서 학생 스토리 본문에 'Finally'가 들어가면
-        //   "final"에 걸려서 finalPart가 ★다음 섹션의 라벨★로 교체됐음.
-        //   ("Finally, I won a trophy." — 중학생 영작에서 가장 흔한 연결어 중 하나)
-        //   같은 함정: 'tip'(multiple, tiptoe…), 'oops', '오류'.
-        // [지금] ① 라벨은 ★한 줄 안에서 ===로 감싸인 짧은 텍스트★일 때만 인정 → 본문은 라벨이 될 수 없음
-        //        ② 먼저 찾은 값을 유지(덮어쓰기 금지)  ③ 본문 = 그 헤더 다음부터 다음 헤더 직전까지
-        const headRe = /={2,}[ \t]*([^=\n]{1,30}?)[ \t]*={2,}/g;
-        const heads = [];
-        let hm;
-        while ((hm = headRe.exec(rawText)) !== null) {
-          heads.push({ label: hm[1].trim().toLowerCase(), bodyStart: headRe.lastIndex, headStart: hm.index });
-        }
-        for (let hi = 0; hi < heads.length; hi++) {
-          const bodyEnd = (hi + 1 < heads.length) ? heads[hi + 1].headStart : rawText.length;
-          const body = rawText.slice(heads[hi].bodyStart, bodyEnd).trim();
-          if (!body) continue;
-          const lb = heads[hi].label;
-          if (!feedbackPart && (lb.includes("피드백") || lb.includes("feedback"))) feedbackPart = body;
-          else if (!finalPart && (lb.includes("최종본") || lb.includes("final"))) finalPart = body;
-          else if (!tipPart && (lb.includes("꿀팁") || lb.includes("tip"))) tipPart = body;
-          else if (!oopsPart && (lb.includes("oops") || lb.includes("오류"))) oopsPart = body;
-        }
-      } catch(e) {}
-
-      // ★ V10(2026-05-12): 파싱 실패 감지 강화 — 4개 섹션 중 하나라도 비면 실패로 간주
-      // 기존엔 feedback+final 둘 다 비어야 실패였는데, finalPart만 빈 케이스에서 rawText가 통째로 "완벽 최종본" 박스에 노출되는 버그가 있어 엄격하게 바꿈
-      // ★ V10 수정: truncated와 parseFailed를 별개 플래그로 구분 (M6 fix)
-      // - rawText에 잘림 마커("이어짐 생략됨"/"✂️")가 있으면 위에서 truncated:true로 이미 return됨
-      // - 여기 도달했는데 섹션이 비었으면 형식 어긋남(parseFailed)이지 잘림이 아님
-      if (!feedbackPart || !finalPart || !tipPart || !oopsPart) return { ok: false, parseFailed: true };
-      // ★ V29: 비어있음만 보던 가드에 ★내용 검사★ 추가.
-      //   최종본은 영어 스토리임 — 알파벳이 10자도 없으면 라벨·한국어 조각이 잘못 들어온 것.
-      //   이게 통과하면 시트에 저장되고 낭독 원고·Azure 채점 기준·Deeto TTS까지 전부 오염됨.
-      if ((String(finalPart).match(/[A-Za-z]/g) || []).length < 10) return { ok: false, parseFailed: true };
-
-      document.getElementById('ms-zeeto-feedback').innerHTML = safeAiRender(feedbackPart);
-      // ★ V10(2026-05-12): finalPart || rawText 폴백 제거 — 파싱 실패하면 위에서 이미 return함
-      // ★ V16: AI의 ^마크 대신 학생 수정본과의 diff로 표시 / ★V17: 2단 색
-      var msFinalEl = document.getElementById('ms-zeeto-final');
-      msFinalEl.dataset.rawFinal = finalPart;   // ★V17: 마크 원문 보관(저장 시 무손실)
-      msFinalEl.innerHTML = renderFinalDiff(finalPart, revision);
-      document.getElementById('ms-zeeto-tip').innerHTML = formatForPersonal(safeAiRender(tipPart));
-      document.getElementById('ms-oops-point').dataset.original = oopsPart;
-      const oopsDisplay = oopsPart.replace(/👽 Zeeto의 (비문 예시|퀴즈):[\s\S]*?🎯/g, '').trim();
-      document.getElementById('ms-oops-point').innerHTML = safeAiRender(oopsDisplay);
-      document.getElementById('ms-display-revision').innerText = revision;
-      return { ok: true };
-    } catch(e) { return { ok: false }; }
-  }
+  async function performMsFinal() { return gptStoryPerformFinal_(); }
 
   async function retryMsHint() {
     if (hintRetryCooldown || isLoading) return;
@@ -3061,7 +3357,7 @@ checkNewComments();
     showLoading("Zeeto 다시 호출 중... 🛸");
     const r = await performMsHint();
     hideLoading();
-    if (r.sessionExpired) return;
+    if (r.sessionExpired || r.blocked) return;
     if (r.ok) {
       showHintRetryBtn(false);
       document.querySelectorAll('.story-step').forEach(step => step.classList.remove('active'));
@@ -3080,7 +3376,7 @@ checkNewComments();
     showLoading("Zeeto 다시 호출 중... 🪄");
     const r = await performMsFinal();
     hideLoading();
-    if (r.sessionExpired) return;
+    if (r.sessionExpired || r.blocked) return;
     const isOnStep3 = document.getElementById('story-step-3').classList.contains('active');
     if (r.ok) {
       showFinalRetryBtn(false, '', null);
@@ -3089,17 +3385,17 @@ checkNewComments();
       document.getElementById('mystory-screen').scrollTop = 0;
     } else {
       // ★ V10 수정(M6 fix): truncated와 parseFailed를 구분해서 안내
-      const msg = r.truncated
+      const msg = r.message || (r.truncated
         ? "Zeeto 답변이 너무 길어서 잘렸음 ✂️ 다시 부르면 끝까지 나옴! (수정본은 그대로 남아있음)"
         : r.parseFailed
           ? "Zeeto 답변 형식이 이상함 🛸 다시 부르면 제대로 나올 거임! (수정본은 그대로 남아있음)"
-          : "아직 Zeeto가 답을 못했음 😿 잠시 후 다시 시도하셈.";
+          : "아직 Zeeto가 답을 못했음 😿 잠시 후 다시 시도하셈.");
       showFinalRetryBtn(true, msg, isOnStep3 ? 'step3' : 'step2');
     }
     setTimeout(() => { finalRetryCooldown = false; }, 5000);
   }
 
-  async function goToStoryStep(stepNumber) {
+  async function gptStoryLegacyGoStep_(stepNumber) {
     if(stepNumber === 2) {
       const lesson = document.getElementById('ms-lesson').value; const grammar = document.getElementById('ms-grammar').value.trim();
       const r1 = document.getElementById('ms-word-req1').value.trim(); const r2 = document.getElementById('ms-word-req2').value.trim(); const r3 = document.getElementById('ms-word-req3').value.trim();
@@ -3111,7 +3407,7 @@ checkNewComments();
       showLoading("Zeeto 분석 중... 🛸");
       const r = await performMsHint();
       hideLoading();
-      if (r.sessionExpired) return;
+      if (r.sessionExpired || r.blocked) return;
       if (!r.ok) {
         showHintRetryBtn(true, r.message || "Zeeto가 잠깐 멈췄음 🛸 아래 버튼으로 다시 부르셈! (초안은 그대로 남아있음)");
         return;
@@ -3124,14 +3420,14 @@ checkNewComments();
       showLoading("최종본 만드는 중... 🪄");
       const r = await performMsFinal();
       hideLoading();
-      if (r.sessionExpired) return;
+      if (r.sessionExpired || r.blocked) return;
       if (!r.ok) {
         // ★ V10 수정(M6 fix): truncated / parseFailed / 일반 실패를 구분
-        const msg = r.truncated
+        const msg = r.message || (r.truncated
           ? "Zeeto 답변이 너무 길어서 잘렸음 ✂️ 아래 버튼으로 다시 부르면 끝까지 나옴! (수정본은 그대로 남아있음)"
           : r.parseFailed
             ? "Zeeto 답변 형식이 이상함 🛸 아래 버튼으로 다시 부르면 제대로 나올 거임! (수정본은 그대로 남아있음)"
-            : "Zeeto가 잠깐 멈췄음 🛸 아래 버튼으로 다시 부르셈! (수정본은 그대로 남아있음)";
+            : "Zeeto가 잠깐 멈췄음 🛸 아래 버튼으로 다시 부르셈! (수정본은 그대로 남아있음)");
         showFinalRetryBtn(true, msg, 'step2');
         return;
       }
@@ -3207,168 +3503,11 @@ checkNewComments();
     if (typeof autoSaveMyStoryDraft === 'function') autoSaveMyStoryDraft(); // ★ V10: 스텝 전환 시 자동저장
   }
 
-  async function checkMsNew(boxNum) {
-    const errText = document.getElementById(`ms-error-${boxNum}`).value.trim();
-    const correctedText = document.getElementById(`ms-corrected-${boxNum}`).value.trim();
-    const reasonText = document.getElementById(`ms-reason-${boxNum}`).value.trim();
-
-    if(!errText || !correctedText || !reasonText) return alert("정문과 이유 둘 다 적어야 함! 👽");
-    // ★V18(2026-08-11): 안 고치고 그대로 제출하면 AI에 보내지 않음.
-    // 예전엔 그대로 통과시켜 "완벽하게 맞았음!" 칭찬이 나갔음(비문이 사실 정문이었던 경우 포함).
-    // 진짜 이의가 있으면 이미 있는 🔁 검증 경로로 보냄.
-    const _norm = (t) => String(t).replace(/\s+/g, ' ').trim();
-    if (_norm(correctedText) === _norm(errText)) {
-      return alert("아직 안 고쳤음! 🤔\n\n이 문장이 진짜 맞는 문장이라고 생각하면\n🔁 버튼을 눌러서 Zeeto한테 확인받아보셈 👽");
-    }
-    if(isLoading) return; // ★ V10(2026-05-12): 병렬 클릭 방지
-
-    showLoading(`Zeeto 채점 중... 👽`);
-    try {
-      const res = await fetch(SHEET_URL, { method: 'POST', body: JSON.stringify({ type: "ms_check_new", studentId: currentStudentId, token: currentToken, errorText: errText, correctedText: correctedText, reasonText: reasonText }) });
-      // ★ V11 패치(2026-05-13): 응답을 텍스트로 먼저 받아 Unauthorized 평문도 처리 가능하게
-      const raw = await res.text();
-      hideLoading();
-      if (raw === "Unauthorized") { alert("⚠️ 세션이 만료됐음! 다시 로그인하셈 👽"); logout(); return; }
-      let data;
-      try { data = JSON.parse(raw); } catch(pe) { alert("Zeeto 응답 형식 오류 🛸 다시 시도해보셈"); return; }
-      if (data.error) { alert("⚠️ " + (data.error === "Unauthorized" ? "세션이 만료됐음! 다시 로그인하셈 👽" : ("Zeeto 응답 오류: " + data.error))); if (data.error === "Unauthorized") logout(); return; }
-      // ★ V12(2026-06-09): degenerate("앗! 앗!..." 반복) 응답 노출 방지
-      const _r = String(data.result || ''); const _t = _r.replace(/\s+/g,'');
-      if (_t.length > 40) { const _c = {}; let _mx = 0, _u = 0; for (const ch of _t) { _c[ch] = (_c[ch]||0)+1; } for (const k in _c) { _u++; if (_c[k] > _mx) _mx = _c[k]; } if ((_mx/_t.length > 0.45) || (_t.length > 120 && _u < 12)) { alert('Zeeto가 헷갈렸음 😵 다시 채점받아줘!'); return; } }
-      const fb = document.getElementById(`ms-feedback-${boxNum}`); fb.style.display = "block"; fb.innerHTML = "👽 " + safeAiRender(data.result);
-      autoSaveMyStoryDraft(); // GPT MS-006: AI 결과 도착 후에도 저장
-    } catch(e) { hideLoading(); alert("통신 오류 🛸"); }
-  }
+  async function checkMsNew(boxNum) { return gptStoryCheckUi_(boxNum); }
 
   // ★ V10(2026-05-12) 확장: 학생이 🔁 누르면 → ① Zeeto가 검증, ② 진짜 비문이면 설명만, 정문이면 새 비문 생성
   // forceRegen=true이면 검증 건너뛰고 바로 새 비문 (학생이 "그래도 새로 만들기" 선택한 경우)
-  async function regenBiumun(boxNum, forceRegen) {
-    const errEl = document.getElementById(`ms-error-${boxNum}`);
-    const regenBtn = document.getElementById(`ms-regen-${boxNum}`);
-    const correctedEl = document.getElementById(`ms-corrected-${boxNum}`);
-    const reasonEl = document.getElementById(`ms-reason-${boxNum}`);
-    const fbEl = document.getElementById(`ms-feedback-${boxNum}`);
-    const previousBiumun = errEl.value.trim();
-    if (!previousBiumun) return alert("이 칸엔 아직 비문이 없음 👽");
-
-    // ★ V10 확장: 학생 입력값 있으면 한 번 확인. forceRegen일 땐 이미 동의했으니 스킵.
-    if (!forceRegen) {
-      const hasInput = (correctedEl.value || '').trim() || (reasonEl.value || '').trim();
-      if (hasInput) {
-        const ok = confirm("⚠️ 이 비문 새로 만들거임?\n적어놓은 정문/이유는 사라짐.\n\n(Zeeto가 먼저 이 문장이 진짜 비문인지 확인해줌)");
-        if (!ok) return;
-      }
-    }
-
-    // Oops Point 원본에서 해당 번호의 블록 정확히 추출 (C1 fix 유지)
-    const oopsRaw = (document.getElementById('ms-oops-point').dataset.original) || '';
-    let errorContext = '', studentSentence = '';
-    try {
-      const blocks = oopsRaw.split(/(?:^|\n)\s*\d+\.\s*❌/);
-      const block = blocks[boxNum];
-      if (block) {
-        const sentMatch = block.match(/실수한 문장[:：]?\s*([^\n]+)/);
-        const whyMatch = block.match(/왜 틀렸을까[?？]?[:：]?\s*([^\n]+)/);
-        if (sentMatch) studentSentence = sentMatch[1].trim();
-        if (whyMatch) errorContext = whyMatch[1].trim();
-      }
-    } catch(e) {}
-
-    if (regenBtn) { regenBtn.disabled = true; regenBtn.style.opacity = '0.5'; regenBtn.textContent = '⏳'; }
-    const checkBtn = document.querySelector(`#story-step-4 button[onclick="checkMsNew(${boxNum})"]`);
-    if (checkBtn) { checkBtn.disabled = true; checkBtn.style.opacity = '0.5'; }
-    showLoading(forceRegen ? 'Zeeto가 새 비문 만드는 중... 👽' : 'Zeeto가 이 문장 확인 중... 🔎');
-
-    try {
-      const res = await fetch(SHEET_URL, { method: 'POST', body: JSON.stringify({
-        type: "ms_regen_biumun", studentId: currentStudentId, token: currentToken,
-        errorContext: errorContext, previousBiumun: previousBiumun, studentSentence: studentSentence,
-        forceRegen: !!forceRegen
-      }) });
-      const data = await res.json();
-      hideLoading();
-      if (data.error) { alert("⚠️ 세션이 만료됐음! 다시 로그인하셈 👽"); logout(); return; }
-      const result = (data.result || '').trim();
-      if (!result || result.includes('멈췄음')) {
-        alert('Zeeto가 응답을 못함 😵 잠시 후 다시 시도해보셈!');
-        return;
-      }
-
-      // ★ V10 확장: 응답 형식에 따라 분기
-      // TYPE: WRONG → 비문 맞음, 설명만 표시
-      // TYPE: CORRECT_REGEN → 정문이었음, 새 비문 교체
-      // forceRegen 모드 → NEW_BIUMUN: 한 줄만 옴
-      const typeMatch = result.match(/TYPE:\s*(WRONG|CORRECT_REGEN)/i);
-      const aiType = typeMatch ? typeMatch[1].toUpperCase() : null;
-      const newBiumunMatch = result.match(/NEW_BIUMUN:\s*([^\n]+)/i);
-      // ★ V10 안전 패치(M1): EXPLANATION이 NEW_BIUMUN이나 TYPE 라인 직전에서 끝나도록 lookahead 조임
-      const explanationMatch = result.match(/EXPLANATION:\s*([\s\S]+?)(?=\n*(?:NEW_BIUMUN:|TYPE:|$))/i);
-
-      // ★ V10 안전 패치(M2): 검증 모드에서 TYPE 라인이 아예 없는 응답은 파싱 실패로 처리
-      // - 이 가드 없으면 NEW_BIUMUN만 있는 응답을 조용히 CORRECT_REGEN처럼 처리해서 학생이 영문도 모르고 비문이 바뀜
-      if (!forceRegen && !aiType) {
-        alert('Zeeto 응답 형식이 이상함 🛸 다시 한 번 🔁 눌러보셈!');
-        return;
-      }
-
-      // 케이스 A: 검증 결과 "진짜 비문" — 학생이 못 알아본 거임
-      if (!forceRegen && aiType === 'WRONG') {
-        const explanation = explanationMatch ? explanationMatch[1].trim() : '(설명을 못 가져옴)';
-        const override = confirm(`👽 이거 진짜 비문 맞음!\n\n${explanation}\n\n다시 한 번 잘 보고 정문으로 고쳐봐!\n\n──────\n그래도 새로 만들거임? (Zeeto의 판정 무시)`);
-        if (override) {
-          // 사용자가 오버라이드 선택 → forceRegen으로 재호출
-          // 버튼 잠금은 finally에서 풀고, 새 호출이 다시 잠금
-          if (regenBtn) { regenBtn.disabled = false; regenBtn.style.opacity = '1'; regenBtn.textContent = '🔁'; }
-          if (checkBtn) { checkBtn.disabled = false; checkBtn.style.opacity = '1'; }
-          return regenBiumun(boxNum, true);
-        }
-        // 학생이 "다시 볼게" 선택 → 박스 그대로 유지, 입력값/피드백 보존
-        return;
-      }
-
-      // 케이스 B: 검증 결과 "정문이었음" OR forceRegen 모드 — 새 비문 교체
-      let newBiumun = newBiumunMatch ? newBiumunMatch[1].trim() : '';
-      // 정제: 꺾쇠/마크다운 제거 + 영어 평서문 골라내기
-      const lines = cleanMsQuizText(newBiumun).split('\n').map(s=>s.trim()).filter(s=>s.length>0);
-      let cleaned = lines.find(s => /^[A-Z]/.test(s) && !/[가-힣]/.test(s) && s.length >= 5) || lines[0] || newBiumun;
-      if (!cleaned) {
-        alert('Zeeto 응답 형식이 이상함 🛸 다시 시도해보셈!');
-        return;
-      }
-      if (cleaned.length > 200) {
-        alert('Zeeto가 너무 길게 만들었음 😵 다시 시도해보셈!');
-        return;
-      }
-      // 이전 비문과 정규화 비교
-      const normalize = (s) => (s || '').toLowerCase().replace(/[.,!?;:]/g, '').replace(/\s+/g, ' ').trim();
-      if (normalize(cleaned) === normalize(previousBiumun)) {
-        alert('Zeeto가 거의 똑같이 만들었음 😵 한 번 더 눌러보셈!');
-        return;
-      }
-
-      // 새 비문 적용 + 학생 입력값 초기화
-      errEl.value = cleaned;
-      if (correctedEl) correctedEl.value = '';
-      if (reasonEl) reasonEl.value = '';
-      if (fbEl) { fbEl.innerHTML = ''; fbEl.style.display = 'none'; }
-      if (forceRegen) {
-        // 오버라이드로 새로 만든 거니까 소소한 알림
-        // (조용히 — 학생이 이미 충분히 안내 받음)
-      } else if (aiType === 'CORRECT_REGEN') {
-        // AI가 "Zeeto 실수했음" 인정 → 작은 안내
-        alert('🔁 Zeeto가 실수해서 정문 만들었었음 😅 새 비문으로 바꿨음! 다시 풀어봐 👽');
-      }
-      if (typeof autoSaveMyStoryDraft === 'function') autoSaveMyStoryDraft();
-
-    } catch(e) {
-      hideLoading();
-      console.error('regenBiumun error:', e);
-      alert('통신 오류가 발생했음 🛸 잠시 후 다시 시도해보셈!');
-    } finally {
-      if (regenBtn) { regenBtn.disabled = false; regenBtn.style.opacity = '1'; regenBtn.textContent = '🔁'; }
-      if (checkBtn) { checkBtn.disabled = false; checkBtn.style.opacity = '1'; }
-    }
-  }
+  async function regenBiumun(boxNum,forceRegen) { return gptStoryRegenerateOopsUi_(boxNum,forceRegen); }
 
   // ★ V10 Phase 2(2026-05-12): Oops Point 다시 풀기 관련 전체 코드 묶음
   let myOopsRetries = [];           // 현재 학생의 Oops 다시 풀기 기록 전체
@@ -3478,9 +3617,7 @@ checkNewComments();
     // ★ V10 Phase 2 수정: lesson+title+originalDate 셋 다 매칭 (제목 중복 방지)
     const storyOrigDate = story.date ? toLocalDateStr(story.date) : '';
     return myOopsRetries.some(r =>
-      String(r.lesson) === String(story.lesson) &&
-      r.storyTitle === story.title &&
-      (!storyOrigDate || toLocalDateStr(r.originalDate) === storyOrigDate) &&
+      gptStoryRetryMatches_(story,r) &&
       r.isMaster === true
     );
   }
@@ -3538,6 +3675,7 @@ checkNewComments();
         const c = JSON.parse(s.corrections || '[]');
         if (!Array.isArray(c)) return false;
         const hasRealQuiz = c.some(item => item && item.quiz && String(item.quiz).trim());
+        if(s.storyV39 && Array.isArray(s.storyV39.exercises) && !s.storyV39.exercises.length)return false;
         const isOldStory = !hasRealQuiz;
         s._oopsState = isOldStory ? 'oldStory' : 'normal';
         // 옛 글은 finalStory가 있어야 새 비문 생성 가능
@@ -3594,9 +3732,7 @@ checkNewComments();
     if (!story) return 0;
     const storyOrigDate = story.date ? toLocalDateStr(story.date) : '';
     return myOopsRetries.filter(r =>
-      String(r.lesson) === String(story.lesson) &&
-      r.storyTitle === story.title &&
-      (!storyOrigDate || toLocalDateStr(r.originalDate) === storyOrigDate)
+      gptStoryRetryMatches_(story,r)
     ).length;
   }
 
@@ -3607,9 +3743,7 @@ checkNewComments();
     if (!story) return [];
     const storyOrigDate = story.date ? toLocalDateStr(story.date) : '';
     return myOopsRetries.filter(r =>
-      String(r.lesson) === String(story.lesson) &&
-      r.storyTitle === story.title &&
-      (!storyOrigDate || toLocalDateStr(r.originalDate) === storyOrigDate)
+      gptStoryRetryMatches_(story,r)
     ).sort((a, b) => new Date(a.timestamp) - new Date(b.timestamp));
   }
 
@@ -3624,273 +3758,26 @@ checkNewComments();
     }
     let html = '<div style="font-weight:500; margin-bottom:4px; color:#26321f; font-size:0.78rem;">🌱 내 도전 기록</div><div style="display:flex; align-items:center; gap:4px; flex-wrap:wrap;">';
     attempts.forEach((r, idx) => {
-      const dot = r.isMaster
-        ? '<span style="background:#EAF3DE; color:#27500A; width:18px; height:18px; border-radius:50%; display:inline-flex; align-items:center; justify-content:center; font-size:0.6rem; font-weight:700;" title="' + (idx+1) + '차: 마스터">✅</span>'
-        : '<span style="background:#FCEBEB; color:#A32D2D; width:18px; height:18px; border-radius:50%; display:inline-flex; align-items:center; justify-content:center; font-size:0.6rem; font-weight:700;" title="' + (idx+1) + '차: 미마스터">❌</span>';
+      const dot='<span style="padding:3px 6px;background:#edf2ef;border-radius:6px;font-size:0.72rem">'+(idx+1)+'차: '+gptStoryRetryRecordLabel_(r)+'</span>'; 
+
       if (idx > 0) html += '<span style="color:#888; font-size:0.65rem;">→</span>';
       html += dot;
     });
-    // 이번 시도(?) 추가
-    html += '<span style="color:#888; font-size:0.65rem;">→</span><span style="background:#FAEEDA; color:#633806; width:18px; height:18px; border-radius:50%; display:inline-flex; align-items:center; justify-content:center; font-size:0.6rem; font-weight:700;" title="이번 시도">?</span>';
-    html += '<span style="margin-left:6px; font-size:0.7rem; color:#534AB7; font-weight:500;">이번이 ' + (attempts.length + 1) + '번째!</span></div>';
+    if(gptStoryRetryUi?.index===storyIndex&&gptStoryRetryUi.saved){
+      html+='<span style="margin-left:6px;font-size:0.75rem">총 '+attempts.length+'회 기록 · 이번 풀이 저장됨</span></div>';
+    }else{
+      html+='<span style="margin-left:6px;font-size:0.75rem">다음은 '+(attempts.length+1)+'번째 풀이</span></div>';
+    }
+
     stripEl.innerHTML = html;
   }
 
   // ★ V11 헬퍼(2026-05-13): 옵션 B — Oops Retry 박스의 🔁 버튼 클릭 시 비문 검증/재생성
   // - 학생이 "이거 정문 같음" 신고 → Zeeto 검증 → 진짜 비문이면 설명만, 정문이면 새 비문 교체
   // - 시트의 원본 corrections는 안 건드림. 화면의 textarea와 currentOopsRetryBiumuns만 갱신.
-  async function regenOopsRetryBiumun(boxNum, forceRegen) {
-    const errEl = document.getElementById('oops-retry-error-' + boxNum);
-    const regenBtn = document.getElementById('oops-retry-regen-' + boxNum);
-    const correctedEl = document.getElementById('oops-retry-corrected-' + boxNum);
-    const reasonEl = document.getElementById('oops-retry-reason-' + boxNum);
-    if (!errEl) return;
-    const previousBiumun = errEl.value.trim();
-    if (!previousBiumun) return alert('이 칸엔 아직 비문이 없음 👽');
+  async function regenOopsRetryBiumun(boxNum,forceRegen) { return gptStoryRetryRegenerate_(boxNum,forceRegen); }
 
-    // 학생 입력값이 있으면 한 번 확인 (forceRegen일 땐 이미 동의했으니 스킵)
-    if (!forceRegen) {
-      const hasInput = (correctedEl && correctedEl.value.trim()) || (reasonEl && reasonEl.value.trim());
-      if (hasInput) {
-        const ok = confirm('⚠️ 이 비문 새로 만들거임?\n적어놓은 정문/이유는 사라짐.\n\n(Zeeto가 먼저 이 문장이 진짜 비문인지 확인해줌)');
-        if (!ok) return;
-      }
-    }
-
-    // Story 정보 (errorContext용)
-    const story = myStories[currentOopsRetryStory];
-    let errorContext = '';
-    if (story && story.grammar) errorContext = String(story.grammar);
-
-    if (regenBtn) { regenBtn.disabled = true; regenBtn.style.opacity = '0.5'; regenBtn.textContent = '⏳'; }
-    showLoading(forceRegen ? 'Zeeto가 새 비문 만드는 중... 👽' : 'Zeeto가 이 문장 확인 중... 🔎');
-
-    try {
-      const res = await fetch(SHEET_URL, { method: 'POST', body: JSON.stringify({
-        type: "ms_regen_biumun", studentId: currentStudentId, token: currentToken,
-        errorContext: errorContext, previousBiumun: previousBiumun, studentSentence: '',
-        forceRegen: !!forceRegen
-      }) });
-      const data = await res.json();
-      hideLoading();
-      if (data.error) {
-        if (data.error === 'Unauthorized') { alert('⚠️ 세션 만료. 다시 로그인하셈 👽'); logout(); return; }
-        alert('🛸 Zeeto가 응답을 못함. 다시 시도해보셈!');
-        return;
-      }
-      const result = (data.result || '').trim();
-      if (!result || result.includes('멈췄음')) {
-        alert('🛸 Zeeto가 응답을 못함. 다시 시도해보셈!');
-        return;
-      }
-
-      const typeMatch = result.match(/TYPE:\s*(WRONG|CORRECT_REGEN)/i);
-      const aiType = typeMatch ? typeMatch[1].toUpperCase() : null;
-      const newBiumunMatch = result.match(/NEW_BIUMUN:\s*([^\n]+)/i);
-      const explanationMatch = result.match(/EXPLANATION:\s*([\s\S]+?)(?=\n*(?:NEW_BIUMUN:|TYPE:|$))/i);
-
-      if (!forceRegen && !aiType) {
-        alert('Zeeto 응답 형식이 이상함 🛸 다시 한 번 🔁 눌러보셈!');
-        return;
-      }
-
-      // 케이스 A: 진짜 비문 — 학생이 못 알아본 거임
-      if (!forceRegen && aiType === 'WRONG') {
-        const explanation = explanationMatch ? explanationMatch[1].trim() : '(설명을 못 가져옴)';
-        const override = confirm('👽 이거 진짜 비문 맞음!\n\n' + explanation + '\n\n다시 한 번 잘 보고 정문으로 고쳐봐!\n\n──────\n그래도 새로 만들거임? (Zeeto 판정 무시)');
-        if (override) {
-          if (regenBtn) { regenBtn.disabled = false; regenBtn.style.opacity = '1'; regenBtn.textContent = '🔁'; }
-          return regenOopsRetryBiumun(boxNum, true);
-        }
-        return;
-      }
-
-      // 케이스 B: 정문이었음 OR forceRegen 모드 — 새 비문 교체
-      let newBiumun = newBiumunMatch ? newBiumunMatch[1].trim() : '';
-      const lines = cleanMsQuizText(newBiumun).split('\n').map(s=>s.trim()).filter(s=>s.length>0);
-      let cleaned = lines.find(s => /^[A-Z]/.test(s) && !/[가-힣]/.test(s) && s.length >= 5) || lines[0] || newBiumun;
-      if (!cleaned) { alert('Zeeto 응답 형식이 이상함 🛸'); return; }
-      if (cleaned.length > 200) { alert('Zeeto가 너무 길게 만들었음 😵'); return; }
-      const normalize = (s) => (s || '').toLowerCase().replace(/[.,!?;:]/g, '').replace(/\s+/g, ' ').trim();
-      if (normalize(cleaned) === normalize(previousBiumun)) { alert('Zeeto가 거의 똑같이 만들었음 😵 한 번 더 눌러보셈!'); return; }
-
-      // 새 비문 적용
-      errEl.value = cleaned;
-      if (currentOopsRetryBiumuns && boxNum <= currentOopsRetryBiumuns.length) {
-        currentOopsRetryBiumuns[boxNum - 1] = cleaned;
-      }
-      // ★ V11 패치(2026-05-13, 3차-6): 옛 글일 때 sessionStorage 캐시도 갱신 → 새로고침해도 🔁 결과 유지
-      if (currentOopsRetryIsOldStory && story) {
-        setCachedOopsBiumuns(story, currentOopsRetryBiumuns);
-      }
-      if (correctedEl) correctedEl.value = '';
-      if (reasonEl) reasonEl.value = '';
-      if (!forceRegen && aiType === 'CORRECT_REGEN') {
-        alert('🔁 Zeeto가 실수해서 정문 만들었었음 😅 새 비문으로 바꿨음! 다시 풀어봐 👽');
-      }
-    } catch(e) {
-      hideLoading();
-      console.error('regenOopsRetryBiumun error:', e);
-      alert('🛸 통신 오류. 잠시 후 다시 시도하셈!');
-    } finally {
-      if (regenBtn) { regenBtn.disabled = false; regenBtn.style.opacity = '1'; regenBtn.textContent = '🔁'; }
-    }
-  }
-
-  async function selectOopsStory(storyIndex) {
-    const story = myStories[storyIndex];
-    if (!story) return alert('Story를 못 찾음 🛸');
-    let corrections;
-    try { corrections = JSON.parse(story.corrections || '[]'); } catch(e) { corrections = []; }
-    if (!Array.isArray(corrections)) corrections = [];
-    // ★ V12(2026-06-09): quiz가 "비문답게" 생겼는지 검사 — 5/12 수정 전 옛 글의 오염된 quiz(설명 텍스트/한글 섞임/너무 김)는 정상 비문으로 안 침 → 옛 글 경로(새 비문 생성)로 보냄
-    const _looksLikeBiumun = (q) => { const s = String(q || '').trim(); return s.length > 0 && s.length <= 120 && /[A-Za-z]/.test(s) && !/[가-힣]/.test(s); };
-    const _nonEmptyQuizzes = corrections.map(c => (c && c.quiz) ? String(c.quiz).trim() : '').filter(s => s);
-    const hasRealQuiz = _nonEmptyQuizzes.length > 0 && _nonEmptyQuizzes.every(_looksLikeBiumun);
-    const isOldStory = !hasRealQuiz;
-
-    // ★ V11 패치(2026-05-13): 옛 글이면 finalStory가 있어야 Zeeto가 새 비문 만들 수 있음
-    if (isOldStory && !(story.finalStory && String(story.finalStory).trim())) {
-      return alert('이 글은 완벽 최종본도 없어서 비문 생성이 안 됨 🛸');
-    }
-
-    currentOopsRetryStory = storyIndex;
-    currentOopsRetryExpanded = false;
-    _cachedOopsEval = null; // ★ V10 Phase 2: 다른 Story 선택 시 캐시 비움
-    currentOopsRetryIsOldStory = isOldStory; // ★ V11: 제출 시 표시용
-
-    // 헤더 채우기
-    document.getElementById('oops-retry-lesson-label').textContent = 'Lesson ' + (story.lesson || '—');
-    document.getElementById('oops-retry-story-title').textContent = story.title || '(제목 없음)';
-    document.getElementById('oops-retry-original-date').textContent = '처음 작성: ' + (story.date ? new Date(story.date).toLocaleDateString('ko-KR') : '—');
-
-    // 설명 박스 (접힘 상태 초기화)
-    const hintContent = document.getElementById('oops-retry-hint-content');
-    // ★ V10 Phase 2 M8 fix: 다른 곳들과 일관성 위해 safeSavedHtml로 sanitize (혹시라도 위험한 태그 막기)
-    // ★ V11: 옛 글은 oops 필드가 비어있으므로 안내 문구로 대체
-    if (isOldStory) {
-      hintContent.innerHTML = '<div style="color:#3C3489;">🛸 이 글은 옛날에 비문 활동을 못 했음. Zeeto가 매번 새 비문을 만들어줘서 풀이 가능함! (같은 문법 카테고리, 다른 문장)</div>';
-    } else {
-      hintContent.innerHTML = safeSavedHtml(story.oops || '(설명 없음)');
-    }
-    hintContent.style.display = 'none';
-    document.getElementById('oops-retry-hint-chevron').textContent = '▶';
-
-    // ★ V11: 도전 기록 스트립 그리기
-    renderAttemptHistory(storyIndex);
-
-    // ★ V11: 옛 글이면 Zeeto가 비문 새로 만듦 (호출 후 박스 렌더링)
-    let biumunList;
-    if (isOldStory) {
-      // ★ V11 패치(2026-05-13, 3차-6): sessionStorage 캐시 먼저 체크 → API 비용 절감 + 새로고침해도 같은 비문 유지
-      const cached = getCachedOopsBiumuns(story);
-      if (cached && cached.length > 0) {
-        biumunList = cached;
-        showOopsRetryPracticeView();
-      } else {
-      // 비문 컨테이너에 로딩 표시
-      const container = document.getElementById('oops-retry-error-container');
-      container.innerHTML = '<div style="text-align:center; color:#3C3489; padding:20px; font-size:0.9rem;">🛸 Zeeto가 새 비문 만드는 중... (옛 글이라 매번 새로 만들어줌)</div>';
-      // 제출 버튼 잠시 숨김 (생성 완료 후 표시)
-      const submitBtnPre = document.getElementById('oops-retry-submit-btn');
-      submitBtnPre.style.display = 'none';
-      showOopsRetryPracticeView();
-      try {
-        const res = await fetch(SHEET_URL, { method: 'POST', body: JSON.stringify({
-          type: "ms_generate_biumun_from_story", studentId: currentStudentId, token: currentToken,
-          finalStory: story.finalStory || '', revision: story.revision || '', grammar: story.grammar || ''
-        }) });
-        const data = await res.json();
-        if (data.error) {
-          if (data.error === 'Unauthorized') { alert('⚠️ 세션 만료. 다시 로그인하셈 👽'); logout(); return; }
-          container.innerHTML = '<div style="text-align:center; color:#A32D2D; padding:20px;">🛸 비문 생성 실패. 잠시 후 다시 시도하셈! <br><button onclick="selectOopsStory(' + storyIndex + ')" style="margin-top:10px; padding:8px 16px; background:#4a5d4e; color:white; border:none; border-radius:8px; cursor:pointer;">🔄 다시 시도</button></div>';
-          return;
-        }
-        biumunList = (data.biumuns || []).filter(b => b && b.trim());
-        if (biumunList.length === 0) {
-          container.innerHTML = '<div style="text-align:center; color:#A32D2D; padding:20px;">🛸 Zeeto가 비문을 못 만들었음. 다시 시도해보셈!</div>';
-          return;
-        }
-        // ★ V11 패치(2026-05-13, 3차-6): 옛 글 비문은 sessionStorage에 저장 → 새로고침해도 같은 비문 유지 (API 재호출 방지)
-        // 3개 다 받았을 때만 캐시 (잘린 경우 캐시 안 함 → 학생이 새로고침으로 재시도 가능)
-        if (biumunList.length === 3 && !data.truncated) {
-          setCachedOopsBiumuns(story, biumunList);
-        }
-        // ★ V11 패치(2026-05-13): MAX_TOKENS 잘림으로 비문이 3개 미만일 때 학생에게 안내
-        if (data.truncated || biumunList.length < 3) {
-          const partialNote = document.createElement('div');
-          partialNote.style.cssText = 'background:#FAEEDA; color:#633806; border-radius:8px; padding:8px 10px; margin-bottom:10px; font-size:0.8rem; line-height:1.5;';
-          partialNote.textContent = '✂️ Zeeto가 ' + biumunList.length + '개만 만들 수 있었음 (응답 길이 한계). 새로고침 후 다시 시도하면 3개 다 받을 수 있음!';
-          // 박스 렌더 시작 전에 안내 삽입 (아래 코드에서 container.innerHTML로 덮어쓰므로, 박스 박은 다음에 삽입해야 함)
-          // → 임시로 변수에 저장해서 박스 렌더 후 prepend
-          window._oopsPartialNote = partialNote;
-        } else {
-          window._oopsPartialNote = null;
-        }
-      } catch(e) {
-        container.innerHTML = '<div style="text-align:center; color:#A32D2D; padding:20px;">🛸 통신 오류. 다시 시도하셈!</div>';
-        return;
-      }
-      } // ★ V11 패치(2026-05-13, 3차-6): cache miss 분기 닫기
-    } else {
-      // 정상 글: corrections의 quiz 사용 (비문답게 생긴 것만 — 오염된 옛 데이터 방어)
-      biumunList = corrections.map(c => c && c.quiz ? c.quiz.trim() : '').filter(s => _looksLikeBiumun(s));
-    }
-    // ★ V11: 상태에 비문 목록 저장 (제출/재생성 시 참조)
-    currentOopsRetryBiumuns = biumunList.slice(0, 3);
-
-    // 비문 박스 렌더 (최대 3개)
-    const container = document.getElementById('oops-retry-error-container');
-    let boxesHtml = '';
-    for (let i = 0; i < Math.min(3, biumunList.length); i++) {
-      const biumun = biumunList[i];
-      if (!biumun) continue;
-      const biumunSafe = escapeHtml(biumun);
-      // ★ V11: 각 박스에 🔁 검증 버튼 추가
-      boxesHtml += `<div class="error-new-box" style="background:#fffafa; border:1px solid #d9534f; border-radius:10px; padding:10px; margin-bottom:8px;">
-        <textarea id="oops-retry-error-${i+1}" class="input-field" style="width:100%; box-sizing:border-box; border-color:#d9534f; margin-bottom:4px; resize:none; line-height:1.4; background-color:#f4f4f4; color:#333;" rows="2" readonly>${biumunSafe}</textarea>
-        <div style="display:flex; justify-content:flex-end; margin-bottom:6px;">
-          <button onclick="regenOopsRetryBiumun(${i+1})" id="oops-retry-regen-${i+1}" style="background:none; border:1px solid #d9534f; color:#d9534f; padding:3px 8px; font-size:0.85rem; border-radius:10px; cursor:pointer; line-height:1;" title="이 비문 새로 만들기">🔁</button>
-        </div>
-        <textarea id="oops-retry-corrected-${i+1}" class="input-field" style="width:100%; box-sizing:border-box; border-color:#2e7d32; margin-bottom:6px; resize:none; line-height:1.4;" rows="2" placeholder="✅ 올바른 문장 (정문)"></textarea>
-        <textarea id="oops-retry-reason-${i+1}" class="input-field" style="width:100%; box-sizing:border-box; border-color:#4a5d4e; margin-bottom:0; resize:none; line-height:1.4;" rows="2" placeholder="💡 왜 틀렸는지 이유"></textarea>
-      </div>`;
-    }
-    container.innerHTML = boxesHtml;
-    // ★ V11 패치(2026-05-13): MAX_TOKENS 잘림 시 부분 응답 안내 prepend
-    if (window._oopsPartialNote) {
-      container.insertBefore(window._oopsPartialNote, container.firstChild);
-      window._oopsPartialNote = null;
-    }
-
-    // 결과 영역 초기화
-    document.getElementById('oops-retry-result').style.display = 'none';
-    const submitBtn = document.getElementById('oops-retry-submit-btn');
-    submitBtn.disabled = false;
-    submitBtn.style.opacity = '1';
-    submitBtn.style.display = ''; // ★ V10 Phase 2 수정: 직전 제출에서 숨겨졌던 거 복구
-    submitBtn.textContent = '👽 Zeeto에게 평가받기';
-
-    // ★ V10 Phase 2: 입력 수정 시 평가 캐시 무효화 (수정한 답에 대해 옛 피드백 저장되는 거 방지)
-    for (let i = 1; i <= 3; i++) {
-      const corrEl = document.getElementById('oops-retry-corrected-' + i);
-      const reasonEl = document.getElementById('oops-retry-reason-' + i);
-      [corrEl, reasonEl].forEach(el => {
-        if (el) el.addEventListener('input', () => {
-          if (_cachedOopsEval) {
-            _cachedOopsEval = null;
-            // 결과 영역 숨기고 버튼 텍스트 원래대로 (재평가 필요함을 시각적으로 알림)
-            const r = document.getElementById('oops-retry-result');
-            if (r) r.style.display = 'none';
-            const sb = document.getElementById('oops-retry-submit-btn');
-            if (sb) { sb.style.display = ''; sb.disabled = false; sb.style.opacity = '1'; sb.textContent = '👽 Zeeto에게 평가받기'; }
-          }
-        });
-      });
-    }
-
-    showOopsRetryPracticeView();
-  }
+  async function selectOopsStory(storyIndex) { return gptStoryRetrySelect_(storyIndex); }
 
   function toggleOopsHint() {
     const content = document.getElementById('oops-retry-hint-content');
@@ -3905,165 +3792,7 @@ checkNewComments();
     }
   }
 
-  async function submitOopsRetry() {
-    if (isTeacherSelf || isUndercover) { alert('👩‍🏫 둘러보기/잠입 모드에선 제출이 안 됨 (ENGsta 글쓰기만 가능).'); return; }
-    if (currentOopsRetryStory == null) return;
-    const story = myStories[currentOopsRetryStory];
-    if (!story) return alert('Story 정보가 사라짐 🛸');
-
-    // ★ V11 패치(2026-05-13): 비문은 readonly textarea(`oops-retry-error-N`)에서 직접 읽음
-    // - 정상 글: corrections.quiz가 들어가 있음
-    // - 옛 글: Zeeto가 생성한 새 비문이 들어가 있음
-    // - 🔁 재생성된 경우: 새 비문이 들어가 있음
-    // → 화면에 보이는 게 진실의 원천
-    const inputs = [];
-    for (let i = 1; i <= 3; i++) {
-      const errEl = document.getElementById(`oops-retry-error-${i}`);
-      const corrEl = document.getElementById(`oops-retry-corrected-${i}`);
-      const reasonEl = document.getElementById(`oops-retry-reason-${i}`);
-      if (!errEl || !corrEl || !reasonEl) continue;
-      inputs.push({
-        biumun: errEl.value.trim(),
-        corrected: corrEl.value.trim(),
-        reason: reasonEl.value.trim()
-      });
-    }
-    // 모든 정문/이유 입력 필수
-    const incomplete = inputs.some(x => x.biumun && (!x.corrected || !x.reason));
-    if (incomplete) return alert('정문과 이유를 모두 적어야 평가 가능함! 👽');
-    if (inputs.length === 0) return alert('풀 비문이 없음 🛸');
-
-    if (isLoading) return;
-    const submitBtn = document.getElementById('oops-retry-submit-btn');
-    submitBtn.disabled = true; submitBtn.style.opacity = '0.5';
-    _oopsSubmitInFlight = true; // ★ V11 패치(2026-05-13): 탭 전환 시 race 방지 플래그
-    showLoading('Zeeto가 평가하는 중... 🌌');
-    try {
-      let feedback, isMaster;
-
-      // ★ V10 Phase 2: 이전에 받은 eval 결과가 있으면 재평가 안 함 (저장만 재시도)
-      if (_cachedOopsEval) {
-        feedback = _cachedOopsEval.feedback;
-        isMaster = _cachedOopsEval.isMaster;
-      } else {
-        submitBtn.textContent = '⏳ Zeeto가 평가 중...';
-        // 1. AI 평가
-        const evalRes = await fetch(SHEET_URL, { method: 'POST', body: JSON.stringify({
-          type: "oops_retry_evaluate", studentId: currentStudentId, token: currentToken,
-          error1: inputs[0]?.biumun || '',   corrected1: inputs[0]?.corrected || '', reason1: inputs[0]?.reason || '',
-          error2: inputs[1]?.biumun || '',   corrected2: inputs[1]?.corrected || '', reason2: inputs[1]?.reason || '',
-          error3: inputs[2]?.biumun || '',   corrected3: inputs[2]?.corrected || '', reason3: inputs[2]?.reason || ''
-        }) });
-        const evalData = await evalRes.json();
-        if (evalData.error) {
-          hideLoading();
-          submitBtn.disabled = false; submitBtn.style.opacity = '1'; submitBtn.textContent = '👽 Zeeto에게 평가받기';
-          const isUnauth = (evalData.error === 'Unauthorized');
-          alert('⚠️ ' + (isUnauth ? '세션이 만료됐음! 다시 로그인하셈 👽' : 'Zeeto 평가 실패. 다시 시도해보셈 🛸'));
-          if (isUnauth) logout();
-          if (evalData.errorReason) console.warn('eval errorReason:', evalData.errorReason);
-          return;
-        }
-        feedback = evalData.feedback || '(피드백 못 받음)';
-        isMaster = !!evalData.isMaster;
-        // 평가 결과 캐싱 (재제출 시 평가 안 다시 함)
-        _cachedOopsEval = { feedback, isMaster };
-
-        // ★ V10 Phase 2 M2 fix: eval 성공 직후 학생에게 결과 먼저 보여주기 (저장 실패해도 손실 안 됨)
-        document.getElementById('oops-retry-result-feedback').innerHTML = '👽 ' + safeAiRender(feedback);
-        const masterBoxPre = document.getElementById('oops-retry-result-master');
-        if (isMaster) {
-          masterBoxPre.innerHTML = '✅ 마스터 완료!';
-          masterBoxPre.style.background = '#EAF3DE';
-          masterBoxPre.style.color = '#27500A';
-        } else {
-          masterBoxPre.innerHTML = '💪 아직 마스터 아님 — 다시 도전 가능!';
-          masterBoxPre.style.background = '#FAEEDA';
-          masterBoxPre.style.color = '#633806';
-        }
-        document.getElementById('oops-retry-result').style.display = 'block';
-        submitBtn.textContent = '💾 저장 중...';
-      }
-
-      // 2. 시트에 저장
-      // ★ V10 Phase 2 수정: storyKey는 'S' 접두사 + 밀리초 timestamp (Sheets Date 자동 변환 방지)
-      // ★ V10 Phase 2 M9 fix: originalDate는 toLocalDateStr 사용 (timezone 일관성)
-      const storyKey = story.date ? ('S' + new Date(story.date).getTime()) : ('S_' + (story.title || '').replace(/\s+/g, '_') + '_L' + story.lesson);
-      const saveRes = await fetch(SHEET_URL, { method: 'POST', body: JSON.stringify({
-        type: "oops_retry_save", studentId: currentStudentId, token: currentToken,
-        userName: currentUserProfile, grade: (currentStudentId ? String(currentStudentId).charAt(0) : ''),
-        lesson: story.lesson || '',
-        originalStoryRow: storyKey,
-        storyTitle: story.title || '',
-        originalDate: story.date ? toLocalDateStr(story.date) : '',
-        error1: inputs[0]?.biumun || '',   corrected1: inputs[0]?.corrected || '', reason1: inputs[0]?.reason || '',
-        error2: inputs[1]?.biumun || '',   corrected2: inputs[1]?.corrected || '', reason2: inputs[1]?.reason || '',
-        error3: inputs[2]?.biumun || '',   corrected3: inputs[2]?.corrected || '', reason3: inputs[2]?.reason || '',
-        zeetoFeedback: feedback, isMaster: isMaster, expandedHint: currentOopsRetryExpanded
-      }) });
-      const saveText = await saveRes.text();
-      hideLoading();
-      // ★ V10 Phase 2 M2 fix: 저장 실패 분기 — Unauthorized 명시 처리 + 평가는 이미 화면에 떠있음
-      if (saveText === "Unauthorized") {
-        submitBtn.disabled = false; submitBtn.style.opacity = '1'; submitBtn.textContent = '💾 다시 저장 시도';
-        alert('⚠️ 세션이 만료됐음! 다시 로그인하셈 👽');
-        logout();
-        return;
-      }
-      if (saveText !== "OopsRetry Saved") {
-        submitBtn.disabled = false; submitBtn.style.opacity = '1'; submitBtn.textContent = '💾 다시 저장 시도';
-        alert('저장 실패 🛸 평가 결과는 위에 보이지만 시트에 못 들어감. 다시 저장 시도 눌러보셈! (평가는 캐시되어 있어서 AI 안 다시 부름)');
-        return;
-      }
-
-      // 3. 결과 표시 (위에서 이미 그렸지만 cached 케이스에서도 확실히 보이게 한 번 더 갱신)
-      document.getElementById('oops-retry-result-feedback').innerHTML = '👽 ' + safeAiRender(feedback);
-      const masterBox = document.getElementById('oops-retry-result-master');
-      if (isMaster) {
-        masterBox.innerHTML = '✅ 마스터 완료!';
-        masterBox.style.background = '#EAF3DE';
-        masterBox.style.color = '#27500A';
-      } else {
-        masterBox.innerHTML = '💪 아직 마스터 아님 — 다시 도전 가능!';
-        masterBox.style.background = '#FAEEDA';
-        masterBox.style.color = '#633806';
-      }
-      document.getElementById('oops-retry-result').style.display = 'block';
-      submitBtn.style.display = 'none'; // 제출 완료 → 버튼 숨김
-      _cachedOopsEval = null; // ★ V10 Phase 2: 저장 성공했으니 캐시 비움 (다음 Story 풀 때 fresh eval)
-      // ★ V11 패치(2026-05-13, 3차-6): 옛 글 비문 캐시도 비움 → 다음 도전 시 새 비문 (간격 반복 학습 효과 유지)
-      if (currentOopsRetryIsOldStory && story) clearCachedOopsBiumuns(story);
-
-      // ★ V10 Phase 2 수정: 낙관적 업데이트 - 서버 재호출 실패에 의존하지 않게
-      // 4-1. 일단 새 결과를 로컬 myOopsRetries에 즉시 추가 (캘린더 보라 배경 바로 보이게)
-      const todayStr = (() => { const d = new Date(); return `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`; })();
-      const sameAttemptCount = myOopsRetries.filter(r =>
-        String(r.lesson) === String(story.lesson) && r.storyTitle === story.title
-      ).length;
-      myOopsRetries.push({
-        timestamp: new Date().toISOString(), date: todayStr,
-        lesson: story.lesson || '', originalStoryRow: storyKey,
-        storyTitle: story.title || '', originalDate: toLocalDateStr(story.date || ''),
-        error1: inputs[0]?.biumun || '',  corrected1: inputs[0]?.corrected || '', reason1: inputs[0]?.reason || '',
-        error2: inputs[1]?.biumun || '',  corrected2: inputs[1]?.corrected || '', reason2: inputs[1]?.reason || '',
-        error3: inputs[2]?.biumun || '',  corrected3: inputs[2]?.corrected || '', reason3: inputs[2]?.reason || '',
-        zeetoFeedback: feedback, isMaster: isMaster, expandedHint: currentOopsRetryExpanded,
-        attemptNumber: sameAttemptCount + 1
-      });
-      // 4-2. 캘린더 즉시 다시 그림
-      if (typeof renderCalendar === 'function') renderCalendar();
-      // 4-3. 백그라운드로 서버 데이터 재동기화 (실패해도 화면엔 영향 없음)
-      loadMyOopsRetries().catch(() => {});
-    } catch(e) {
-      console.error('submitOopsRetry error:', e);
-      hideLoading();
-      submitBtn.disabled = false; submitBtn.style.opacity = '1'; submitBtn.textContent = '👽 Zeeto에게 평가받기';
-      alert('통신 오류 🛸 잠시 후 다시 시도해보셈!');
-    } finally {
-      // ★ V11 패치(2026-05-13): 어떤 경로로 종료되더라도 in-flight 플래그 해제
-      _oopsSubmitInFlight = false;
-    }
-  }
+  async function submitOopsRetry() { return gptStoryRetrySubmit_(); }
 
   // ★ V10(2026-05-12): My Story 작성 내용 자동저장/복원 — 새로고침해도 내용 안 날아가게
   const MYSTORY_DRAFT_KEY = 'even_mystory_draft';
@@ -4083,7 +3812,7 @@ checkNewComments();
     const hasOops = /❌/.test(document.getElementById('ms-oops-point').textContent || '');
     label.textContent = count ? '👽 비문을 정문으로 고치고 이유를 적어보셈!'
       : hasOops ? '연습 문제를 불러오지 못했음. 성찰을 적고 선생님께 알려주셈.'
-      : '교정할 문법 오류가 없었음! 이번 글을 돌아보고 성찰을 적어주셈 🌱';
+      : '연습할 문법 교정을 찾지 못했음. 이번 글을 돌아보고 성찰을 적어주셈 🌱';
   }
 
   function resetMsSubmitButton() {
@@ -4100,6 +3829,7 @@ checkNewComments();
         const getHtml = (id) => { const el = document.getElementById(id); return el ? el.innerHTML : ''; };
         const activeStepEl = document.querySelector('.story-step.active');
         const draft = {
+          storyV39: gptStoryUi,
           studentId: currentStudentId,
           savedAt: Date.now(),
           activeStep: activeStepEl ? activeStepEl.id : 'story-step-1',
@@ -4169,6 +3899,8 @@ checkNewComments();
       if (typeof d.msCombinedWords === 'string') msCombinedWords = d.msCombinedWords;
       if (typeof d.hintRetryCount === 'number') hintRetryCount = d.hintRetryCount;
       if (typeof d.finalRetryCount === 'number') finalRetryCount = d.finalRetryCount;
+      if(d.storyV39 && typeof d.storyV39==='object') gptStoryUi=d.storyV39;
+      gptStoryRestoreFollowup_();
       setHtml('ms-zeeto-hint', d.zeetoHint); setHtml('ms-display-draft', d.displayDraft);
       setHtml('ms-zeeto-feedback', d.zeetoFeedback); setHtml('ms-zeeto-final', d.zeetoFinal);
       const mfe = document.getElementById('ms-zeeto-final'); if (mfe && d.zeetoFinalRaw) mfe.dataset.rawFinal = d.zeetoFinalRaw;
@@ -4207,7 +3939,7 @@ checkNewComments();
       return true;
     } catch(e) { console.warn('restoreMyStoryDraft failed:', e); return false; }
   }
-  function clearMyStoryDraft() { try { sessionStorage.removeItem(MYSTORY_DRAFT_KEY); } catch(e) {} }
+  function clearMyStoryDraft() { gptStoryUi={hint:null,final:null,assessments:{},meaning:''}; try { sessionStorage.removeItem(MYSTORY_DRAFT_KEY); } catch(e) {} }
   function attachMyStoryAutosave() {
     if (window._msAutosaveAttached) return;
     window._msAutosaveAttached = true;
@@ -4230,6 +3962,7 @@ checkNewComments();
   }
 
   function submitMyStory() {
+    let evidence;try{evidence=gptStorySubmitEvidence_();}catch(e){alert(e.message);return;}
     if (isTeacherSelf || isUndercover) { alert('👩‍🏫 둘러보기/잠입 모드에선 제출이 안 됨 (ENGsta 글쓰기만 가능).'); return; }
     const reflection = document.getElementById('ms-reflection').value.trim(); if(!reflection) return alert("성찰(Reflection)을 적어주셈! 🌱");
 
@@ -4258,29 +3991,20 @@ checkNewComments();
       .replace(/<\/span>/g, function(){ return '\x01'; })
       .replace(/~~([^\x01]*)\x01/g, '~~$1~~').replace(/\x01/g, '^');
 
-    // ★ V6→V8: Oops Point 교정 데이터 수집 (정문+이유 분리)
-    const corrections = [];
-    for (let i = 1; i <= 3; i++) {
-      const quiz = document.getElementById(`ms-error-${i}`).value.trim();
-      const corrected = document.getElementById(`ms-corrected-${i}`).value.trim();
-      const reason = document.getElementById(`ms-reason-${i}`).value.trim();
-      const fbEl = document.getElementById(`ms-feedback-${i}`);
-      const feedback = fbEl.style.display !== 'none' ? fbEl.innerText : '';
-      if (quiz) corrections.push({ quiz, corrected, reason, feedback });
-    }
+    const corrections=evidence.items;
 
     const payload = {
-      type: "ms_submit", userName: currentUserProfile, studentId: currentStudentId, token: currentToken, lesson: document.getElementById('ms-lesson').value,
+      ...evidence, type: "ms_submit", userName: currentUserProfile, studentId: currentStudentId, token: currentToken, lesson: document.getElementById('ms-lesson').value,
       grammar: document.getElementById('ms-grammar').value, reqWords: msCombinedWords, title: document.getElementById('ms-title').value,
       draft: document.getElementById('ms-draft').value,
-      hint: document.getElementById('ms-zeeto-hint').innerHTML,
+      hint: document.getElementById('ms-zeeto-hint').innerText,
       revision: document.getElementById('ms-revision').value,
       feedback: document.getElementById('ms-zeeto-feedback').innerHTML,
       finalStory: rawFinalStory,
       tip: document.getElementById('ms-zeeto-tip').innerHTML,
       oops: document.getElementById('ms-oops-point').innerHTML,
       reflection: reflection,
-      corrections: JSON.stringify(corrections)
+      corrections: JSON.stringify(corrections), ...gptStoryInputs_()
     };
     
     fetch(SHEET_URL, { method: 'POST', body: JSON.stringify(payload) })
@@ -4292,14 +4016,16 @@ checkNewComments();
         hideLoading();
         if (submitBtn) { submitBtn.disabled = false; submitBtn.style.opacity = '1'; }
         console.error('Unexpected server response:', text);
-        alert("⚠️ 저장에 실패했음! 작성 내용은 그대로 남아있으니 잠시 후 다시 시도해보셈 🛸");
+        let saveMessage='저장을 확인하지 못했음. 작성 내용은 그대로 보존됨.';
+          try{const failure=JSON.parse(text);if(typeof failure.message==='string')saveMessage=failure.message;}catch(e){}
+          alert(saveMessage);
         return;
       }
       hideLoading();
       // ★ V14(2026-08-10): 제출 성공 → 낭독 녹음 단계(Step 5)로
       resetMsSubmitButton(); // GPT MS-005: 다음 글도 제출 가능하게 복구
       window._msrPending = { lesson: payload.lesson, title: payload.title, finalStory: payload.finalStory };
-      myStories.push({ date: new Date().toISOString(), lesson: payload.lesson, grammar: payload.grammar, words: payload.reqWords, title: payload.title, draft: payload.draft, hint: payload.hint, revision: payload.revision, feedback: payload.feedback, finalStory: payload.finalStory, tip: payload.tip, oops: payload.oops, reflection: payload.reflection, corrections: payload.corrections , hasAudio: false });
+      myStories.push({ date: new Date().toISOString(), lesson: payload.lesson, grammar: payload.grammar, words: payload.reqWords, title: payload.title, draft: payload.draft, hint: payload.hint, revision: payload.revision, feedback: payload.feedback, finalStory: payload.finalStory, tip: payload.tip, oops: payload.oops, reflection: payload.reflection, corrections: payload.corrections, storyV39: {contract:"mystory-v39",saveId:gptStoryUi.final.saveId,state:gptStoryUi.final.state,exercises:gptStoryUi.final.state.exercises}, hasAudio: false });
       // ★ sessionStorage 동기화 (새로고침 착시 방지)
       const savedLogin = sessionStorage.getItem('even_login');
       if (savedLogin) { const loginData = JSON.parse(savedLogin); loginData.myStories = myStories; sessionStorage.setItem('even_login', JSON.stringify(loginData)); }
@@ -4446,11 +4172,11 @@ checkNewComments();
       htmlStory += `<div class="log-detail-box"><div class="log-label">✏️ 나의 수정본</div><div class="log-text">${escapeHtml(currentStoryData.revision || "-")}</div></div>`;
 
       // ★ V16(2026-08-11): 저장된 글도 표시 시점에 diff 재계산 (구버전 글은 ^마크로 폴백)
-      const redFinalStory = renderFinalDiff(currentStoryData.finalStory, currentStoryData.revision);
+      const redFinalStory = renderFinalDiff(currentStoryData.finalStory, currentStoryData.revision, currentStoryData.storyV39);
       htmlStory += `<div class="log-detail-box" style="border: 1px solid #4a5d4e; background:#f0f7f2;">
         <div class="log-label" style="color:#ff9800; margin-bottom:5px;">👽 Zeeto's Feedback</div>
         <div class="log-text" style="font-size:0.85rem; color:#666;">${safeSavedHtml(currentStoryData.feedback || "-")}</div>
-        <div class="log-label" style="color:#4a5d4e; margin-top:10px; margin-bottom:5px;">✨ 완벽 최종본</div>
+        <div class="log-label" style="color:#4a5d4e; margin-top:10px; margin-bottom:5px;">✨ 최종본</div>
         <div style="font-size:0.68rem; color:#888; margin-bottom:4px; line-height:1.5;"><span style="color:#d9534f; font-weight:bold;">빨강</span> = Oops Point에서 다룬 실수 · <span style="color:#767676; text-decoration:underline; text-decoration-color:#c9c9c9; text-underline-offset:3px;">회색</span> = 그 밖에 고친 부분</div>
         <div class="log-text" style="font-size:0.95rem;">${redFinalStory || "-"}</div>
         <div class="log-label" style="color:#2196f3; margin-top:10px; margin-bottom:5px;">💡 Zeeto's Tip</div>
@@ -4469,12 +4195,12 @@ checkNewComments();
           htmlStory += '<div class="log-label" style="color:#4a5d4e;">📝 Oops Point 교정</div>';
           corr.forEach(c => {
             htmlStory += '<div style="margin-top:8px; padding:8px; background:#fff; border-radius:8px;">';
-            htmlStory += '<div style="color:#c62828; font-size:0.85rem;">❌ ' + escapeHtml(c.quiz) + '</div>';
+            htmlStory += '<div style="color:#c62828; font-size:0.85rem;">연습 문장: ' + escapeHtml(c.quiz) + '</div>';
             if (c.corrected) {
-              htmlStory += '<div style="color:#2e7d32; font-size:0.85rem; margin-top:3px;">✅ ' + escapeHtml(c.corrected) + '</div>';
+              htmlStory += '<div style="color:#2e7d32; font-size:0.85rem; margin-top:3px;">내 답 [' + gptStoryAssessmentLabel_(c.status) + ']: ' + escapeHtml(c.corrected) + '</div>';
               htmlStory += '<div style="color:#1565c0; font-size:0.85rem; margin-top:3px;">💡 ' + escapeHtml(c.reason) + '</div>';
             } else if (c.answer) {
-              htmlStory += '<div style="color:#2e7d32; font-size:0.85rem; margin-top:3px;">✅ ' + escapeHtml(c.answer) + '</div>';
+              htmlStory += '<div style="color:#2e7d32; font-size:0.85rem; margin-top:3px;">이전 답: ' + escapeHtml(c.answer) + '</div>';
             }
             if (c.feedback) htmlStory += '<div style="color:#666; font-size:0.8rem; margin-top:3px;">👽 ' + escapeHtml(c.feedback) + '</div>';
             htmlStory += '</div>';
@@ -4504,7 +4230,7 @@ checkNewComments();
         const reason = r['reason' + i] || '';
         htmlOops += '<div style="background:#fffafa; border-left:3px solid #d9534f; border-radius:8px; padding:10px; margin-bottom:8px;">';
         htmlOops += '<div style="color:#c62828; font-size:0.85rem;">🚨 ' + escapeHtml(biumun) + '</div>';
-        if (corrected) htmlOops += '<div style="color:#2e7d32; font-size:0.85rem; margin-top:4px;">✅ 내 답: ' + escapeHtml(corrected) + '</div>';
+        if (corrected) htmlOops += '<div style="font-size:0.8rem;color:#4a5d4e">' + gptStoryAssessmentLabel_(r.assessmentV39?.assessments?.[i-1]?.status) + '</div><div style="color:#2e7d32; font-size:0.85rem; margin-top:4px;">내 답: ' + escapeHtml(corrected) + '</div>';
         if (reason) htmlOops += '<div style="color:#1565c0; font-size:0.85rem; margin-top:4px;">💡 이유: ' + escapeHtml(reason) + '</div>';
         htmlOops += '</div>';
       }
@@ -7066,13 +6792,13 @@ function switchStudentModal(type) {
                 return (ex && ex.ratio > 1.25)
                   ? `<div style="font-size:0.72rem; color:#8a6d1a; background:#fffdf3; border:1px solid #f0e4bd; border-radius:8px; padding:5px 9px; margin:3px 0 7px;">⚠️ Zeeto가 많이 고침 (${ex.rw}단어 → ${ex.fw}단어, ${ex.ratio.toFixed(2)}배)</div>`
                   : ''; })()}
-            <div class="log-text">${renderFinalDiff(s.finalStory||'', s.revision||'')}</div>
+            <div class="log-text">${renderFinalDiff(s.finalStory||'', s.revision||'', s.storyV39)}</div>
             <div class="log-label" style="color:#2196f3; margin-top:8px;">💡 Zeeto's Tip</div>
             <div class="log-text" style="color:#0d47a1;">${formatForPersonal(safeSavedHtml(s.tip||'-'))}</div>
             <div class="log-label" style="color:#c62828; margin-top:8px;">🚨 Oops Point</div>
             <div class="log-text" style="color:#c62828;">${safeSavedHtml(s.oops||'-')}</div>
           </div>
-          ${(() => { try { const corr = JSON.parse(s.corrections || '[]'); if (!corr.length) return ''; let h = '<div class="log-detail-box" style="border-left:3px solid #d9534f; background:#fffafa;"><div class="log-label" style="color:#4a5d4e;">📝 Oops Point 교정</div>'; corr.forEach(c => { h += '<div style="margin-top:8px; padding:8px; background:#fff; border-radius:8px;">'; h += '<div style="color:#c62828; font-size:0.85rem;">❌ ' + escapeHtml(c.quiz) + '</div>'; if (c.corrected) { h += '<div style="color:#2e7d32; font-size:0.85rem; margin-top:3px;">✅ ' + escapeHtml(c.corrected) + '</div>'; h += '<div style="color:#1565c0; font-size:0.85rem; margin-top:3px;">💡 ' + escapeHtml(c.reason) + '</div>'; } else if (c.answer) { h += '<div style="color:#2e7d32; font-size:0.85rem; margin-top:3px;">✅ ' + escapeHtml(c.answer) + '</div>'; } if (c.feedback) h += '<div style="color:#666; font-size:0.8rem; margin-top:3px;">👽 ' + escapeHtml(c.feedback) + '</div>'; h += '</div>'; }); h += '</div>'; return h; } catch(e) { return ''; } })()}
+          ${(() => { try { const corr = JSON.parse(s.corrections || '[]'); if (!corr.length) return ''; let h = '<div class="log-detail-box" style="border-left:3px solid #d9534f; background:#fffafa;"><div class="log-label" style="color:#4a5d4e;">📝 Oops Point 교정</div>'; corr.forEach(c => { h += '<div style="margin-top:8px; padding:8px; background:#fff; border-radius:8px;">'; h += '<div style="color:#c62828; font-size:0.85rem;">연습 문장: ' + escapeHtml(c.quiz) + '</div>'; if (c.corrected) { h += '<div style="color:#2e7d32; font-size:0.85rem; margin-top:3px;">내 답 [' + gptStoryAssessmentLabel_(c.status) + ']: ' + escapeHtml(c.corrected) + '</div>'; h += '<div style="color:#1565c0; font-size:0.85rem; margin-top:3px;">💡 ' + escapeHtml(c.reason) + '</div>'; } else if (c.answer) { h += '<div style="color:#2e7d32; font-size:0.85rem; margin-top:3px;">이전 답: ' + escapeHtml(c.answer) + '</div>'; } if (c.feedback) h += '<div style="color:#666; font-size:0.8rem; margin-top:3px;">👽 ' + escapeHtml(c.feedback) + '</div>'; h += '</div>'; }); h += '</div>'; return h; } catch(e) { return ''; } })()}
           <div class="log-detail-box"><div class="log-label">🤔 Reflection</div><div class="log-text">${escapeHtml(s.reflection||'-')}</div></div>
         </div>
       </details>`;
@@ -7196,7 +6922,7 @@ function switchStudentModal(type) {
           const reason = r['reason' + i] || '';
           html += `<div style="background:#fffafa; border-left:3px solid #d9534f; border-radius:8px; padding:10px; margin-bottom:8px;">
             <div style="color:#c62828; font-size:0.85rem;">🚨 ${escapeHtml(biumun)}</div>
-            ${corrected ? `<div style="color:#2e7d32; font-size:0.85rem; margin-top:4px;">✅ ${escapeHtml(corrected)}</div>` : ''}
+            ${corrected ? `<div style="color:#2e7d32; font-size:0.85rem; margin-top:4px;">내 답 [${gptStoryAssessmentLabel_(r.assessmentV39?.assessments?.[i-1]?.status)}]: ${escapeHtml(corrected)}</div>` : ''}
             ${reason ? `<div style="color:#1565c0; font-size:0.85rem; margin-top:4px;">💡 ${escapeHtml(reason)}</div>` : ''}
           </div>`;
         }
