@@ -1,3 +1,4 @@
+<!-- GPT HTML V38 2026-09-22: shared final retry policy and actionable failure messages -->
 <!-- GPT V37 TEST-DEPLOYMENT CANDIDATE: My Story full pipeline. Production verification pending. -->
 <!DOCTYPE html>
 <!-- EvEn GPT HTML V35 (2026-09-14): DL-001 Daily Log intent shown in teacher and student history. -->
@@ -2920,9 +2921,39 @@ async function gptStoryPost_(type,data) {
   }
   return {errorReason:'story_progress_limit',message:'검토가 길어져 잠시 멈췄음. 작성 내용과 끝낸 검토는 보존됨. 다시 확인해주셈.'};
 }
+// One attempt budget per exact input, shared by both final buttons and restored with the draft.
+function gpt40FailureMessage_(data) {
+  const code=String(data&&(data.errorReason||data.error)||'');
+  if(/story_model_budget/.test(code))return 'AI 서비스의 월간 사용 한도에 도달해 검토를 진행할 수 없음. 작성 내용은 보존됨. 반복해서 누르지 말고 선생님께 알려주셈.';
+  if(/story_model_output_limit/.test(code))return 'AI의 검토 응답이 길어져 끝까지 받지 못했음. 작성 내용은 보존됨. 선생님께 알려주셈.';
+  if(/story_(remaining_errors|audit_uncertain|final_language_unresolved)/.test(code)){
+    const quotes=Array.isArray(data.reviewIssues)?data.reviewIssues.slice(0,3).map(x=>typeof x.quote==='string'?'「'+x.quote.slice(0,240)+'」':'').filter(Boolean):[];
+    return '교정한 글을 다시 검사했지만 일부 교정을 확정하지 못했음. 작성한 수정본은 보존됨.'+(quotes.length?'\n확인 중이던 부분: '+quotes.join(' / '):'')+'\n같은 버튼을 계속 누르기보다 해당 문장의 뜻·표기를 확인하거나 선생님께 알려주셈.';
+  }
+  if(/story_model_http:429/.test(code))return '현재 요청이 몰려 검토를 마치지 못했음. 작성 내용은 보존됨. 잠시 후 다시 확인해주셈.';
+  if(/story_(model_transport|model_incomplete|model_http:5|progress_)/.test(code))return '검토를 이어받지 못해 잠시 멈췄음. 작성 내용은 보존됨. 잠시 후 다시 확인해주셈.';
+  return 'Zeeto의 분석을 확인하지 못했음. 작성한 내용은 보존되어 있으니 다시 시도해주셈.';
+}
+async function gpt40RunFinal_() {
+  const key=gptStoryInputKey_(gptStoryInputs_(),'final');
+  if(gptStoryUi.finalAttempt?.key!==key)gptStoryUi.finalAttempt={key:key,attempts:0,nextAt:0,message:''};
+  const state=gptStoryUi.finalAttempt;
+  finalRetryCount=Math.max(0,state.attempts-1);
+  if(state.attempts>=1+MAX_MS_RETRY)return {ok:false,message:state.message||'같은 글의 재시도 한도에 도달했음. 작성 내용은 보존됨.'};
+  if(Date.now()<state.nextAt)return {ok:false,message:state.message||'잠시 후 다시 확인해주셈.'};
+  state.attempts++;finalRetryCount=Math.max(0,state.attempts-1);autoSaveMyStoryDraft();
+  try {
+    const result=await gptStoryPerformFinal_();
+    state.message=result.message||'';
+    // A follow-up is a successful diagnosis requiring new input, not a failed server request.
+    if(result.blocked){state.attempts--;finalRetryCount=Math.max(0,state.attempts-1);}
+    return result;
+  } finally {state.nextAt=Date.now()+5000;autoSaveMyStoryDraft();}
+}
+
 function gptStoryClientError_(data) {
   if(data&&data.error==='Unauthorized'){alert('세션이 만료됐음. 다시 로그인해주셈.');logout();return {ok:false,sessionExpired:true};}
-  if(!data||data.error||data.errorReason)return {ok:false,message:'Zeeto의 분석을 확인하지 못했음. 작성한 내용은 보존되어 있으니 다시 시도해주셈.'};
+  if(!data||data.error||data.errorReason)return {ok:false,message:gpt40FailureMessage_(data)};
   if(data.storyContract!=='mystory-v39')return {ok:false,message:'서버와 화면의 버전이 달라 새 분석을 시작할 수 없음. 선생님께 알려주셈. 작성한 내용은 보존됨.'};
   return null;
 }
@@ -3292,6 +3323,7 @@ function gptStoryRetryRecordLabel_(r) {
 
   function resetMsRetryState() {
     hintRetryCount = 0; finalRetryCount = 0;
+    delete gptStoryUi.finalAttempt;
     hintRetryCooldown = false; finalRetryCooldown = false;
     showHintRetryBtn(false); showFinalRetryBtn(false, '', null);
   }
@@ -3329,7 +3361,7 @@ function gptStoryRetryRecordLabel_(r) {
       btn.disabled = true; btn.style.opacity = '0.5'; btn.style.cursor = 'not-allowed';
       btn.textContent = '🚫 재시도 한도 초과';
       msgBox.style.display = 'block';
-      msgBox.textContent = '여러 번 시도해도 안 되면 선생님께 알려주세요 🙏 (작성한 수정본은 그대로 남아있음)';
+      msgBox.textContent = (msg ? msg + '\n' : '') + '같은 글의 재시도 한도에 도달했음. 작성 내용은 보존됨. 위 안내를 확인하거나 선생님께 알려주셈.';
     } else {
       btn.disabled = false; btn.style.opacity = '1'; btn.style.cursor = 'pointer';
       btn.textContent = `🔄 Zeeto 다시 부르기 (${MAX_MS_RETRY - finalRetryCount}회 남음)`;
@@ -3348,7 +3380,7 @@ function gptStoryRetryRecordLabel_(r) {
   async function performMsHint() { return gptStoryPerformHint_(); }
 
   // ★ V9 추가: ms_final 실제 호출 (재사용) — 성공 시 true 리턴
-  async function performMsFinal() { return gptStoryPerformFinal_(); }
+  async function performMsFinal() { return gpt40RunFinal_(); }
 
   async function retryMsHint() {
     if (hintRetryCooldown || isLoading) return;
@@ -3370,9 +3402,7 @@ function gptStoryRetryRecordLabel_(r) {
   }
 
   async function retryMsFinal() {
-    if (finalRetryCooldown || isLoading) return;
-    if (finalRetryCount >= MAX_MS_RETRY) return;
-    finalRetryCount++; finalRetryCooldown = true;
+    if (isLoading) return;
     showLoading("Zeeto 다시 호출 중... 🪄");
     const r = await performMsFinal();
     hideLoading();
