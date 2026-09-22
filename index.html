@@ -1,3 +1,4 @@
+<!-- GPT HTML V39 2026-09-22: recover final checks after service failures -->
 <!-- GPT HTML V38 2026-09-22: shared final retry policy and actionable failure messages -->
 <!-- GPT V37 TEST-DEPLOYMENT CANDIDATE: My Story full pipeline. Production verification pending. -->
 <!DOCTYPE html>
@@ -2910,6 +2911,7 @@ async function gptStoryPost_(type,data) {
     const response=await fetch(SHEET_URL,{method:'POST',body:JSON.stringify({...data,type:type,studentId:studentId,token:token,storyContract:'mystory-v39',storyRequestId:job.id})});
     const text=await response.text();if(text.trim()==='Unauthorized')return {error:'Unauthorized'};
     let result;try{result=JSON.parse(text);}catch(e){return {error:'bad_response'};}
+    if(!result||Array.isArray(result)||typeof result!=='object'||(!result.error&&result.storyContract!=='mystory-v39'))return {error:'bad_response'};
     if(result.status!=='working'){
       const resumable=/story_model_(transport|incomplete|http:(429|5\d\d))/.test(String(result.errorReason||''));
       if(!resumable&&gptStoryUi.pendingJob===job)gptStoryUi.pendingJob=null;
@@ -2924,9 +2926,10 @@ async function gptStoryPost_(type,data) {
 // One attempt budget per exact input, shared by both final buttons and restored with the draft.
 function gpt40FailureMessage_(data) {
   const code=String(data&&(data.errorReason||data.error)||'');
+  if(/bad_response|story_(flat|envelope|schema|shape)/.test(code))return 'AI 검토 응답의 형식을 확인하지 못했음. 작성 내용은 보존됨. 잠시 후 다시 확인해주셈.';
   if(/story_model_budget/.test(code))return 'AI 서비스의 월간 사용 한도에 도달해 검토를 진행할 수 없음. 작성 내용은 보존됨. 반복해서 누르지 말고 선생님께 알려주셈.';
   if(/story_model_output_limit/.test(code))return 'AI의 검토 응답이 길어져 끝까지 받지 못했음. 작성 내용은 보존됨. 선생님께 알려주셈.';
-  if(/story_(remaining_errors|audit_uncertain|final_language_unresolved)/.test(code)){
+  if(/story_(remaining_errors|audit_uncertain|final_language_unresolved|final_requirements_changed)/.test(code)){
     const quotes=Array.isArray(data.reviewIssues)?data.reviewIssues.slice(0,3).map(x=>typeof x.quote==='string'?'「'+x.quote.slice(0,240)+'」':'').filter(Boolean):[];
     return '교정한 글을 다시 검사했지만 일부 교정을 확정하지 못했음. 작성한 수정본은 보존됨.'+(quotes.length?'\n확인 중이던 부분: '+quotes.join(' / '):'')+'\n같은 버튼을 계속 누르기보다 해당 문장의 뜻·표기를 확인하거나 선생님께 알려주셈.';
   }
@@ -2936,7 +2939,7 @@ function gpt40FailureMessage_(data) {
 }
 async function gpt40RunFinal_() {
   const key=gptStoryInputKey_(gptStoryInputs_(),'final');
-  if(gptStoryUi.finalAttempt?.key!==key)gptStoryUi.finalAttempt={key:key,attempts:0,nextAt:0,message:''};
+  if(gptStoryUi.finalAttempt?.key!==key||gptStoryUi.finalAttempt?.release!==41||Date.now()-(gptStoryUi.finalAttempt?.startedAt||0)>=900000)gptStoryUi.finalAttempt={key:key,release:41,startedAt:Date.now(),attempts:0,nextAt:0,message:''};
   const state=gptStoryUi.finalAttempt;
   finalRetryCount=Math.max(0,state.attempts-1);
   if(state.attempts>=1+MAX_MS_RETRY)return {ok:false,message:state.message||'같은 글의 재시도 한도에 도달했음. 작성 내용은 보존됨.'};
@@ -3361,7 +3364,7 @@ function gptStoryRetryRecordLabel_(r) {
       btn.disabled = true; btn.style.opacity = '0.5'; btn.style.cursor = 'not-allowed';
       btn.textContent = '🚫 재시도 한도 초과';
       msgBox.style.display = 'block';
-      msgBox.textContent = (msg ? msg + '\n' : '') + '같은 글의 재시도 한도에 도달했음. 작성 내용은 보존됨. 위 안내를 확인하거나 선생님께 알려주셈.';
+      msgBox.textContent = (msg ? msg + '\n' : '') + '같은 글을 3회 확인했음. 최초 시도에서 15분 후 다시 확인할 수 있음. 작성 내용은 보존됨. 위 안내를 확인하거나 선생님께 알려주셈.';
     } else {
       btn.disabled = false; btn.style.opacity = '1'; btn.style.cursor = 'pointer';
       btn.textContent = `🔄 Zeeto 다시 부르기 (${MAX_MS_RETRY - finalRetryCount}회 남음)`;
