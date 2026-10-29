@@ -1,3 +1,4 @@
+<!-- EvEn V42 (2026-10-29, Claude): AS V43 짝 — My Story 최종본이 'story_review_inconclusive'(검토 합의 실패, 재확인 요청)로 돌아오면 서버 안내문을 그대로 보여주고 시도 횟수에서 뺌(사용자 결정 ③). 그 밖은 V41 그대로. AS V42 서버와도 그대로 동작. -->
 <!-- EvEn V41 (2026-10-29, Claude): 전수조사 A그룹 화면 수정 — Daily Log ✔️ 기록 기반 저장·✔️ 없는 제출 차단, My Story Step 4 출구·저장 충돌 완료 처리, ENGsta 저장 확인·글 복원, 교사 잠입 모드 로그아웃 방지·내 계정 유지 ENGsta 허용, Weeto 늦은 응답 폐기·빈 D열 숨김, 로그아웃 시 저장소 비우기. 프론트 단독 배포(서버 AS V42 그대로). -->
 <!-- EvEn V40 (2026-10-01, Claude): Daily Log Practice 채점 재구성 — 끝 부호·대문자 코드 확인, 요약/뜻 역할 분리, 2차 교정문 가드, AI 무응답 시 제출 허용. 프론트 단독 배포 가능(서버 AS V41 그대로). -->
 <!-- GPT HTML V39 2026-09-22: recover final checks after service failures -->
@@ -3040,6 +3041,7 @@ async function gptStoryPost_(type,data) {
 // One attempt budget per exact input, shared by both final buttons and restored with the draft.
 function gpt40FailureMessage_(data) {
   const code=String(data&&(data.errorReason||data.error)||'');
+  if(/story_review_inconclusive/.test(code)&&typeof data.message==='string'&&data.message.trim())return data.message; // ★ V42: 서버(AS V43)의 재확인 안내문 그대로
   if(/bad_response|story_(flat|envelope|schema|shape)/.test(code))return 'AI 검토 응답의 형식을 확인하지 못했음. 작성 내용은 보존됨. 잠시 후 다시 확인해주셈.';
   if(/story_model_budget/.test(code))return 'AI 서비스의 월간 사용 한도에 도달해 검토를 진행할 수 없음. 작성 내용은 보존됨. 반복해서 누르지 말고 선생님께 알려주셈.';
   if(/story_model_output_limit/.test(code))return 'AI의 검토 응답이 길어져 끝까지 받지 못했음. 작성 내용은 보존됨. 선생님께 알려주셈.';
@@ -3071,7 +3073,7 @@ async function gpt40RunFinal_() {
 function gptStoryClientError_(data) {
   if(data&&data.error==='undercover')return {ok:false,message:'👩‍🏫 잠입/내 계정 모드에선 My Story AI 기능을 쓸 수 없음 (둘러보기만 가능).'}; // ★ V41
   if(data&&data.error==='Unauthorized'){alert('세션이 만료됐음. 다시 로그인해주셈.');logout();return {ok:false,sessionExpired:true};}
-  if(!data||data.error||data.errorReason)return {ok:false,message:gpt40FailureMessage_(data)};
+  if(!data||data.error||data.errorReason)return {ok:false,message:gpt40FailureMessage_(data),blocked:!!(data&&data.inconclusive===true)}; // ★ V42: 검토 합의 실패(재확인 요청)는 시도 횟수에서 뺌 — gpt40RunFinal_이 blocked면 attempts--
   if(data.storyContract!=='mystory-v39')return {ok:false,message:'서버와 화면의 버전이 달라 새 분석을 시작할 수 없음. 선생님께 알려주셈. 작성한 내용은 보존됨.'};
   return null;
 }
