@@ -983,7 +983,7 @@
       <div id="aliens-select-view">
         <div class="chat-header">
           <div class="header-left"><span style="font-size:1.3rem">📡</span>&nbsp;&nbsp;<strong>Aliens</strong></div>
-          <div class="header-right"><span id="student-notice-btn" style="font-size:0.85rem; color:#4a5d4e; cursor:pointer; font-weight:bold;" onclick="openNoticeModal()">📢 공지</span>&nbsp;&nbsp;<span class="logout-btn" onclick="logout()">로그아웃</span></div>
+          <div class="header-right"><span id="student-notice-btn" style="font-size:0.85rem; color:#4a5d4e; cursor:pointer; font-weight:bold;" onclick="openNoticeModal()">📢 공지</span>&nbsp;&nbsp;<span class="logout-btn" onclick="logout(true)">로그아웃</span></div>
         </div>
         <div class="aliens-select">
           <h2>뭐 하러 왔음?</h2>
@@ -1015,7 +1015,7 @@
             <span style="font-size:1.3rem">👽</span>&nbsp;&nbsp;<strong>Zeeto</strong>
             <span id="notice-dot" style="margin-left:8px;cursor:pointer;display:none;" onclick="showNoticePopup()">🔔</span>
           </div>
-          <div class="header-right"><span class="logout-btn" onclick="logout()">로그아웃</span></div>
+          <div class="header-right"><span class="logout-btn" onclick="logout(true)">로그아웃</span></div>
         </div>
         <div class="chat-box" id="chat-box"><div class="message received" id="greeting-msg">👽 안녕! 나는 외계인 Zeeto. 지구 언어 영어 마스터. 질문 있음?</div></div>
         <div class="input-area">
@@ -1031,7 +1031,7 @@
             <span class="back-btn" style="display:inline" onclick="flippedBack()">←</span>
             <span style="font-size:1.3rem">📡</span>&nbsp;&nbsp;<strong id="fl-head-title">Zeeto's class</strong>
           </div>
-          <div class="header-right"><span class="logout-btn" onclick="logout()">로그아웃</span></div>
+          <div class="header-right"><span class="logout-btn" onclick="logout(true)">로그아웃</span></div>
         </div>
 
         <div class="fl-progress-wrap" id="fl-progress-wrap" style="display:none;">
@@ -1291,8 +1291,13 @@
         <textarea id="ms-reflection" class="input-field" style="width:100%; box-sizing:border-box; height:80px; resize:none;" placeholder="Reflection: 오늘 글쓰기 성찰 적기"></textarea>
         
         <button class="btn" style="width:100%;" onclick="submitMyStory()">우주 서버로 최종 제출 🚀</button>
+        <!-- ★ V41(2026-10-29): Step 4 출구 -->
+        <div style="display:flex; gap:8px; margin-top:10px;">
+          <button type="button" onclick="gptStoryBackToStep3_()" style="flex:1; background:none; border:1px solid #4a5d4e; color:#4a5d4e; border-radius:12px; padding:8px; cursor:pointer; font-size:0.85rem;">← 최종본 다시 보기</button>
+          <button type="button" onclick="discardMyStoryDraft_()" style="flex:1; background:none; border:1px solid #d9534f; color:#d9534f; border-radius:12px; padding:8px; cursor:pointer; font-size:0.85rem;">이 글 접고 새로 쓰기</button>
+        </div>
       </div>
-    </div> 
+    </div>
 
     <div id="insta-screen" class="screen">
       <div class="chat-header">
@@ -1301,7 +1306,7 @@
           <div style="font-weight:700; color:#4a5d4e;">ENGstagram</div>
         </div>
         <div class="header-right">
-          <span class="logout-btn" onclick="logout()">로그아웃</span>
+          <span class="logout-btn" onclick="logout(true)">로그아웃</span>
         </div>
       </div>
       <div id="insta-feed">
@@ -1329,7 +1334,7 @@
         <div class="header-left"><div style="font-weight:700; color:#4a5d4e;">My Page</div></div>
         <div class="header-right" style="display:flex; gap:8px; align-items:center;">
           <button id="undercover-return-btn" onclick="exitUndercoverMode()" style="display:none; background:#4a5d4e; color:white; border:none; border-radius:15px; padding:6px 12px; font-size:0.8rem; font-weight:bold; cursor:pointer;">👩‍🏫 관리자 복귀</button>
-          <span class="logout-btn" onclick="logout()">로그아웃</span>
+          <span class="logout-btn" onclick="logout(true)">로그아웃</span>
         </div>
       </div> <div class="mypage-dashboard">
 
@@ -1495,7 +1500,7 @@
     </div>
     <div class="header-right" style="display:flex; gap:8px; align-items:center;">
   <button onclick="enterUndercoverMode()" style="background:#4a5d4e; color:white; border:none; border-radius:15px; padding:6px 12px; font-size:0.8rem; font-weight:bold; cursor:pointer;">🕵️ EvEn 앱 접속</button>
-  <span class="logout-btn" onclick="logout()">로그아웃</span>
+  <span class="logout-btn" onclick="logout(true)">로그아웃</span>
 </div>
   </div>
 
@@ -2057,7 +2062,21 @@ checkNewComments();
     }
   }
 
-  function logout() { sessionStorage.removeItem('even_login'); location.reload(); }
+  // ★ V41(2026-10-29): ① 직접 누른 로그아웃(force)은 브라우저 임시 저장소를 전부 비움 — 교사 비밀번호(teacherPw)·앞 학생의 My Story 임시저장이 남던 문제(10/29 확인)
+  //   ② 잠입·내 계정 유지 모드에서 서버가 Unauthorized를 돌려줘도 교사를 튕기지 않고 관리자 화면으로 복귀(10/29 재현: Zeeto 질문 1개로 강제 로그아웃)
+  //   ③ 세션 만료로 인한 로그아웃은 My Story 임시저장을 남겨 둠(다시 로그인하면 복원)
+  function logout(force) {
+    if (!force && typeof isUndercover !== 'undefined' && isUndercover) {
+      alert('👩‍🏫 잠입/내 계정 모드에선 이 기능을 쓸 수 없음 (둘러보기만 가능). 관리자 화면으로 돌아감.');
+      if (typeof exitUndercoverMode === 'function') exitUndercoverMode();
+      return;
+    }
+    try {
+      if (force) sessionStorage.clear();
+      else { sessionStorage.removeItem('even_login'); sessionStorage.removeItem('teacherPw'); }
+    } catch(e) {}
+    location.reload();
+  }
 
   // ★ 행성 개발 프로젝트 함수들
   async function loadPlanetData() {
@@ -2592,6 +2611,7 @@ checkNewComments();
   }
   async function sendMessage() {
     if (isZeetoSending) return; // 진행 중인 요청 있으면 무시
+    if (isUndercover) { alert('👩‍🏫 잠입/내 계정 모드에선 Zeeto와 대화할 수 없음 (둘러보기만 가능).'); return; } // ★ V41: 학생ID+교사토큰 → Unauthorized → 강제 로그아웃 방지
     const input = document.getElementById('chat-input'); const text = input.value.trim(); if(!text) return;
     isZeetoSending = true;
     if (input) input.disabled = true;
@@ -2728,7 +2748,16 @@ checkNewComments();
   //          ④ AI가 응답 못 하면 Practice 2 없이도 제출 가능(기록에 표시)
   //   상세: DailyLog_피드백_진단_수정방안_20261001.md
   // ═══════════════════════════════════════════════════════════
-  let practiceAiFailed = false;   // AI 무응답이 있었는지 — submitLog에서 Practice 2 필수 여부를 정함
+  let practiceAiFailed = false;   // (V41부터 제출 허용 판단에는 쓰지 않음 — AI 무응답이면 제출 불가, 학생이 교사에게 알림. 사용자 결정 10/29)
+  // ★ V41(2026-10-29): ✔️로 확인받은 문장과 그때 받은 힌트·답변을 함께 기억. 제출은 지금 문장이 이 기록과 같을 때만 가능.
+  //   [왜] 화면에 남은 힌트 글자를 읽어 저장해서, 이전 기록(또는 고치기 전 문장)의 힌트·답변이 다음 기록에 그대로 저장됐음(10/29 재현).
+  let practiceChecked = { p1: '', hint: '', p2: '', answer: '' };
+  function resetPracticeChecked() {
+    practiceChecked = { p1: '', hint: '', p2: '', answer: '' };
+    lastPracticeHint = '';
+    ['hint-area', 'answer-area'].forEach(id => { const el = document.getElementById(id); if (el) el.style.display = 'none'; });
+    ['hint-text', 'answer-text'].forEach(id => { const el = document.getElementById(id); if (el) el.innerHTML = ''; });
+  }
 
   // AI에 보내기 전 코드로 확인하는 두 가지. 문제가 없으면 빈 문자열.
   function practicePrecheck_(input) {
@@ -2827,16 +2856,20 @@ checkNewComments();
         // ★ V25(2026-08-26): AI는 VERDICT 줄로만 판정하고, 코드는 ★그 줄만★ 읽음.
         const pv = parsePracticeVerdict_(result);
         document.getElementById('hint-text').innerHTML = safeAiRender(pv.msg);
+        practiceChecked.p1 = input; practiceChecked.hint = pv.msg; // ★ V41: 확인받은 1차 문장·힌트 기록
         if (pv.verdict === 'OK') {
           // ★ Practice 1 정답 → Practice 2 자동 패스 (기존 동작 그대로)
           document.getElementById('practice-2').value = input;
           document.getElementById('answer-area').style.display = "block";
           document.getElementById('answer-text').innerText = "1st Practice에서 완벽했음! 패스 👽✨";
+          practiceChecked.p2 = input; practiceChecked.answer = "1st Practice에서 완벽했음! 패스 👽✨"; // ★ V41
           // ★ V28: OK일 때 msg는 칭찬문임 → 2차 체크리스트로 넘기지 않음.
           lastPracticeHint = "";
         } else {
           lastPracticeHint = pv.msg;   // ★ V26: 2차 프롬프트로 넘기기 위해 보관 (FIX일 때만)
+          practiceChecked.p2 = ''; practiceChecked.answer = ''; // ★ V41: 1차를 다시 확인했으면 2차도 다시 ✔️ 받아야 함
           document.getElementById('answer-area').style.display = "none";
+          document.getElementById('answer-text').innerHTML = '';
         }
       } else {
         // ★ V28: 1차 문장은 넣지 않음(칭찬 날조 방지). 1차 힌트만 체크리스트로 전달.
@@ -2844,10 +2877,11 @@ checkNewComments();
         hideLoading(); practiceAiFailed = false;
         document.getElementById('answer-area').style.display = "block";
         document.getElementById('answer-text').innerHTML = safeAiRender(out.text);
+        practiceChecked.p2 = input; practiceChecked.answer = out.text; // ★ V41: 확인받은 2차 문장·답변 기록
       }
     } catch(e) {
       hideLoading(); practiceAiFailed = true;
-      alert("😵 Zeeto가 지금 응답을 못 함. 잠시 후 다시 눌러보셈. 계속 안 되면 그대로 Submit 해도 됨 (AI 확인 못 함으로 기록됨).");
+      alert("😵 Zeeto가 지금 응답을 못 함. 잠시 후 다시 눌러보셈. 계속 안 되면 선생님께 말해주셈."); // ★ V41: ✔️ 없는 제출은 막음(사용자 결정 10/29)
     }
   }
 
@@ -2893,7 +2927,9 @@ checkNewComments();
     const intentVal = document.getElementById('log-intent').value.trim();   // ★ V28
     const p2Val = document.getElementById('practice-2').value.trim(); const reflectionVal = document.getElementById('log-reflection').value.trim();
     // ★ V40: AI가 응답하지 못한 경우에만 Practice 2 없이 제출 허용(기록에 표시)
-    if (!lessonVal || !summaryVal || !newThingsVal || !intentVal || !p1Val || (!p2Val && !practiceAiFailed) || !reflectionVal) return alert("모든 항목을 채우셈!");
+    if (!lessonVal || !summaryVal || !newThingsVal || !intentVal || !p1Val || !p2Val || !reflectionVal) return alert("모든 항목을 채우셈!");
+    // ★ V41(2026-10-29): ✔️로 확인받은 문장만 제출 가능(사용자 결정). 문장을 고쳤으면 다시 ✔️. AI가 응답 못 하면 제출 불가 → 선생님께 알림.
+    if (p1Val !== practiceChecked.p1 || p2Val !== practiceChecked.p2) return alert("1st·2nd Practice는 ✔️ 확인을 받은 문장만 제출할 수 있음. 문장을 고쳤으면 다시 ✔️를 눌러주셈!");
 
     let logDateStr;
     if (isLateMode) {
@@ -2913,7 +2949,7 @@ checkNewComments();
     if(isLoading) return;
     showLoading("우주 서버로 전송 중... 🚀");
     const previewImg = document.getElementById('photo-preview'); let base64Data = previewImg.style.display === 'block' ? previewImg.src : null;
-    const newLog = { date: logDateStr, lesson: lessonVal, summary: summaryVal, newThings: newThingsVal, p1: p1Val, hint: document.getElementById('hint-text').innerText || (practiceAiFailed ? "(AI 확인 못 함)" : ""), p2: p2Val, answer: document.getElementById('answer-text').innerText || (practiceAiFailed ? "(AI 확인 못 함)" : ""), reflection: reflectionVal, image: base64Data, intent: intentVal };
+    const newLog = { date: logDateStr, lesson: lessonVal, summary: summaryVal, newThings: newThingsVal, p1: p1Val, hint: practiceChecked.hint, p2: p2Val, answer: practiceChecked.answer, reflection: reflectionVal, image: base64Data, intent: intentVal }; // ★ V41: 화면 글자가 아니라 ✔️ 때 기록한 힌트·답변을 저장
 
     // ★ 지각 제출 시 overrideDate를 서버에 전달 (서버에서 날짜 덮어쓰기용)
     const payload = { type: "log", userName: currentUserProfile, studentId: currentStudentId, token: currentToken, lesson: newLog.lesson, summary: newLog.summary, newThings: newLog.newThings, p1: newLog.p1, aiHint: newLog.hint, p2: newLog.p2, aiAnswer: newLog.answer, reflection: newLog.reflection, imageBase64: newLog.image, intent: newLog.intent };
@@ -2955,7 +2991,8 @@ checkNewComments();
         ['log-summary','log-new','log-intent','practice-1','practice-2','log-reflection'].forEach(id => document.getElementById(id).value = "");
         lastPracticeHint = "";   // ★ V28: 다음 로그로 힌트가 새어나가지 않게
         practiceAiFailed = false; // ★ V40
-        document.getElementById('photo-preview').style.display = 'none'; document.getElementById('hint-area').style.display = 'none'; document.getElementById('answer-area').style.display = 'none';
+        resetPracticeChecked();   // ★ V41: 힌트·답변 글자까지 비움(숨기기만 해서 다음 기록에 저장되던 문제)
+        document.getElementById('photo-preview').style.display = 'none';
         changeTab('mypage-screen');
     })
     .catch(e => { console.error('Log submit error:', e); hideLoading(); alert('통신 오류가 발생했어요 😵 다시 시도해주세요!'); });
@@ -2977,6 +3014,7 @@ function gptStoryInputKey_(input,stage) {
     goals:input.grammarGoals,words:input.reqWords,...(stage==='final'?{draft:input.draft,meaning:input.intendedMeaning}:{})});
 }
 async function gptStoryPost_(type,data) {
+  if(typeof isUndercover!=='undefined'&&isUndercover)return {error:'undercover'}; // ★ V41: 잠입 모드에선 My Story AI 요청 자체를 보내지 않음(강제 로그아웃 방지)
   const studentId=currentStudentId,token=currentToken,key=JSON.stringify([studentId,type,data]);
   if(gptStoryUi.pendingJob?.key!==key)gptStoryUi.pendingJob={key:key,id:'ms_'+Date.now().toString(36)+'_'+Math.random().toString(36).slice(2)};
   const job=gptStoryUi.pendingJob;let previous='',stalled=0;
@@ -3030,6 +3068,7 @@ async function gpt40RunFinal_() {
 }
 
 function gptStoryClientError_(data) {
+  if(data&&data.error==='undercover')return {ok:false,message:'👩‍🏫 잠입/내 계정 모드에선 My Story AI 기능을 쓸 수 없음 (둘러보기만 가능).'}; // ★ V41
   if(data&&data.error==='Unauthorized'){alert('세션이 만료됐음. 다시 로그인해주셈.');logout();return {ok:false,sessionExpired:true};}
   if(!data||data.error||data.errorReason)return {ok:false,message:gpt40FailureMessage_(data)};
   if(data.storyContract!=='mystory-v39')return {ok:false,message:'서버와 화면의 버전이 달라 새 분석을 시작할 수 없음. 선생님께 알려주셈. 작성한 내용은 보존됨.'};
@@ -3146,7 +3185,7 @@ async function goToStoryStep(stepNumber) {
 }
 
 function gptStoryRenderOops_(state) {
-  const exercises=state.exercises||[],lines=exercises.map((q,i)=>(i+1)+'. ❌ '+(q.sourceBefore||'(문장 경계)')+' → '+q.sourceAfter+'\n'+q.explanation+'\n👽 Zeeto의 비문 예시: '+q.question);
+  const exercises=state.exercises||[],lines=exercises.map((q,i)=>(i+1)+'. ❌ '+(q.sourceBefore||'(문장 경계)')+' → '+(q.sourceAfter||'(삭제)')+'\n'+q.explanation+'\n👽 Zeeto의 비문 예시: '+q.question); // ★ V41: 삭제 교정은 "(삭제)"로(Step 3과 같게)
   const text=lines.length?lines.join('\n\n'):'이 수정본에서는 Oops Point로 연습할 문법 교정을 찾지 못했음. 성찰을 적고 글을 제출할 수 있음.';
   const oops=document.getElementById('ms-oops-point');oops.dataset.original=lines.join('\n\n');oops.innerHTML=gptStoryTextHtml_(text);
   document.getElementById('ms-oops-point-copy').innerHTML=oops.innerHTML;
@@ -3294,6 +3333,7 @@ function gptStoryRetryRender_() {
 }
 async function gptStoryRetrySelect_(index) {
   if(_oopsSubmitInFlight||isLoading)return;
+  if(isUndercover){alert('👩‍🏫 잠입/내 계정 모드에선 Oops 다시 풀기를 열 수 없음 (둘러보기만 가능).');return;} // ★ V41: 강제 로그아웃 방지
   gptStoryRetryCache_();const story=myStories[index];if(!story)return;
   currentOopsRetryStory=index;currentOopsRetryExpanded=false;_cachedOopsEval=null;gptStoryRetryUi=null;
   document.getElementById('oops-retry-lesson-label').textContent='Lesson '+story.lesson;
@@ -4048,6 +4088,34 @@ function gptStoryRetryRecordLabel_(r) {
     } catch(e) { console.warn('restoreMyStoryDraft failed:', e); return false; }
   }
   function clearMyStoryDraft() { gptStoryUi={hint:null,final:null,assessments:{},meaning:''}; try { sessionStorage.removeItem(MYSTORY_DRAFT_KEY); } catch(e) {} }
+  // ★ V41(2026-10-29): My Story 폼 초기화를 한 곳으로(제출 완료·"이 글 접고 새로 쓰기"가 같이 씀)
+  function resetMyStoryForm_() {
+    const inputs = ['ms-lesson','ms-word-req1','ms-word-req2','ms-word-req3','ms-word-opt1','ms-word-opt2','ms-title','ms-draft','ms-revision','ms-error-1','ms-corrected-1','ms-reason-1','ms-error-2','ms-corrected-2','ms-reason-2','ms-error-3','ms-corrected-3','ms-reason-3','ms-reflection'];
+    inputs.forEach(id => document.getElementById(id).value = "");
+    document.getElementById('ms-grammar').value = '';
+    document.getElementById('ms-grammar-display').textContent = '먼저 Lesson을 선택하세요';
+    ['ms-display-draft','ms-zeeto-hint','ms-display-revision','ms-zeeto-feedback','ms-zeeto-final','ms-zeeto-tip','ms-oops-point','ms-oops-point-copy'].forEach(id => document.getElementById(id).innerHTML = "");
+    delete document.getElementById('ms-zeeto-final').dataset.rawFinal;
+    delete document.getElementById('ms-oops-point').dataset.original;
+    ['ms-feedback-1','ms-feedback-2','ms-feedback-3'].forEach(id => { const fb = document.getElementById(id); fb.innerHTML = ''; fb.style.display = 'none'; });
+    document.querySelectorAll('.story-step').forEach(step => step.classList.remove('active'));
+    document.getElementById('story-step-1').classList.add('active');
+    resetMsRetryState(); // ★ V9: 새 My Story 시작 시 재시도 카운트 초기화
+    clearMyStoryDraft(); // ★ V10(2026-05-12): 임시저장 삭제
+    resetMsSubmitButton();
+  }
+  // ★ V41(2026-10-29): Step 4 출구 — 제출 버튼 하나뿐이라 막다른 길이던 문제(9/30 진단 6절 2단계)
+  function gptStoryBackToStep3_() {
+    document.querySelectorAll('.story-step').forEach(e => e.classList.remove('active'));
+    document.getElementById('story-step-3').classList.add('active');
+    document.getElementById('mystory-screen').scrollTop = 0; autoSaveMyStoryDraft();
+  }
+  function discardMyStoryDraft_() {
+    if (isLoading) return;
+    if (!confirm('지금 쓰던 글과 Zeeto의 분석 결과를 모두 지우고 새 글을 시작함.\n(이미 제출한 글은 My Page에 그대로 있음)\n정말 접을까?')) return;
+    resetMyStoryForm_();
+    document.getElementById('mystory-screen').scrollTop = 0;
+  }
   function attachMyStoryAutosave() {
     if (window._msAutosaveAttached) return;
     window._msAutosaveAttached = true;
@@ -4121,42 +4189,55 @@ function gptStoryRetryRecordLabel_(r) {
       // ★ V10(2026-05-12): 응답 검증 강화 — 정확히 "MyStory Saved"일 때만 성공 처리
       if (text === "Unauthorized") { hideLoading(); if (submitBtn) { submitBtn.disabled = false; submitBtn.style.opacity = '1'; } alert("⚠️ 다른 기기에서 로그인해서 세션이 만료됐음! 다시 로그인하셈 👽"); logout(); return; }
       if (text !== "MyStory Saved") {
+        let failure = null; try { failure = JSON.parse(text); } catch(e) {}
+        // ★ V41(2026-10-29): 이미 저장된 글(첫 제출 응답이 끊긴 뒤 고쳐서 재제출)은 실패가 아니라 완료로 처리 — Step 4에 갇히던 문제(10/29 재현)
+        if (failure && failure.errorReason === 'story_save_conflict') {
+          alert('이 글은 처음 제출한 내용으로 이미 저장돼 있음 ✅\n지금 고친 답·성찰은 저장되지 않았음. My Page에서 저장된 내용을 확인해보셈.');
+          finishMyStorySave(false);
+          return;
+        }
         hideLoading();
         if (submitBtn) { submitBtn.disabled = false; submitBtn.style.opacity = '1'; }
         console.error('Unexpected server response:', text);
-        let saveMessage='저장을 확인하지 못했음. 작성 내용은 그대로 보존됨.';
-          try{const failure=JSON.parse(text);if(typeof failure.message==='string')saveMessage=failure.message;}catch(e){}
-          alert(saveMessage);
+        alert(failure && typeof failure.message === 'string' ? failure.message : '저장을 확인하지 못했음. 작성 내용은 그대로 보존됨.');
         return;
       }
+      finishMyStorySave(true);
+    })
+    .catch(async e => {
+      console.error('Story submit error:', e);
+      // ★ V41: 통신이 끊겨도 서버엔 저장됐을 수 있음 → 먼저 서버에 물어보고, 저장돼 있으면 완료 처리
+      if (await isSavedOnServer()) { alert('통신이 끊겼지만 글은 서버에 저장돼 있음 ✅ 다음 단계로 넘어감.'); finishMyStorySave(false); return; }
+      hideLoading(); if (submitBtn) { submitBtn.disabled = false; submitBtn.style.opacity = '1'; } alert('통신 오류가 발생했어요 😵 작성 내용은 그대로 남아있으니 다시 시도해주세요!');
+    });
+
+    // ★ V41: 이 글(saveId)이 서버 MyStory에 있는지 확인 — My Page 새로고침과 같은 요청
+    async function isSavedOnServer() {
+      const saveId = gptStoryUi.final && gptStoryUi.final.saveId; if (!saveId) return false;
+      try {
+        const r = await fetch(SHEET_URL, { method: 'POST', body: JSON.stringify({ type: "refresh_my_data", studentId: currentStudentId, token: currentToken }) });
+        const d = await r.json();
+        return !!(d && Array.isArray(d.myStories) && d.myStories.some(s => s.storyV39 && s.storyV39.saveId === saveId));
+      } catch(e) { return false; }
+    }
+    // ★ V41: 저장 완료 뒤 처리를 한 곳으로. savedNow=false면 서버에 이미 저장돼 있던 글 — 화면 기록은 서버에서 다시 받아 맞춤.
+    function finishMyStorySave(savedNow) {
       hideLoading();
       // ★ V14(2026-08-10): 제출 성공 → 낭독 녹음 단계(Step 5)로
       resetMsSubmitButton(); // GPT MS-005: 다음 글도 제출 가능하게 복구
       window._msrPending = { lesson: payload.lesson, title: payload.title, finalStory: payload.finalStory };
-      myStories.push({ date: new Date().toISOString(), lesson: payload.lesson, grammar: payload.grammar, words: payload.reqWords, title: payload.title, draft: payload.draft, hint: payload.hint, revision: payload.revision, feedback: payload.feedback, finalStory: payload.finalStory, tip: payload.tip, oops: payload.oops, reflection: payload.reflection, corrections: payload.corrections, storyV39: {contract:"mystory-v39",saveId:gptStoryUi.final.saveId,state:gptStoryUi.final.state,exercises:gptStoryUi.final.state.exercises}, hasAudio: false });
+      if (savedNow) myStories.push({ date: new Date().toISOString(), lesson: payload.lesson, grammar: payload.grammar, words: payload.reqWords, title: payload.title, draft: payload.draft, hint: payload.hint, revision: payload.revision, feedback: payload.feedback, finalStory: payload.finalStory, tip: payload.tip, oops: payload.oops, reflection: payload.reflection, corrections: payload.corrections, storyV39: {contract:"mystory-v39",saveId:gptStoryUi.final.saveId,state:gptStoryUi.final.state,exercises:gptStoryUi.final.state.exercises}, hasAudio: false });
       // ★ sessionStorage 동기화 (새로고침 착시 방지)
       const savedLogin = sessionStorage.getItem('even_login');
       if (savedLogin) { const loginData = JSON.parse(savedLogin); loginData.myStories = myStories; sessionStorage.setItem('even_login', JSON.stringify(loginData)); }
       updateDashboard(); 
 
-      const inputs = ['ms-lesson','ms-word-req1','ms-word-req2','ms-word-req3','ms-word-opt1','ms-word-opt2','ms-title','ms-draft','ms-revision','ms-error-1','ms-corrected-1','ms-reason-1','ms-error-2','ms-corrected-2','ms-reason-2','ms-error-3','ms-corrected-3','ms-reason-3','ms-reflection'];
-      inputs.forEach(id => document.getElementById(id).value = "");
-      document.getElementById('ms-grammar').value = '';
-      document.getElementById('ms-grammar-display').textContent = '먼저 Lesson을 선택하세요';
-      ['ms-display-draft','ms-zeeto-hint','ms-display-revision','ms-zeeto-feedback','ms-zeeto-final','ms-zeeto-tip','ms-oops-point','ms-oops-point-copy'].forEach(id => document.getElementById(id).innerHTML = "");
-      delete document.getElementById('ms-zeeto-final').dataset.rawFinal;
-      delete document.getElementById('ms-oops-point').dataset.original;
-      ['ms-feedback-1','ms-feedback-2','ms-feedback-3'].forEach(id => document.getElementById(id).style.display = 'none');
-      
-      document.querySelectorAll('.story-step').forEach(step => step.classList.remove('active'));
-      document.getElementById('story-step-1').classList.add('active'); changeTab('mypage-screen');
-      resetMsRetryState(); // ★ V9: 새 My Story 시작 시 재시도 카운트 초기화
-      clearMyStoryDraft(); // ★ V10(2026-05-12): 임시저장 삭제 (제출 완료했으니)
+      if (!savedNow) refreshMyDataFromServer(); // ★ V41: 서버에 저장된 내용(첫 제출의 답·성찰)으로 My Page를 맞춤
+      resetMyStoryForm_(); changeTab('mypage-screen'); // ★ V41: 입력·AI 결과 비우기, Step 1로, 임시저장 삭제
       // ★ V14: 낭독 녹음 모달 — 2학기(L5+)만. 1학기 과를 늦게 제출하는 경우엔 현행 유지
       if (parseInt(payload.lesson, 10) >= AUDIO_FROM_LESSON) { openMsRecordModal(); }
       else { window._msrPending = null; alert("🎉 My Story가 저장되었습니다!"); }
-    })
-    .catch(e => { console.error('Story submit error:', e); hideLoading(); if (submitBtn) { submitBtn.disabled = false; submitBtn.style.opacity = '1'; } alert('통신 오류가 발생했어요 😵 작성 내용은 그대로 남아있으니 다시 시도해주세요!'); });
+    }
   }
 
   function changeMonth(step) { currentDate.setDate(1); currentDate.setMonth(currentDate.getMonth() + step); renderCalendar(); }
@@ -4436,7 +4517,7 @@ function gptStoryRetryRecordLabel_(r) {
     allInstaPostsFiltered = [];
     document.getElementById('insta-back-btn').style.display = 'none';
     // ★ V12(2026-06-09): 전체 피드를 서버에서 새로 가져옴 — 필터 보는 동안 올라온 새 글까지 반영 (옛 캐시만 보이던 문제)
-    loadInstaPosts(true);
+    return loadInstaPosts(true); // ★ V41: uploadPost가 기다릴 수 있게 Promise 반환
   }
 
   // ★ V10 패치(2026-05-13): ENGsta 서버 페이지네이션 — 처음 10개만 가져오고 "더 보기" 시 추가 fetch
@@ -4570,9 +4651,9 @@ function gptStoryRetryRecordLabel_(r) {
 
   async function uploadPost() {
     if(isLoading) return;
-    if (isUndercover) { alert('👩‍🏫 잠입 모드에선 학생 명의로 글을 쓸 수 없음! (본인 계정으로 돌아가면 가능)'); return; } // ★V23: 학생ID+교사토큰 조합이 Unauthorized→강제 로그아웃되는 사고 방지
+    if (isUndercover && !isTeacherSelf) { alert('👩‍🏫 잠입 모드에선 학생 명의로 글을 쓸 수 없음! (본인 계정으로 돌아가면 가능)'); return; } // ★V23: 학생ID+교사토큰 조합이 Unauthorized→강제 로그아웃되는 사고 방지 / ★V41: "내 계정 유지"는 허용(V34부터 같이 막혀 있었음)
     const content = document.getElementById('insta-content').value.trim(); if(!content) return alert("글을 적어주세요!");
-    if (currentFilterUser) clearFilter(); // ★ V12(2026-06-09): 필터 보는 중 글쓰면 전체 피드로 복귀 (낙관적 삽입이 화면에 반영되도록)
+    if (currentFilterUser) await clearFilter(); // ★ V12(2026-06-09): 필터 보는 중 글쓰면 전체 피드로 복귀 / ★ V41: 피드 재조회가 끝난 뒤에 글을 넣음 — 재조회가 방금 글을 덮어 사라져 보이던 문제
     let image = document.getElementById('insta-preview').style.display === 'block' ? document.getElementById('insta-preview').src : "";
     const tempId = "P" + new Date().getTime();
     allInstaPosts.unshift({ id: tempId, date: new Date().toISOString(), name: currentUserProfile, content: content, image: image, comments: [] });
@@ -4592,7 +4673,22 @@ function gptStoryRetryRecordLabel_(r) {
       const savedLogin2 = sessionStorage.getItem('even_login');
       if (savedLogin2) { try { const ld = JSON.parse(savedLogin2); ld.myPostCount = myPostCount; sessionStorage.setItem('even_login', JSON.stringify(ld)); } catch(e) {} }
       renderInstaPosts();
-      alert('⚠️ 글이 안 올라갔음 (' + reason + ') 🛸\n네트워크 확인하고 다시 시도해보셈!');
+      // ★ V41(2026-10-29): 쓴 글·사진을 입력칸에 되살림 — 붙여넣기가 막혀 있어 처음부터 다시 타이핑해야 했음
+      try {
+        openWriteModal();
+        document.getElementById('insta-content').value = content;
+        if (image) { const pv = document.getElementById('insta-preview'); pv.src = image; pv.style.display = 'block'; }
+      } catch(e) {}
+      alert('⚠️ 글이 안 올라갔음 (' + reason + ') 🛸\n네트워크 확인하고 다시 시도해보셈! (쓴 글은 그대로 남겨 뒀음)');
+    };
+    // ★ V41(2026-10-29): 서버는 글을 저장한 뒤 같은 요청 안에서 Zeeto 댓글을 만드느라 오래 걸림. 그 사이 통신이 끊기면
+    //   글은 저장됐는데 화면이 "실패"로 되돌리고 글을 지웠음 → 다시 올리면 같은 글 2개. 실패로 보이면 먼저 서버에서 방금 글(같은 tempId)을 찾아봄.
+    const confirmSavedOnServer = async () => {
+      try {
+        const url = SHEET_URL + (SHEET_URL.indexOf('?') === -1 ? '?' : '&') + 'action=get_insta_feed&offset=0&limit=10&filterUser=' + encodeURIComponent(currentUserProfile);
+        const r = await fetch(url); const d = await r.json();
+        return !!(d && Array.isArray(d.posts) && d.posts.some(p => String(p.id) === tempId));
+      } catch(e) { return false; }
     };
     try {
       // ★ V10 패치(2026-05-13): tempId를 서버로 보내서 서버 시트에도 같은 ID 저장 → 댓글이 새 글에 정확히 매칭됨
@@ -4607,11 +4703,13 @@ function gptStoryRetryRecordLabel_(r) {
       }
       if (text !== "Post Saved" && text.indexOf('Post Saved') === -1) {
         console.error('Unexpected uploadPost response:', text);
+        if (await confirmSavedOnServer()) { loadInstaPosts(true); return; } // ★ V41: 실제론 저장됨 → 피드만 새로 받음
         rollback('서버 오류');
         return;
       }
     } catch(e) {
       console.error('uploadPost error:', e);
+      if (await confirmSavedOnServer()) { loadInstaPosts(true); return; } // ★ V41: 통신은 끊겼지만 저장됨
       rollback('통신 오류');
     }
   }
@@ -4653,7 +4751,7 @@ function gptStoryRetryRecordLabel_(r) {
   // ★ 기존 댓글 함수 업그레이드
   async function addComment(postId) {
     if(isLoading) return;
-    if (isUndercover) { alert('👩‍🏫 잠입 모드에선 학생 명의로 댓글을 쓸 수 없음! (본인 계정으로 돌아가면 가능)'); return; } // ★V23: 강제 로그아웃 사고 방지
+    if (isUndercover && !isTeacherSelf) { alert('👩‍🏫 잠입 모드에선 학생 명의로 댓글을 쓸 수 없음! (본인 계정으로 돌아가면 가능)'); return; } // ★V23: 강제 로그아웃 사고 방지 / ★V41: "내 계정 유지"는 허용
     const input = document.getElementById(`input-${postId}`);
     const comment = input.value.trim();
     if(!comment) return;
@@ -6481,7 +6579,7 @@ async function loadPendingUsers() {
       html += `<div style="background:white;border-radius:12px;padding:12px;margin-bottom:8px;border:1px solid #eee;">
         <div style="display:flex;justify-content:space-between;align-items:center;">
           <div>
-            <div style="font-weight:bold;color:#333;">${u.emoji} ${escapeHtml(u.lastName)}${escapeHtml(u.firstName)}</div>
+            <div style="font-weight:bold;color:#333;">${escapeHtml(u.emoji)} ${escapeHtml(u.lastName)}${escapeHtml(u.firstName)}</div>
             <div style="font-size:0.75rem;color:#999;">${escapeHtml(u.school)} | 학번: ${escapeHtml(u.studentId)} | ${d.getFullYear()}.${d.getMonth()+1}.${d.getDate()}</div>
           </div>
           <div style="display:flex;gap:6px;">
@@ -6604,7 +6702,7 @@ function renderLogStatus() {
   if (submitted.length > 0) {
     html += `<div style="font-size:0.8rem; font-weight:bold; color:#4a5d4e; margin-bottom:6px;">✅ 제출 완료 (${submitted.length}명)</div>
     <div style="display:flex; flex-wrap:wrap; gap:6px;">`;
-    submitted.forEach(u => { html += `<span style="background:#e8f0eb; color:#4a5d4e; padding:5px 8px; border-radius:8px; font-size:0.8rem;">${u.emoji} ${u.firstName}</span>`; });
+    submitted.forEach(u => { html += `<span style="background:#e8f0eb; color:#4a5d4e; padding:5px 8px; border-radius:8px; font-size:0.8rem;">${escapeHtml(u.emoji)} ${escapeHtml(u.firstName)}</span>`; }); // ★ V41: 가입 값은 글자로만
     html += `</div>`;
   }
   document.getElementById('dash-log-content').innerHTML = html;
@@ -6732,7 +6830,7 @@ function renderStats() {
   if (inactive.length > 0) {
     inactiveBox.style.display = 'block';
     document.getElementById('t-stats-inactive-list').innerHTML = inactive.map(u =>
-      `<span style="background:#ffcccc; color:#c62828; padding:4px 8px; border-radius:8px; font-size:0.8rem;">${u.emoji} ${u.firstName}</span>`
+      `<span style="background:#ffcccc; color:#c62828; padding:4px 8px; border-radius:8px; font-size:0.8rem;">${escapeHtml(u.emoji)} ${escapeHtml(u.firstName)}</span>`
     ).join('');
   } else {
     inactiveBox.style.display = 'none';
@@ -6756,9 +6854,9 @@ function renderRanking() {
     const isTop = idx < 3;
     html += `<div style="display:flex; align-items:center; padding:10px; border-radius:10px; margin-bottom:6px; background:${isTop ? '#fffde7' : 'white'}; border:1px solid ${isTop ? '#ffe082' : '#eee'};">
       <div style="font-size:1.2rem; width:30px;">${medal}</div>
-      <div style="font-size:1.4rem; margin-right:8px;">${u.emoji}</div>
+      <div style="font-size:1.4rem; margin-right:8px;">${escapeHtml(u.emoji)}</div>
       <div style="flex:1;">
-        <div style="font-weight:bold; font-size:0.9rem; color:#333;">${u.firstName}</div>
+        <div style="font-weight:bold; font-size:0.9rem; color:#333;">${escapeHtml(u.firstName)}</div>
         <div style="font-size:0.75rem; color:#999;">Log: ${u.logScore||0} + Story: ${u.storyScore||0} + Post: ${u.postScore||0} + 댓글: ${u.commentScore||0} + Weeto: ${u.teachScore||0}${(u.penaltyScore||0) < 0 ? ` <span style="color:#c62828;">패널티: ${u.penaltyScore}</span>` : ''}</div>
       </div>
       <div style="text-align:right;">
@@ -7404,6 +7502,7 @@ function tryRestoreWeetoSession() {
     return;
   }
   // 세션 복원
+  weetoSessionSeq++; // ★ V41
   currentWeeetoGrammar = session.grammar;
   weetoChatHistory = session.chatHistory;
   currentWeetoAttempt = session.attempt || 1;
@@ -7500,6 +7599,7 @@ function backToGrammarSelect() {
     } catch(e) { console.warn('Weeto session save failed:', e); }
   }
   // 대화 중 나가면 초기화
+  weetoSessionSeq++; // ★ V41: 나간 뒤 도착하는 응답은 버림
   weetoChatHistory = [];
   currentWeeetoGrammar = null;
   document.getElementById('weeto-grammar-select').style.display = 'flex';
@@ -7529,7 +7629,9 @@ function renderGrammarList() {
   const listEl = document.getElementById('grammar-list');
   let html = '<h3>어떤 문법을 가르칠까요?</h3>';
   const lessons = {};
-  weetoGrammarList.forEach(g => {
+  // ★ V41(2026-10-29): 판정 기준(Grammar 시트 D열)이 빈 문법은 목록에서 숨김 — 기준 없이 통과를 주던 문제. 선생님이 채우면 자동으로 열림(사용자 결정 10/29)
+  const visibleGrammar = weetoGrammarList.filter(g => String(g.grammarDesc || '').trim());
+  visibleGrammar.forEach(g => {
     if (!lessons[g.lesson]) lessons[g.lesson] = [];
     lessons[g.lesson].push(g);
   });
@@ -7561,7 +7663,7 @@ function renderGrammarList() {
     });
     html += '</div>';
   });
-  if (weetoGrammarList.length === 0) {
+  if (visibleGrammar.length === 0) {
     html += '<p style="text-align:center;color:#999;margin-top:30px;">아직 등록된 문법이 없어요.</p>';
   }
   listEl.innerHTML = html;
@@ -7571,6 +7673,7 @@ function startTeaching(grammarName, lesson) {
   const grammar = weetoGrammarList.find(g => g.grammarName === grammarName && String(g.lesson) === String(lesson));
   if (!grammar) return;
   currentWeeetoGrammar = grammar;
+  weetoSessionSeq++; // ★ V41
   weetoChatHistory = [];
   // 시도 횟수 계산: 기존 기록 수 + 1 (이번 시도)
   const key = lesson + "||" + grammarName;
@@ -7588,6 +7691,9 @@ function startTeaching(grammarName, lesson) {
 }
 
 // ★ V10 복구(2026-05-12): V9부터 잘려있던 Weeto 함수들 — teach_chat/teach_complete 백엔드 API 시그니처 기준으로 재작성
+// ★ V41(2026-10-29): 대화 세션 번호 — 문법을 고르거나 나갈 때마다 올림. 보낸 뒤 세션이 바뀌었으면 그 응답은 버림.
+//   [왜] 마지막 답을 보내고 기다리다 뒤로 가서 다른 문법 B를 고르면, A의 CLEAR 응답이 B의 완료(+3점)로 기록됐음(10/29 재현). 사용자 결정: 인정하지 않고 처음부터.
+let weetoSessionSeq = 0;
 async function sendWeetoAuto(systemMsg) {
   const chatBox = document.getElementById('weeto-chat-box');
   // 타이핑 인디케이터 표시
@@ -7595,6 +7701,7 @@ async function sendWeetoAuto(systemMsg) {
   chatBox.scrollTop = chatBox.scrollHeight;
 
   if (!currentWeeetoGrammar) return;
+  const grammarAtSend = currentWeeetoGrammar, seqAtSend = weetoSessionSeq; // ★ V41
   // 백엔드는 history 문자열 + 마지막 message를 받음. weetoChatHistory에는 학생 발언이 이미 push되어 있어야 함.
   const historyStr = weetoChatHistory.map(h => h.role + ": " + h.text).join("\n");
 
@@ -7615,6 +7722,8 @@ async function sendWeetoAuto(systemMsg) {
       })
     });
     const data = await res.json();
+    // ★ V41: 기다리는 동안 나갔거나 다른 문법을 골랐으면 이 응답은 버림(늦은 CLEAR가 다른 문법에 찍히던 문제)
+    if (seqAtSend !== weetoSessionSeq || currentWeeetoGrammar !== grammarAtSend) { console.warn('Weeto: 세션이 바뀌어 늦은 응답을 버림'); return; }
 
     // 타이핑 인디케이터 제거
     const typing = document.getElementById('weeto-typing');
@@ -7653,6 +7762,7 @@ async function sendWeetoAuto(systemMsg) {
     if (input) { input.disabled = false; input.placeholder = 'Weeto에게 답해주세요...'; input.focus(); }
   } catch(e) {
     console.error('sendWeetoAuto error:', e);
+    if (seqAtSend !== weetoSessionSeq || currentWeeetoGrammar !== grammarAtSend) return; // ★ V41: 나간 대화의 오류는 새 대화창에 띄우지 않음
     const typing = document.getElementById('weeto-typing');
     if (typing) typing.remove();
     if (systemMsg && systemMsg.indexOf('(첫 만남') === 0) {
