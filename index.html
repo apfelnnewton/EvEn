@@ -1,3 +1,4 @@
+<!-- EvEn V45 (2026-11-13, Claude): Aliens 카드 이름(Zeeto's class)이 폰 너비에서 칸보다 넓어 오른쪽으로 치우치던 것을 가운데 정렬로 고침(CSS 1줄). 카드 설명 문구 "수업 전에 미리 봄"→"오늘 수업 스포", "영어 가르쳐 주삼!"→"가르쳐주삼!"(폰에서 한 줄에 들어가게, 사용자 선택). 그 밖은 V44 그대로. 프론트 단독 배포(서버 AS V43 그대로). -->
 <!-- EvEn V44 (2026-11-12, Claude): Planet Builders 학년 카드 왼쪽 색 줄(border-left) 제거 — 사용자 요청. 그 밖은 V43 그대로. 프론트 단독 배포(서버 AS V43 그대로). -->
 <!-- EvEn V43 (2026-11-09, Claude): Daily Log Practice 채점 보강 — 교정문에 오류가 남지 않게 지시문 수정(오류/취향 구분, 교정문은 오류 0), 교정문 재확인 1회, 2차에서 전혀 다른 문장 쓰기 막음, 쉼표 뒤 띄어쓰기 사전 확인, 권유 말투. 프론트 단독 배포(서버 AS V43 그대로). -->
 <!-- EvEn V42 (2026-10-29, Claude): AS V43 짝 — My Story 최종본이 'story_review_inconclusive'(검토 합의 실패, 재확인 요청)로 돌아오면 서버 안내문을 그대로 보여주고 시도 횟수에서 뺌(사용자 결정 ③). 그 밖은 V41 그대로. AS V42 서버와도 그대로 동작. -->
@@ -757,7 +758,8 @@
   .alien-cards { gap: 10px; }
   .alien-card { padding: 20px 6px; min-width: 0; flex: 1 1 0; }
   .alien-card .alien-emoji { font-size: 2.3rem; margin-bottom: 8px; }
-  .alien-card .alien-name { font-size: 0.85rem; white-space: nowrap; }
+  /* ★ V45(2026-11-13): 이름이 칸 안쪽 폭보다 넓으면(폰 375px에서 Zeeto's class 85px > 78px) nowrap 글자가 왼쪽에 붙어 오른쪽으로 넘쳤음(3.8px 치우침). flex 가운데 정렬은 넘쳐도 양쪽으로 똑같이 넘치고, 음수 여백으로 카드 안쪽 여백까지 씀 → 정중앙. */
+  .alien-card .alien-name { font-size: 0.85rem; white-space: nowrap; display: flex; justify-content: center; margin: 0 -6px; }
   .alien-card .alien-desc { font-size: 0.68rem; margin-top: 4px; word-break: keep-all; }
 
   .grammar-select { padding: 15px; flex: 1; overflow-y: auto; }
@@ -999,12 +1001,12 @@
             <div class="alien-card" onclick="showFlipped()">
               <div class="alien-emoji">📡</div>
               <div class="alien-name">Zeeto's class</div>
-              <div class="alien-desc">수업 전에 미리 봄</div>
+              <div class="alien-desc">오늘 수업 스포</div>
             </div>
             <div class="alien-card" onclick="showWeeto()">
               <div class="alien-emoji">👾</div>
               <div class="alien-name">Weeto</div>
-              <div class="alien-desc">영어 가르쳐 주삼!</div>
+              <div class="alien-desc">가르쳐주삼!</div>
             </div>
           </div>
         </div>
